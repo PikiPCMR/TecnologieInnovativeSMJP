@@ -10,7 +10,7 @@ app.use(express.json()); // Body parser per JSON
 app.use(express.urlencoded({ extended: true })); // Body parser per form data
 
 // Servire file statici
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '..', 'Frontend', 'public')));
 
 // Routes principali
 app.use('/', homeRoutes);
