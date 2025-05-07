@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Pulsanti Orizzontali</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+    }
+
+    .button-container {
+      display: flex;
+      width: 100%;
+      margin: 40px 0;
+    }
+
+    .button-container button {
+      flex: 1;
+      font-size: 1.5em;
+      padding: 20px;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .button-container button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .button-container button:nth-child(1) {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    .button-container button:nth-child(2) {
+      background-color: #FFC107;
+      color: black;
+    }
+
+    .button-container button:nth-child(3) {
+      background-color: #F44336;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="prodotti">
+    <!-- Inserisci qui i prodotti -->
+  </div>
+
+  <div class="button-container">
+    <button onclick="aggiungi()">Aggiungi</button>
+    <button onclick="modifica()">Modifica</button>
+    <button onclick="rimuovi()">Rimuovi</button>
+  </div>
+
+  <div id="altro-contenuto">
+    <!-- Altri contenuti -->
+  </div>
+
+  <script>
+    function aggiungi() {
+      alert("Hai cliccato su Aggiungi");
+    }
+
+    function modifica() {
+      alert("Hai cliccato su Modifica");
+    }
+
+    function rimuovi() {
+      alert("Hai cliccato su Rimuovi");
+    }
+  </script>
+
+</body>
+</html>
