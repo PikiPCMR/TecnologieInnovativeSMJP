@@ -22,13 +22,13 @@ async function connectToDatabase() {
 }
 
 // Funzione per inserire una registrazione
-async function inserisciRegistrazione(nome, cognome, email) {
+async function inserisciRegistrazione(nome, cognome, email, password, tipo_utente) {
   try {
     const insertQuery = `
-      INSERT INTO registrazione (nome, cognome, email)
-      VALUES ($1, $2, $3)
+      INSERT INTO registrazione (nome, cognome, email, password, tipo_utente)
+      VALUES ($1, $2, $3, $4, $5)
     `;
-    await client.query(insertQuery, [nome, cognome, email]);
+    await client.query(insertQuery, [nome, cognome, email, password, tipo_utente]);
     console.log('Registrazione inserita con successo!');
   } catch (err) {
     console.error('Errore nell\'inserimento dei dati:', err);
@@ -59,12 +59,17 @@ function chiediDatiUtente() {
 
   rl.question('Nome: ', (nome) => {
     rl.question('Cognome: ', (cognome) => {
-      rl.question('Email: ', async (email) => {
-        rl.close();
-        await connectToDatabase();
-        await inserisciRegistrazione(nome, cognome, email);
-        await leggiRegistrazioni();
-      });
+      rl.question('Email: ', (email) => {
+        rl.question('Password: ', (password) => {
+          rl.question('Tipo utente: ', async (tipo_utente) => {
+            // Chiudi l'interfaccia di lettura
+            rl.close();
+            await connectToDatabase();
+            await inserisciRegistrazione(nome, cognome, email, password, tipo_utente);
+            await leggiRegistrazioni();
+          });
+        });
+       });
     });
   });
 }
