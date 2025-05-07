@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <title>Pulsanti Orizzontali</title>
+  <title>Pulsanti Orizzontali + Profilo</title>
   <style>
     body {
       margin: 0;
@@ -10,6 +10,29 @@
       font-family: sans-serif;
     }
 
+    /* Barra in alto */
+    .top-bar {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      padding: 10px 20px;
+      background-color: #f0f0f0;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .top-bar a img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .top-bar a img:hover {
+      transform: scale(1.1);
+    }
+
+    /* Pulsanti orizzontali */
     .button-container {
       display: flex;
       width: 100%;
@@ -48,16 +71,26 @@
 </head>
 <body>
 
+  <!-- Barra superiore con profilo -->
+  <div class="top-bar">
+    <a href="profilo.html">
+      <img src="/mnt/data/artigiano-icon.webp" alt="Profilo Artigiano">
+    </a>
+  </div>
+
+  <!-- Sezione per prodotti -->
   <div id="prodotti">
     <!-- Inserisci qui i prodotti -->
   </div>
 
+  <!-- Pulsanti -->
   <div class="button-container">
     <button onclick="aggiungi()">Aggiungi</button>
     <button onclick="modifica()">Modifica</button>
     <button onclick="rimuovi()">Rimuovi</button>
   </div>
 
+  <!-- Altro contenuto -->
   <div id="altro-contenuto">
     <!-- Altri contenuti -->
   </div>
@@ -78,3 +111,4 @@
 
 </body>
 </html>
+
