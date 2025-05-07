@@ -1,0 +1,24 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: rgb(255, 255, 255); /* Colore di sfondo opzionale */
+}
+
+.login-container {
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    transition: 0.3s;
+    width: 300px;
+    padding: 20px;
+    background-color: #f1f1f1; /* Colore di sfondo del contenitore */
+}
+
+.login-container > * {
+    margin-bottom: 15px; /* Spazio tra gli elementi */
+}
+
+.login-container > *:last-child {
+    margin-bottom: 0; /* Rimuove il margine dall'ultimo elemento */
+}
