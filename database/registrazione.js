@@ -1,27 +1,6 @@
-const readline = require('readline');
-const { Client } = require('pg');
+const client = require('./config');
 
-// Configurazione della connessione
-const client = new Client({
-  user: 'postgres.sbxrdptjegjxqaklfpxq',
-  host: 'aws-0-eu-west-3.pooler.supabase.com',
-  database: 'postgres',
-  password: 'ZTWeq036f7SD',
-  port: 6543,
-});
-
-// Funzione per connettersi al database
-async function connectToDatabase() {
-  try {
-    await client.connect();
-    console.log('Connesso al database!');
-  } catch (err) {
-    console.error('Errore di connessione al DB:', err);
-    process.exit(1);
-  }
-}
-
-/*Funzione per inserire una registrazione
+//Funzione per inserire una registrazione
 async function inserisciRegistrazione(nome, cognome, email, password, tipo_utente) {
   try {
     const insertQuery = `
@@ -75,9 +54,4 @@ function chiediDatiUtente() {
 }
 
 // Avvia la procedura
-chiediDatiUtente();*/
-// Connetti al database all'avvio del file
-connectToDatabase();
-
-// Esporta il client per l'uso in altri file
-module.exports = client;
+chiediDatiUtente();
