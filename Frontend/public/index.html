@@ -1,34 +1,156 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Artigianato Online</title>
-    <link rel="stylesheet" href="styles/style.css">
+    <link rel="stylesheet" href="styles.css">
+    <title>WorkSpace Pro - Prenota il tuo spazio</title>
 </head>
-<body>
 
-    <div class="top-bar">
-        <div class="logo">
-            <img src="logo.png" alt="Logo" style="width: 100px; height: auto;">
+<body>
+    <!-- Menu Button -->
+    <button class="menu-btn" onclick="toggleSidebar()">
+        <div class="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
         </div>
-        <div class="search-bar">
-            <input type="text" placeholder="Cerca...">
+    </button>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">WorkSpace Pro</div>
+        <div class="profile-section">
+            <div class="profile-btn" onclick="toggleProfileMenu()">
+                <svg class="profile-icon" viewBox="0 0 24 24">
+                    <path
+                        d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 7V9C15 11.8 12.8 14 10 14S5 11.8 5 9V7L3 7V9C3 12.9 6.1 16 10 16S17 12.9 17 9Z" />
+                </svg>
+            </div>
+            <div class="profile-dropdown" id="profileDropdown">
+                <div class="dropdown-item" onclick="accedi()">
+                    <svg width="16" height="16" viewBox="0 0 24 24">
+                        <path
+                            d="M10,17V14H3V10H10V7L15,12L10,17M10,2H19A2,2 0 0,1 21,4V20A2,2 0 0,1 19,22H10A2,2 0 0,1 8,20V18H10V20H19V4H10V6H8V4A2,2 0 0,1 10,2Z" />
+                    </svg>
+                    <span>Accedi</span>
+                </div>
+                <div class="dropdown-item" onclick="registrati()">
+                    <svg width="16" height="16" viewBox="0 0 24 24">
+                        <path
+                            d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM13 17H11V15H13V17ZM13 13H11V7H13V13Z" />
+                    </svg>
+                    <span>Registrati</span>
+                </div>
+                <div class="dropdown-item" id="profileItem" style="display: none;" onclick="handleProfile()">
+                    <svg width="16" height="16" viewBox="0 0 24 24">
+                        <path
+                            d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" />
+                    </svg>
+                    Il mio profilo
+                </div>
+                <div class="dropdown-item" id="logoutItem" style="display: none;" onclick="handleLogout()">
+                    <svg width="16" height="16" viewBox="0 0 24 24">
+                        <path
+                            d="M16,17V14H9V10H16V7L21,12L16,17M14,2A2,2 0 0,1 16,4V6H14V4H5V20H14V18H16V20A2,2 0 0,1 14,22H5A2,2 0 0,1 3,20V4A2,2 0 0,1 5,2H14Z" />
+                    </svg>
+                    Esci
+                </div>
+            </div>
         </div>
-        <div class="user-info">
-            <input type="button" class="loginButton" onclick="window.location.href='login.html'" value="Login" class="login-button">
-            <!--<img src="user-icon.png" alt="User Icon" style="width: 40px; height: auto;">
-            <span>Nome Utente</span> -->
+    </header>
+
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-item" onclick="navigateTo('home')">
+            <svg viewBox="0 0 24 24">
+                <path d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z" />
+            </svg>
+            <span>Home</span>
         </div>
-    </div>
-    <div class="card">
-        <div class="card-header">
-            <h2>Vaso</h2>
+        <div class="sidebar-item" onclick="navigateTo('explore')">
+            <svg viewBox="0 0 24 24">
+                <path
+                    d="M12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5M12,2A7,7 0 0,1 19,9C19,14.25 12,22 12,22C12,22 5,14.25 5,9A7,7 0 0,1 12,2Z" />
+            </svg>
+            <span>Esplora Sedi</span>
         </div>
-        <div class="card-body">
-            <img src="immagine_di_prova.jpg" alt="Descrizione immagine" style="width: 100%; height: auto;">
-            <p>Descrizione Vaso</p>
+        <div class="sidebar-item" onclick="navigateTo('bookings')">
+            <svg viewBox="0 0 24 24">
+                <path
+                    d="M19,3H18V1H16V3H8V1H6V3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M19,19H5V8H19V19Z" />
+            </svg>
+            <span>Le mie Prenotazioni</span>
         </div>
-    </div>
+        <div class="sidebar-item" onclick="navigateTo('services')">
+            <svg viewBox="0 0 24 24">
+                <path
+                    d="M12,2A3,3 0 0,1 15,5V11A3,3 0 0,1 12,14A3,3 0 0,1 9,11V5A3,3 0 0,1 12,2M19,11C19,14.53 16.39,17.44 13,17.93V21H11V17.93C7.61,17.44 5,14.53 5,11H7A5,5 0 0,0 12,16A5,5 0 0,0 17,11H19Z" />
+            </svg>
+            <span>Servizi</span>
+        </div>
+        <div class="sidebar-item" onclick="navigateTo('support')">
+            <svg viewBox="0 0 24 24">
+                <path
+                    d="M11,18H13V16H11V18M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,6A4,4 0 0,0 8,10H10A2,2 0 0,1 12,8A2,2 0 0,1 14,10C14,12 11,11.75 11,15H13C13,12.75 16,12.5 16,10A4,4 0 0,0 12,6Z" />
+            </svg>
+            <span>Supporto</span>
+        </div>
+    </nav>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <section class="welcome-section">
+            <h1 class="welcome-title">Il tuo spazio di lavoro perfetto</h1>
+            <p class="welcome-subtitle">Trova e prenota spazi di coworking in tutta Italia. Sale riunioni, postazioni
+                flessibili e servizi professionali a portata di click.</p>
+        </section>
+
+        <div class="action-cards">
+            <!-- Cerca Spazi -->
+            <div class="action-card" onclick="searchSpaces()">
+                <div class="card-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path
+                            d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z" />
+                    </svg>
+                </div>
+                <h3 class="card-title">Cerca Spazi</h3>
+                <p class="card-description">Esplora centinaia di spazi di coworking nelle principali città italiane.
+                    Filtra per tipo, servizi e disponibilità.</p>
+            </div>
+
+            <!-- Prenota Ora -->
+            <div class="action-card" onclick="quickBooking()">
+                <div class="card-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path
+                            d="M17,12C17,17.55 12.16,22 5.69,22C6.03,22 6.4,22 6.78,21.96C9.59,21.72 12.1,20.46 14.07,18.5C15.89,16.64 17,14.19 17,11.5C17,7.91 14.69,4.87 11.5,3.17C16.73,4.83 20.5,9.23 20.5,14.5C20.5,16.9 19.96,19.16 19.05,21.16C19.27,21.26 19.53,21.34 19.78,21.4C20.85,21.65 21.47,21.7 21.5,21.7C21.5,21.7 21.5,21.67 21.47,21.61C21.42,21.5 21.28,21.26 21.1,20.93C20.73,20.27 20.21,19.26 19.72,18.04C19.22,16.81 18.78,15.39 18.5,13.91C17.84,13.36 17,12.74 17,12Z" />
+                    </svg>
+                </div>
+                <h3 class="card-title">Prenota Ora</h3>
+                <p class="card-description">Prenotazione rapida per oggi o domani. Trova subito uno spazio libero vicino
+                    a te per le tue esigenze immediate.</p>
+            </div>
+
+            <!-- Le Mie Prenotazioni -->
+            <div class="action-card" onclick="viewBookings()">
+                <div class="card-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path
+                            d="M19,3H18V1H16V3H8V1H6V3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M19,19H5V8H19V19M16,10V12H14V14H16V16H14V18H12V16H10V14H12V12H10V10H12V8H14V10H16Z" />
+                    </svg>
+                </div>
+                <h3 class="card-title">Le Mie Prenotazioni</h3>
+                <p class="card-description">Gestisci le tue prenotazioni attive e passate. Modifica, cancella o ripeti
+                    le tue prenotazioni preferite.</p>
+            </div>
+        </div>
+    </main>
+    <script src="src/index.js"></script>
 </body>
+
 </html>
