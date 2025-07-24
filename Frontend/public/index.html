@@ -6,9 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css">
     <title>WorkSpace Pro - Prenota il tuo spazio</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
 
-<body>
+<body onload="checkLogin()">
     <!-- Menu Button (sidebar chiusa)
     <button class="menu-btn" onclick="toggleSidebar()">
         <div class="hamburger">
@@ -153,6 +154,19 @@
         </div>
     </main>
     <script src="src/index.js"></script>
+      <script>
+    function checkLogin() {
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (user) {
+        document.getElementById('welcome').textContent =
+          'Benvenuto, ' + user.id;
+      }
+    }
+    function logout() {
+      localStorage.removeItem('user');
+      window.location.href = 'login.html';
+    }
+  </script>
 </body>
 
 </html>

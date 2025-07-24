@@ -48,11 +48,11 @@ function handleLogin() {
 }
 
 function accedi() {
-    window.location.href = 'login.js';
+    window.location.href = 'login.html';
 }
 
 function registrati() {
-    window.location.href = 'register.js';
+    window.location.href = 'register.html';
 }
 
 function handleProfile() {
