@@ -1,37 +1,68 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <link rel="stylesheet" href="styles/login.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Registrazione</title>
+  <link rel="stylesheet" href="styles/register.css" />
+  <link rel="stylesheet" href="styles.css" /> <!-- Per stile coerente -->
 </head>
 <body>
+
+  <header class="header">
+    <a href="index.html" class="logo-link">
+      <div class="logo">WorkSpace Pro</div>
+    </a>
+  </header>
+
+  <div class="wrapper">
     <div class="login-container">
-        <h2>Registrati</h2>
-        <form action="/register" method="POST">
-            <div class="form-group">
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" required>
-            </div>
-            <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required>
-            </div>
-            <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required>
-            </div>
-            <div class="form-group">
-                <label for="address">Indirizzo:</label>
-                <input type="text" id="address" name="address" required>
-            </div>
-            <div class="form-group">
-                <label for="phone">Telefono:</label>
-                <input type="text" id="phone" name="phone" required>   
-            </div>
-        </form>
+      <h2>Registrati</h2>
+      <form id="registrationForm" method="POST">
+        <div class="form-group">
+          <label for="username">Username: <span class="required">*</span></label>
+          <input type="text" id="username" name="username" required>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password: <span class="required">*</span></label>
+          <input type="password" id="password" name="password" required>
+          <small class="password-hint">Min. 6 caratteri e 1 lettera maiuscola</small>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email: <span class="required">*</span></label>
+          <input type="email" id="email" name="email" required>
+        </div>
+
+        <div class="form-group">
+          <label for="address">Indirizzo:</label>
+          <input type="text" id="address" name="address">
+        </div>
+
+        <div class="form-group">
+          <label for="phone">Telefono:</label>
+          <input type="text" id="phone" name="phone">
+        </div>
+
+        <div class="form-group">
+          <label for="role">Ruolo: <span class="required">*</span></label>
+          <select id="role" name="role" class="styled-select" required>
+            <option value="">Seleziona un ruolo</option>
+            <option value="cliente">Cliente</option>
+            <option value="gestore">Gestore</option>
+            <option value="amministratore">Amministratore</option>
+          </select>
+        </div>
+
         <button type="submit" class="login-button">Registrati</button>
-        <p>Hai già un account? <a href="login.html">Accedi</a></p>
+      </form>
+
+      <p class="note"><span class="required">*</span> Campi obbligatori</p>
+      <p>Hai già un account? <a href="login.html">Accedi</a></p>
     </div>
+  </div>
+
+  <script src="scripts/register.js"></script>
+</body>
 </html>

@@ -21,7 +21,9 @@
     
     <!-- Header -->
     <header class="header">
-        <div class="logo">WorkSpace Pro</div>
+        <a href="index.html" class="logo-link">
+            <div class="logo">WorkSpace Pro</div>
+        </a>
         <div class="profile-section">
             <div class="profile-btn" onclick="toggleProfileMenu()">
                 <svg class="profile-icon" viewBox="0 0 24 24">
@@ -189,10 +191,11 @@
         window.location.href = 'profilo.html'; // o il nome reale della pagina profilo
         }
 
-    function logout() {
-      localStorage.removeItem('user');
-      window.location.href = 'login.html';
+        function handleLogout() {
+    localStorage.removeItem('user');
+    checkLogin(); // ripristina visibilità dei bottoni
     }
+
   </script>
 </body>
 

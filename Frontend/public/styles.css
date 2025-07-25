@@ -22,10 +22,20 @@ body {
     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
+.logo-link {
+  text-decoration: none;
+}
+
 .logo {
-    font-size: 24px;
-    font-weight: bold;
-    color: white;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #fff;
+  transition: transform 0.3s ease;
+}
+
+.logo:hover {
+  transform: scale(1.05);
+  cursor: pointer;
 }
 
 /* Menu Button */
@@ -317,4 +327,6 @@ body {
         left: 15px;
         top: 20px;
     }
+
+
 }
