@@ -148,8 +148,22 @@ document.addEventListener('DOMContentLoaded', function() {
      }
 
         function handleProfile() {
-        window.location.href = 'profilo.html'; // o il nome reale della pagina profilo
-        }
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    if (!user || !user.tipo_utente) {
+        alert("Errore: utente non identificato.");
+        return;
+    }
+
+    if (user.tipo_utente === "cliente") {
+        window.location.href = 'profilo-cliente.html';
+    } else if (user.tipo_utente === "gestore") {
+        window.location.href = 'profilo-gestore.html';
+    } else {
+        alert("Tipo utente non valido.");
+    }
+}
+
 
         function handleLogout() {
     localStorage.removeItem('user');
