@@ -76,11 +76,11 @@
 
   // INSERIMENTO IN SUPABASE
   async function saveUser(user) {
-    const { error } = await supabase.from("registrazione").insert([user]);
+    /*const { error } = await supabase.from("registrazione").insert([user]);
     if (error) {
       alert("Errore nella registrazione: " + error.message);
       return;
-    }
+    }*/
 
     alert("Registrazione completata con successo!");
     window.location.href = "login.html";

@@ -36,6 +36,7 @@ if (togglePassword && passwordInput) {
     passwordInput.type = isVisible ? "password" : "text";
     togglePassword.textContent = isVisible ? "Mostra" : "Nascondi";
   });
+
 }
 
 
