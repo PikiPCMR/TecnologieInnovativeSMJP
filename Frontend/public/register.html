@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Registrazione</title>
   <link rel="stylesheet" href="styles/register.css" />
-  <link rel="stylesheet" href="styles.css" /> <!-- Per stile coerente -->
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
@@ -18,36 +18,41 @@
   <div class="wrapper">
     <div class="login-container">
       <h2>Registrati</h2>
-      <form id="registrationForm" method="POST">
+      <form id="registrationForm">
         <div class="form-group">
           <label for="username">Username: <span class="required">*</span></label>
-          <input type="text" id="username" name="username" required>
+          <input type="text" id="username" required>
         </div>
 
-        <div class="form-group">
-          <label for="password">Password: <span class="required">*</span></label>
-          <input type="password" id="password" name="password" required>
-          <small class="password-hint">Min. 6 caratteri e 1 lettera maiuscola</small>
+       <div class="form-group">
+            <label for="password">Password: <span class="required">*</span></label>
+            <div class="password-wrapper">
+                <input type="password" id="password" required>
+                <button type="button" id="togglePassword" class="toggle-password">Mostra</button>
+            </div>
+            <small class="password-hint">Min. 6 caratteri e 1 lettera maiuscola</small>
         </div>
+
+
 
         <div class="form-group">
           <label for="email">Email: <span class="required">*</span></label>
-          <input type="email" id="email" name="email" required>
+          <input type="email" id="email" required>
         </div>
 
         <div class="form-group">
           <label for="address">Indirizzo:</label>
-          <input type="text" id="address" name="address">
+          <input type="text" id="address">
         </div>
 
         <div class="form-group">
           <label for="phone">Telefono:</label>
-          <input type="text" id="phone" name="phone">
+          <input type="text" id="phone">
         </div>
 
         <div class="form-group">
           <label for="role">Ruolo: <span class="required">*</span></label>
-          <select id="role" name="role" class="styled-select" required>
+          <select id="role" class="styled-select" required>
             <option value="">Seleziona un ruolo</option>
             <option value="cliente">Cliente</option>
             <option value="gestore">Gestore</option>
@@ -55,7 +60,7 @@
           </select>
         </div>
 
-        <button type="submit" class="login-button">Registrati</button>
+        <button type="submit" class="login-button" id="submitBtn">Registrati</button>
       </form>
 
       <p class="note"><span class="required">*</span> Campi obbligatori</p>
@@ -63,6 +68,7 @@
     </div>
   </div>
 
-  <script src="scripts/register.js"></script>
+  <script src="src\register.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </body>
 </html>

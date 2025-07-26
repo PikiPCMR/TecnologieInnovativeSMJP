@@ -189,3 +189,27 @@ a:hover {
   margin-top: 10px;
   text-align: left;
 }
+
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 10px;
+  padding: 6px 10px;
+  background-color: rgba(255, 255, 255, 0.15);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.toggle-password:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+}
+
