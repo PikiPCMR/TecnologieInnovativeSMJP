@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>Profilo Gestore</title>
+  <title>Profilo Gestore | WorkSpace Pro</title>
   <link rel="stylesheet" href="styles/profilo-gestore.css" />
 <link rel="stylesheet" href="styles/styles.css" />
 
@@ -18,12 +18,12 @@
     
   <main class="main-content">
     <section class="profile-overview">
-      <img id="avatar" class="avatar" src="" alt="Avatar">
+      <img id="avatar" class="avatar" src="placeholder-avatar.png" alt="Avatar">
       <div class="profile-info">
         <h1 id="nomeCognome"></h1>
         <p id="azienda"></p>
         <div class="ratings">
-          ⭐ <span id="rating">4.8</span> · <span id="reviews">23 recensioni</span>
+          <span id="rating">4.8</span> · <span id="reviews">23 recensioni</span>
         </div>
       </div>
       <button onclick="modificaProfilo()" class="btn-edit">Modifica profilo</button>
@@ -36,6 +36,7 @@
       <button onclick="navigate('indirizzi')">Indirizzi</button>
       <button onclick="navigate('comunicazioni')">Comunicazioni</button>
     </section>
+
 
     <section id="section-content" class="section-content">
       <!-- contenuti dinamici caricati da JS -->
