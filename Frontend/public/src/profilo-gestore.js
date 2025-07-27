@@ -15,14 +15,69 @@ function caricaDatiGestore() {
     return;
   }
 
-  document.getElementById('avatar').src = user.avatarUrl || 'placeholder-avatar.png';
+  const avatarSrc = user.avatarUrl || 'img/avatar-default.jpg';
+  const avatarEl = document.getElementById('avatar');
+  avatarEl.src = avatarSrc;
+  avatarEl.addEventListener('click', () => apriPopup(avatarSrc));
   document.getElementById('nomeCognome').textContent = user.nome + ' ' + user.cognome;
   document.getElementById('azienda').textContent = user.azienda || '';
   document.getElementById('rating').textContent = user.rating || '0';
   document.getElementById('reviews').textContent = (user.reviewsCount || 0) + ' recensioni';
   navigate('ordini');
 }
+// FUNZIONE: Apre popup avatar
+function apriPopup(src) {
+  const popup = document.getElementById('avatar-popup');
+  const preview = document.getElementById('preview-avatar');
+  const fileInput = document.getElementById('upload-avatar');
 
+  popup.style.display = 'flex';
+  preview.src = src;
+
+  // Reset file input per forzare onChange anche se si seleziona lo stesso file
+  fileInput.value = "";
+
+  // Listener dinamico per anteprima
+  fileInput.onchange = function () {
+    const file = fileInput.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        preview.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+}
+
+
+// FUNZIONE: Chiude popup avatar
+function chiudiPopup() {
+  document.getElementById('avatar-popup').style.display = 'none';
+}
+
+// FUNZIONE: Salva nuovo avatar
+function salvaAvatar() {
+  const fileInput = document.getElementById('upload-avatar');
+  const file = fileInput.files[0];
+
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const base64 = e.target.result;
+
+      let user = JSON.parse(localStorage.getItem('user'));
+      user.avatarUrl = base64;
+      localStorage.setItem('user', JSON.stringify(user));
+
+      document.getElementById('avatar').src = base64;
+      chiudiPopup();
+    };
+    reader.readAsDataURL(file);
+  } else {
+    chiudiPopup();
+  }
+}
 // NAVIGAZIONE SEZIONI
 async function navigate(sezione) {
   const cont = document.getElementById('section-content');
@@ -199,7 +254,90 @@ async function navigate(sezione) {
   }
 }
 
-// MODIFICA PROFILO (placeholder)
+// MODIFICA PROFILO
 function modificaProfilo() {
-  alert('Funzione modifica profilo non ancora implementata.');
+  const user = JSON.parse(localStorage.getItem('user'));
+  const cont = document.getElementById('section-content');
+
+  cont.innerHTML = `
+    <h2>Modifica Profilo</h2>
+    <form id="form-profilo" class="form-modifica">
+      ${createInput('nome', 'Nome', user.nome)}
+      ${createInput('cognome', 'Cognome', user.cognome)}
+      ${createInput('username', 'Username', user.username)}
+      ${createInput('email', 'Email', user.email, 'email')}
+      ${createInput('password', 'Nuova Password (lascia vuoto se invariata)', '', 'password')}
+      ${createInput('indirizzo', 'Indirizzo', user.indirizzo || '')}
+      ${createInput('fatturazione', 'Indirizzo di Fatturazione', user.indirizzo_fatturazione || '')}
+      ${createInput('pagamento', 'Metodo di Pagamento', user.metodo_pagamento || '')}
+      ${createInput('telefono', 'Numero di Telefono', user.telefono || '')}
+      ${createInput('piva', 'Partita IVA', user.piva || '')}
+      <button type="submit" class="btn-edit">Salva Modifiche</button>
+    </form>
+  `;
+
+  document.getElementById('form-profilo').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    // 🔁 Simula salvataggio e torna alla schermata iniziale
+    const cont = document.getElementById('section-content');
+    cont.innerHTML = '';
+
+    // Ritorna alla visualizzazione profilo
+    caricaDatiGestore();
+  });
 }
+
+function createInput(name, label, value = '', type = 'text') {
+  return `
+    <div class="form-group">
+      <label for="${name}">${label}</label>
+      <input type="${type}" id="${name}" name="${name}" value="${value}" placeholder="${label}">
+    </div>
+  `;
+}
+
+
+function createInput(name, label, value = '', type = 'text') {
+  return `
+    <div class="form-group">
+      <label for="${name}">${label}</label>
+      <input type="${type}" id="${name}" name="${name}" value="${value}" placeholder="${label}">
+    </div>
+  `;
+}
+
+function apriPopup(src) {
+  document.getElementById('avatar-popup').style.display = 'flex';
+  document.getElementById('preview-avatar').src = src;
+  document.getElementById('upload-avatar').value = '';
+}
+
+function chiudiPopup() {
+  document.getElementById('avatar-popup').style.display = 'none';
+}
+
+function salvaAvatar() {
+  const fileInput = document.getElementById('upload-avatar');
+  const file = fileInput.files[0];
+
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const base64 = e.target.result;
+
+      let user = JSON.parse(localStorage.getItem('user'));
+      user.avatarUrl = base64;
+      localStorage.setItem('user', JSON.stringify(user));
+
+      document.getElementById('avatar').src = base64;
+      chiudiPopup();
+    };
+    reader.readAsDataURL(file);
+  } else {
+    chiudiPopup();
+  }
+}
+
+
+
