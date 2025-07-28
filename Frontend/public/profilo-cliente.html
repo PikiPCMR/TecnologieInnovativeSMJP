@@ -1,1 +1,31 @@
-profilo cliente
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Profilo Cliente</title>
+  <link rel="stylesheet" href="styles/profile.css" />
+</head>
+<body>
+  <div class="profile-container">
+        <h1>Ciao, <span id="user-name">Mario</span></h1>
+
+</script>
+
+
+    <div class="circle-container">
+      <a href="#" class="circle">Ordini</a>
+      <a href="#" class="circle">Compra</a>
+      <a href="#" class="circle">Account</a>
+    </div>
+  </div>
+
+  <script>
+    // Recupera l'utente dal localStorage (dopo login/registrazione)
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user && user.username) {
+      document.getElementById('user-name').textContent = user.username;
+    }
+  </script>
+</body>
+</html>
