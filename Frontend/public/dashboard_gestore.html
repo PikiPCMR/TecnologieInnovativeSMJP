@@ -5,11 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
     <title>Dashboard Gestore</title>
 </head>
 
 <body onload="checkLogin()">
+ <!-- Header -->
     <header class="header">
         <a href="dashboard_gestore.html" class="logo-link">
             <div class="logo">WorkSpace Pro</div>
@@ -93,8 +93,8 @@
 
         </div>
     </main>
-    <script src="src/index.js"></script>
-    <script src="src/login.js"></script>
+    <script type="module" src="src/index.js"></script>
+    <script type="module" src="src/login.js"></script>
     <script> requireUserRole("gestore"); </script>
     
 

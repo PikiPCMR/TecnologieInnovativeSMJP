@@ -101,7 +101,7 @@ function mostraPopupDecisione(user) { // Ricevi user come parametro
 
   document.getElementById("btnCompleta").addEventListener("click", () => {
     overlay.remove();
-    window.location.href = "profilo-gestore.html";
+    window.location.href = "profilo.html";
   });
 
   document.getElementById("btnEsplora").addEventListener("click", () => {

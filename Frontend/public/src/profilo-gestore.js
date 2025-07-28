@@ -1,10 +1,6 @@
 
 import { supabase } from './collegamentoDb.js';
 
-async function getUserData() {
-  const { data, error } = await supabase.from('utenti').select('*');
-  
-}
 
 // DEBUG: Mostra user salvato
 console.log("USER:", JSON.parse(localStorage.getItem('user')));
@@ -28,6 +24,8 @@ function caricaDatiGestore() {
   document.getElementById('reviews').textContent = (user.reviewsCount || 0) + ' recensioni';
   navigate('ordini');
 }
+
+
 // FUNZIONE: Apre popup avatar
 function apriPopup(src) {
   const popup = document.getElementById('avatar-popup');

@@ -1,179 +1,147 @@
-const supabaseUrl = 'https://sbxrdptjegjxqaklfpxq.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNieHJkcHRqZWdqeHFha2xmcHhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY2MjcxMTcsImV4cCI6MjA2MjIwMzExN30.-eNAPw6hGKrSLtYmFSxxneOtEKrAyH6OUi_pKZmg-zs';
-const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-// Stato dell'applicazione
+import { supabase } from './collegamentoDb.js';
+
+async function testDbConnection() {
+  const { data, error } = await supabase.from('registrazione').select('id, nome, cognome').limit(1);
+  if (error) console.error("❌ Errore Supabase:", error);
+  else console.log("✅ Connessione OK. Primo utente:", data[0]);
+}
+
+// Stato app
 let isLoggedIn = false;
 let user = null;
 
-// Toggle Sidebar
-function toggleSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('overlay');
+// === FUNZIONI GLOBALI ===
 
-    sidebar.classList.toggle('active');
-    overlay.classList.toggle('active');
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('active');
+  document.getElementById('overlay').classList.toggle('active');
 }
+window.toggleSidebar = toggleSidebar;
 
 function closeSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('overlay');
-
-    sidebar.classList.remove('active');
-    overlay.classList.remove('active');
+  document.getElementById('sidebar').classList.remove('active');
+  document.getElementById('overlay').classList.remove('active');
 }
+window.closeSidebar = closeSidebar;
 
-// Toggle Profile Menu
 function toggleProfileMenu() {
-    const dropdown = document.getElementById('profileDropdown');
-    dropdown.classList.toggle('active');
+  document.getElementById('profileDropdown').classList.toggle('active');
 }
-
-// Chiudi dropdown quando si clicca fuori
-document.addEventListener('click', function (event) {
-    const profileSection = document.querySelector('.profile-section');
-    const dropdown = document.getElementById('profileDropdown');
-
-    if (!profileSection.contains(event.target)) {
-        dropdown.classList.remove('active');
-    }
-});
-
-// tenere a mente toggle profilemenu molto utile per il login e logout
-function handleLogin() {
-    if (!isLoggedIn) {
-        // Simula il login
-        isLoggedIn = true;
-        user = { name: 'Mario Rossi', email: 'mario.rossi@email.com' };
-        updateProfileMenu();
-        alert('Login effettuato con successo!');
-    }
-    toggleProfileMenu();
-}
+window.toggleProfileMenu = toggleProfileMenu;
 
 function accedi() {
-    window.location.href = 'login.html';
+  window.location.href = 'login.html';
 }
+window.accedi = accedi;
 
 function registrati() {
-    window.location.href = 'register.html';
+  window.location.href = 'register.html';
 }
+window.registrati = registrati;
 
 function handleProfile() {
-    alert('Apertura gestione profilo per: ' + user.name);
-    toggleProfileMenu();
+  const user = JSON.parse(localStorage.getItem('user'));
+  if (!user || !user.tipo_utente) {
+    alert("Errore: utente non identificato.");
+    return;
+  }
+  window.location.href = 'profilo.html';
+  toggleProfileMenu();
 }
+window.handleProfile = handleProfile;
 
 function handleLogout() {
-    isLoggedIn = false;
-    user = null;
-    updateProfileMenu();
-    alert('Logout effettuato con successo!');
-    toggleProfileMenu();
+  localStorage.removeItem('user');
+  checkLogin();
+  window.location.href = 'index.html';
 }
+window.handleLogout = handleLogout;
 
-function updateProfileMenu() {
-    const loginText = document.getElementById('loginText');
-    const profileItem = document.getElementById('profileItem');
-    const logoutItem = document.getElementById('logoutItem');
-
-    if (isLoggedIn) {
-        loginText.textContent = 'Registrati';
-        profileItem.style.display = 'flex';
-        logoutItem.style.display = 'flex';
-    } else {
-        loginText.textContent = 'Accedi';
-        profileItem.style.display = 'none';
-        logoutItem.style.display = 'none';
-    }
-}
-
-// Navigazione Sidebar
 function navigateTo(page) {
-    alert('Navigazione verso: ' + page);
-    closeSidebar();
+  alert('Navigazione verso: ' + page);
+  closeSidebar();
 }
+window.navigateTo = navigateTo;
 
-// Azioni delle card
 function searchSpaces() {
-    alert('Apertura pagina ricerca spazi di coworking...');
+  alert('Apertura pagina ricerca spazi...');
 }
+window.searchSpaces = searchSpaces;
 
 function quickBooking() {
-    if (!isLoggedIn) {
-        alert('Effettua il login per prenotare uno spazio');
-        return;
-    }
-    alert('Apertura prenotazione rapida...');
+  if (!isLoggedIn) {
+    alert('Effettua il login per prenotare');
+    return;
+  }
+  alert('Prenotazione rapida...');
 }
+window.quickBooking = quickBooking;
 
 function viewBookings() {
-    if (!isLoggedIn) {
-        alert('Effettua il login per visualizzare le tue prenotazioni');
-        return;
-    }
-    alert('Apertura gestione prenotazioni...');
+  if (!isLoggedIn) {
+    alert('Effettua il login per visualizzare prenotazioni');
+    return;
+  }
+  alert('Gestione prenotazioni...');
 }
+window.viewBookings = viewBookings;
 
-//Aspetta che la pagina sia completamente caricata
-document.addEventListener('DOMContentLoaded', function () {
-    // Il tuo codice JavaScript qui
-    updateProfileMenu();
-});//Aspetta che la pagina sia completamente caricata
-/*function checkLogin() {
-  const user = JSON.parse(localStorage.getItem('user'));
-  if (user) {
-    document.getElementById('welcome').textContent =
-      'Benvenuto, ' + user.id;
+// === GESTIONE MENU PROFILO ===
+
+function updateProfileMenu() {
+  const loginText = document.getElementById('loginText');
+  const profileItem = document.getElementById('profileItem');
+  const logoutItem = document.getElementById('logoutItem');
+
+  const userData = JSON.parse(localStorage.getItem('user'));
+  isLoggedIn = !!userData; // forza lo stato booleano
+
+  if (isLoggedIn) {
+    user = userData;
+    loginText.textContent = 'Registrati';
+    profileItem.style.display = 'flex';
+    logoutItem.style.display = 'flex';
+  } else {
+    user = null;
+    loginText.textContent = 'Accedi';
+    profileItem.style.display = 'none';
+    logoutItem.style.display = 'none';
   }
 }
-  */
+
+
 function checkLogin() {
-    const user = JSON.parse(localStorage.getItem('user'));
+  const userData = JSON.parse(localStorage.getItem('user'));
+  const loginItem = document.querySelector('.dropdown-item[onclick="accedi()"]');
+  const registerItem = document.querySelector('.dropdown-item[onclick="registrati()"]');
+  const profileItem = document.getElementById('profileItem');
+  const logoutItem = document.getElementById('logoutItem');
 
-    const loginItem = document.querySelector('.dropdown-item[onclick="accedi()"]');
-    const registerItem = document.querySelector('.dropdown-item[onclick="registrati()"]');
-    const profileItem = document.getElementById('profileItem');
-    const logoutItem = document.getElementById('logoutItem');
+  if (userData) {
+    isLoggedIn = true;
+    user = userData;
+    loginItem.style.display = 'none';
+    registerItem.style.display = 'none';
+    logoutItem.style.display = 'block';
 
-    if (user) {
-        loginItem.style.display = 'none';
-        registerItem.style.display = 'none';
-        logoutItem.style.display = 'block';
-
-        // Mostra il profilo solo se esiste ed è gestore/cliente
-        if (user.tipo_utente === "gestore" || user.tipo_utente === "cliente") {
-            profileItem.style.display = 'block';
-        } else {
-            profileItem.style.display = 'none';
-        }
-    } else {
-        loginItem.style.display = 'block';
-        registerItem.style.display = 'block';
-        profileItem.style.display = 'none';
-        logoutItem.style.display = 'none';
+    if (user.tipo_utente === "gestore" || user.tipo_utente === "cliente") {
+      profileItem.style.display = 'block';
     }
+  } else {
+    isLoggedIn = false;
+    user = null;
+    loginItem.style.display = 'block';
+    registerItem.style.display = 'block';
+    profileItem.style.display = 'none';
+    logoutItem.style.display = 'none';
+  }
 }
 
-function handleProfile() {
-    const user = JSON.parse(localStorage.getItem('user'));
+// === AVVIO PAGINA ===
 
-    if (!user || !user.tipo_utente) {
-        alert("Errore: utente non identificato.");
-        return;
-    }
+document.addEventListener("DOMContentLoaded", () => {
+  checkLogin();          // Prima controlli se l’utente è loggato
+  updateProfileMenu();   // Poi aggiorni il menu in base allo stato
+  testDbConnection();    // (solo per debug)
+});
 
-    if (user.tipo_utente === "cliente") {
-        window.location.href = 'profilo-cliente.html';
-    } else if (user.tipo_utente === "gestore") {
-        window.location.href = 'profilo-gestore.html';
-    } else {
-        alert("Tipo utente non valido.");
-    }
-}
-
-
-function handleLogout() {
-    localStorage.removeItem('user');
-    checkLogin(); // ripristina visibilità dei bottoni
-    window.location.href = 'index.html'; // reindirizza alla home
-}

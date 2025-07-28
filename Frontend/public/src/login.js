@@ -1,6 +1,12 @@
-const supabaseUrl = 'https://sbxrdptjegjxqaklfpxq.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNieHJkcHRqZWdqeHFha2xmcHhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY2MjcxMTcsImV4cCI6MjA2MjIwMzExN30.-eNAPw6hGKrSLtYmFSxxneOtEKrAyH6OUi_pKZmg-zs';
-const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+import { supabase } from './collegamentoDb.js';
+
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("loginForm");
+  form.addEventListener("submit", async function (e) {
+    e.preventDefault();
+    await login(); // chiama la funzione normalmente
+  });
+});
 
 async function login() {
   const id = document.getElementById('id').value.trim();
@@ -32,7 +38,7 @@ async function login() {
     return;
   }
 
-  alert('Accesso effettuato con successo!');
+  
   localStorage.setItem('user', JSON.stringify(user));
 
   // Redirezione basata sul ruolo
@@ -73,6 +79,8 @@ function requireUserRole(role) {
     window.location.href = "index.html";
   }
 }
+
+export { requireUserRole };
 
 
 
