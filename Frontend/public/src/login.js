@@ -20,10 +20,29 @@ async function login() {
 
   if (data.length === 0) {
     alert('Credenziali errate');
+    return;
+  }
+
+  const user = data[0];
+  console.log("Utente loggato:", user);
+  console.log("Tipo utente:", user.tipo_utente); // verifica che esista
+
+  if (!user.tipo_utente) {
+    alert("Errore: campo tipo_utente mancante.");
+    return;
+  }
+
+  alert('Accesso effettuato con successo!');
+  localStorage.setItem('user', JSON.stringify(user));
+
+  // Redirezione basata sul ruolo
+  if (user.tipo_utente === "gestore") {
+    window.location.href = "dashboard_gestore.html";
+  } else if (user.tipo_utente === "cliente") {
+    window.location.href = "index.html";
   } else {
-    alert('Accesso effettuato con successo!');
-    localStorage.setItem('user', JSON.stringify(data[0]));
-    window.location.href = 'index.html';
+    alert("Tipo utente non riconosciuto: " + user.tipo_utente);
+    window.location.href = "index.html";
   }
 }
 
