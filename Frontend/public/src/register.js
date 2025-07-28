@@ -74,11 +74,11 @@ registrationForm?.addEventListener("submit", function (e) {
 // Simula il salvataggio e mostra popup
 function saveUser(user) {
   localStorage.setItem("user", JSON.stringify(user));
-  mostraPopupDecisione();
+  mostraPopupDecisione(user); // Passa user come parametro
 }
 
 // Mostra popup di conferma
-function mostraPopupDecisione() {
+function mostraPopupDecisione(user) { // Ricevi user come parametro
   const overlay = document.createElement("div");
   overlay.classList.add("overlay-popup");
 
@@ -102,7 +102,11 @@ function mostraPopupDecisione() {
 
   document.getElementById("btnEsplora").addEventListener("click", () => {
     overlay.remove();
-    window.location.href = "index.html";
+    if (user.tipo_utente === "gestore") {
+      window.location.href = "dashboard_gestore.html";
+    } else if (user.tipo_utente === "cliente") {
+      window.location.href = "index.html";
+    }
   });
 }
 
