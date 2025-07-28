@@ -17,6 +17,13 @@ body {
   position: relative;
 }
 
+.required-marker,
+.required {
+  color: #ff6b6b; /* colore rosso usato anche per gli altri */
+  font-weight: bold;
+}
+
+
 .header {
   width: 100%;
   padding: 20px 40px;
@@ -51,16 +58,63 @@ body {
 }
 
 .login-container {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(20px);
-  border-radius: 20px;
-  padding: 40px;
-  width: 100%;
-  max-width: 400px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
-  text-align: center;
-  margin-top: 80px;
+  max-width: 900px; /* oppure 1000px se vuoi ancora più largo */
+  margin: auto;
+  padding: 2rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 15px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
 }
+
+@media (min-width: 1024px) {
+  .login-container {
+    max-width: 960px;
+  }
+}
+
+@media (min-width: 768px) {
+  .grid-form {
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem 1.5rem; /* righe, colonne */
+  }
+}
+
+.wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+/* Estende il contenitore */
+.login-container.wide {
+  max-width: 800px;
+  width: 90%;
+}
+
+/* Griglia a due colonne per campi */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+/* Fa estendere il bottone su tutta la larghezza */
+.form-group.full-width {
+  grid-column: span 2;
+}
+
+/* Responsivo per mobile */
+@media (max-width: 768px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-group.full-width {
+    grid-column: span 1;
+  }
+}
+
 
 .login-container h2 {
   font-size: 2rem;
@@ -287,5 +341,31 @@ a:hover {
   to {
     transform: scale(1);
     opacity: 1;
+  }
+}
+
+/* Layout a due colonne per i form */
+.grid-form {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .grid-form {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .grid-form .form-group {
+    width: 100%;
+  }
+
+  .password-wrapper {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .password-wrapper input {
+    flex: 1;
   }
 }

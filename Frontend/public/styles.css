@@ -330,3 +330,6 @@ body {
 
 
 }
+.wrapper {
+  margin-top: 40px; /* o anche 100px se vuoi più spazio */
+}
