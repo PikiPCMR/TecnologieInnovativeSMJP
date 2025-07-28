@@ -50,13 +50,12 @@ function apriPopup(src) {
   };
 }
 
-
 // FUNZIONE: Chiude popup avatar
 function chiudiPopup() {
   document.getElementById('avatar-popup').style.display = 'none';
 }
 
-// FUNZIONE: Salva nuovo avatar
+/* FUNZIONE: Salva nuovo avatar
 function salvaAvatar() {
   const fileInput = document.getElementById('upload-avatar');
   const file = fileInput.files[0];
@@ -77,7 +76,92 @@ function salvaAvatar() {
   } else {
     chiudiPopup();
   }
-}
+} 
+
+async function salvaAvatar() {
+  const fileInput = document.getElementById('upload-avatar');
+  const file = fileInput.files[0];
+
+  if (!file) {
+    chiudiPopup();
+    return;
+  }
+
+  // 1. Prendi credenziali dal localStorage
+  const storedUser = JSON.parse(localStorage.getItem('user'));
+  const userId = storedUser?.id;
+  const password = storedUser?.password;
+
+  if (!userId || !password) {
+    alert("Utente non identificato.");
+    return;
+  }
+
+  // 2. Ottieni la tupla utente dal DB
+  const { data: utenti, error: userError } = await supabase
+    .from('registrazione')
+    .select('*')
+    .eq('id', userId)
+    .eq('password', password);
+
+  const utente = utenti?.[0];
+
+  if (userError || !utente) {
+    alert("Credenziali non valide.");
+    return;
+  }
+
+  // 3. Crea nome file univoco
+  const fileExt = file.name.split('.').pop();
+  const fileName = `${userId}_${Date.now()}.${fileExt}`;
+  const filePath = `immaginiprofilo/${fileName}`;
+
+  // 4. Carica immagine nel bucket 'immaginiprofilo'
+  const { error: uploadError } = await supabase
+    .storage
+    .from('immaginiprofilo')
+    .upload(filePath, file, { upsert: true });
+
+  if (uploadError) {
+    console.error("Errore upload:", uploadError);
+    alert("Errore durante il caricamento dell'immagine.");
+    return;
+  }
+
+  // 5. Ottieni URL pubblico
+  const { data: publicData } = supabase
+    .storage
+    .from('immaginiprofilo')
+    .getPublicUrl(filePath);
+
+  const publicUrl = publicData.publicUrl;
+
+  // 6. Aggiorna la tupla nel DB (colonna: immagine_profilo)
+  const { error: updateError } = await supabase
+    .from('registrazione')
+    .update({ immagine_profilo: publicUrl })
+    .eq('id', userId)
+    .eq('password', password);
+
+  if (updateError) {
+    console.error("Errore nel salvataggio dell'URL:", updateError);
+    alert("Errore nel salvataggio nel database.");
+    return;
+  }
+
+  // 7. Aggiorna il localStorage
+  storedUser.immagine_profilo = publicUrl;
+  localStorage.setItem('user', JSON.stringify(storedUser));
+
+  // 8. Aggiorna immagine nel DOM
+  document.getElementById('avatar').src = publicUrl;
+
+  // 9. Chiudi popup
+  chiudiPopup();
+} */
+
+
+
 // NAVIGAZIONE SEZIONI
 async function navigate(sezione) {
   const cont = document.getElementById('section-content');
@@ -307,37 +391,6 @@ function createInput(name, label, value = '', type = 'text') {
   `;
 }
 
-function apriPopup(src) {
-  document.getElementById('avatar-popup').style.display = 'flex';
-  document.getElementById('preview-avatar').src = src;
-  document.getElementById('upload-avatar').value = '';
-}
-
-function chiudiPopup() {
-  document.getElementById('avatar-popup').style.display = 'none';
-}
-
-function salvaAvatar() {
-  const fileInput = document.getElementById('upload-avatar');
-  const file = fileInput.files[0];
-
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      const base64 = e.target.result;
-
-      let user = JSON.parse(localStorage.getItem('user'));
-      user.avatarUrl = base64;
-      localStorage.setItem('user', JSON.stringify(user));
-
-      document.getElementById('avatar').src = base64;
-      chiudiPopup();
-    };
-    reader.readAsDataURL(file);
-  } else {
-    chiudiPopup();
-  }
-}
 
 
 
