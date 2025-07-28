@@ -112,42 +112,46 @@ function viewBookings() {
 }
 
 //Aspetta che la pagina sia completamente caricata
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Il tuo codice JavaScript qui
     updateProfileMenu();
 });//Aspetta che la pagina sia completamente caricata
-    /*function checkLogin() {
-      const user = JSON.parse(localStorage.getItem('user'));
-      if (user) {
-        document.getElementById('welcome').textContent =
-          'Benvenuto, ' + user.id;
-      }
-    }
-      */
-    function checkLogin() {
-        const user = JSON.parse(localStorage.getItem('user'));
+/*function checkLogin() {
+  const user = JSON.parse(localStorage.getItem('user'));
+  if (user) {
+    document.getElementById('welcome').textContent =
+      'Benvenuto, ' + user.id;
+  }
+}
+  */
+function checkLogin() {
+    const user = JSON.parse(localStorage.getItem('user'));
 
-        const loginItem = document.querySelector('.dropdown-item[onclick="accedi()"]');
-        const registerItem = document.querySelector('.dropdown-item[onclick="registrati()"]');
-        const profileItem = document.getElementById('profileItem');
-        const logoutItem = document.getElementById('logoutItem');
+    const loginItem = document.querySelector('.dropdown-item[onclick="accedi()"]');
+    const registerItem = document.querySelector('.dropdown-item[onclick="registrati()"]');
+    const profileItem = document.getElementById('profileItem');
+    const logoutItem = document.getElementById('logoutItem');
 
-        if (user) {
-            // Utente loggato → mostra "Il mio profilo" e "Esci"
-            loginItem.style.display = 'none';
-            registerItem.style.display = 'none';
+    if (user) {
+        loginItem.style.display = 'none';
+        registerItem.style.display = 'none';
+        logoutItem.style.display = 'block';
+
+        // Mostra il profilo solo se esiste ed è gestore/cliente
+        if (user.tipo_utente === "gestore" || user.tipo_utente === "cliente") {
             profileItem.style.display = 'block';
-            logoutItem.style.display = 'block';
         } else {
-            // Utente NON loggato → mostra "Accedi" e "Registrati"
-            loginItem.style.display = 'block';
-            registerItem.style.display = 'block';
             profileItem.style.display = 'none';
-            logoutItem.style.display = 'none';
         }
-     }
+    } else {
+        loginItem.style.display = 'block';
+        registerItem.style.display = 'block';
+        profileItem.style.display = 'none';
+        logoutItem.style.display = 'none';
+    }
+}
 
-        function handleProfile() {
+function handleProfile() {
     const user = JSON.parse(localStorage.getItem('user'));
 
     if (!user || !user.tipo_utente) {
@@ -165,7 +169,8 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 
-        function handleLogout() {
+function handleLogout() {
     localStorage.removeItem('user');
     checkLogin(); // ripristina visibilità dei bottoni
-    }
+    window.location.href = 'index.html'; // reindirizza alla home
+}

@@ -216,6 +216,15 @@ body {
     margin: 0 auto;
 }
 
+.card-dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+    margin-bottom: 25px;
+}
+
 .action-card {
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
