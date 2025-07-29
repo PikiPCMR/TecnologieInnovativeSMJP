@@ -66,29 +66,32 @@
       <div class="popup-container">
         <h2>Modifica Password</h2>
         <form id="form-modifica-password" class="form-modifica">
-        <div class="form-group">
-          <label for="vecchiaPassword">Vecchia Password</label>
-          <div class="password-wrapper">
-            <input type="password" id="vecchiaPassword" name="vecchiaPassword" />
-            <button type="button" class="toggle-btn" onclick="togglePassword('vecchiaPassword', this)">Mostra</button>
+          <div class="form-group">
+            <label for="vecchiaPassword">Vecchia Password</label>
+            <div class="password-wrapper">
+              <input type="password" id="vecchiaPassword" name="vecchiaPassword" />
+              <button type="button" class="toggle-btn" onclick="togglePassword('vecchiaPassword', this)">Mostra</button>
+            </div>
           </div>
-        </div>
 
-        <div class="form-group">
-          <label for="nuovaPassword">Nuova Password</label>
-          <div class="password-wrapper">
-            <input type="password" id="nuovaPassword" name="nuovaPassword" />
-            <button type="button" class="toggle-btn" onclick="togglePassword('nuovaPassword', this)">Mostra</button>
+          <div class="form-group">
+            <label for="nuovaPassword">Nuova Password</label>
+            <div class="password-wrapper">
+              <input type="password" id="nuovaPassword" name="nuovaPassword" />
+              <button type="button" class="toggle-btn" onclick="togglePassword('nuovaPassword', this)">Mostra</button>
+            </div>
           </div>
-        </div>
 
-        <button type="submit" class="btn-edit">Salva Password</button>
-      </form>
+          <div class="popup-actions">
+            <button type="submit" class="btn-edit">Salva Password</button>
+            <button type="button" class="btn-cancel" id="btnAnnullaPassword">Annulla</button>
+          </div>
+        </form>
 
 
       </div>
     </div>
-
+    
   </main>
 
   <!-- Popup Avatar -->
@@ -103,6 +106,8 @@
       </div>
     </div>
   </div>
+
+
 
   <script type="module" src="src/profilo.js"></script>
 </body>

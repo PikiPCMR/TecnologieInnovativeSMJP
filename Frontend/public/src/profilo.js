@@ -22,7 +22,11 @@ export function caricaDatiCliente() {
   document.getElementById('avatar').addEventListener('click', () => apriPopup(avatarSrc));
 
   const saluto = document.getElementById("salutoUtente");
+  if (user.nome === null || user.nome === '') {
+    saluto.textContent = `Ciao, ${user.id}`;
+  } else {
   saluto.textContent = `Ciao, ${user.nome}`;
+  }
 
   if (user.tipo_utente === "gestore") {
     const media = user.rating || 'N/A';
@@ -67,6 +71,7 @@ export async function navigate(sezione) {
       cont.innerHTML = `
         <h2>DATI GENERALI</h2>
         <div class="dati-box">
+          <div class="dato"><strong>Username:</strong> ${user.id}</div>
           <div class="dato"><strong>Nome:</strong> ${user.nome}</div>
           <div class="dato"><strong>Cognome:</strong> ${user.cognome}</div>
           <div class="dato"><strong>Indirizzo:</strong> ${user.indirizzo}</div>
@@ -87,7 +92,7 @@ export async function navigate(sezione) {
             <button class="btn-edit" onclick="apriPopupPassword()">Cambia password</button>
           </div>
           <div class="dato">
-            <button class="btn-edit">Attiva autenticazione a due fattori</button>
+            <button class="btn-edit" onclick="attivaAutenticazione2FA()">Attiva autenticazione a due fattori</button>
           </div>
         </div>
       `;
@@ -168,6 +173,7 @@ export function modificaDatiGenerali() {
   cont.innerHTML = `
     <h2>Modifica Dati Generali</h2>
     <form id="form-modifica-dati" class="form-modifica">
+      ${createInput('username', 'Username', user.id)}
       ${createInput('nome', 'Nome', user.nome)}
       ${createInput('cognome', 'Cognome', user.cognome)}
       ${createInput('indirizzo', 'Indirizzo', user.indirizzo || '')}
@@ -179,12 +185,34 @@ export function modificaDatiGenerali() {
   document.getElementById('form-modifica-dati').addEventListener('submit', async function (e) {
     e.preventDefault();
     const form = e.target;
+    const nuovoUsername = form.username.value.trim();
     const updatedUser = {
+      id: nuovoUsername,
       nome: form.nome.value,
       cognome: form.cognome.value,
       indirizzo: form.indirizzo.value,
       numero_telefono: form.telefono.value
     };
+
+    // Controllo username già esistente (escludendo il proprio)
+    if (nuovoUsername !== user.id) {
+      const { data: utentiStessoUsername, error: usernameError } = await supabase
+        .from('registrazione')
+        .select('id')
+        .eq('id', nuovoUsername)
+        .neq('id', user.id);
+
+      if (usernameError) {
+        alert("Errore nel controllo username.");
+        console.error(usernameError);
+        return;
+      }
+
+      if (utentiStessoUsername.length > 0) {
+        alert("Questo username è già in uso. Scegli un altro username.");
+        return;
+      }
+    }
 
     const { error } = await supabase
       .from('registrazione')
@@ -197,6 +225,7 @@ export function modificaDatiGenerali() {
       return;
     }
 
+    // Aggiorna localStorage e saluto
     const nuovoUtente = { ...user, ...updatedUser };
     localStorage.setItem('user', JSON.stringify(nuovoUtente));
     document.getElementById('salutoUtente').textContent = `Ciao, ${nuovoUtente.nome}`;
@@ -364,6 +393,11 @@ document.getElementById('form-modifica-password')?.addEventListener('submit', as
     alert("Password aggiornata con successo.");
     });
 
+// Listener per il tasto "Annulla" nel popup password
+document.getElementById('btnAnnullaPassword')?.addEventListener('click', function () {
+  chiudiPopupPassword();
+});
+
 function chiudiPopupPassword() {
    const popup = document.getElementById('popup-password');
   popup.style.display = 'none';
@@ -381,3 +415,4 @@ export function togglePassword(inputId, btn) {
   btn.textContent = isHidden ? 'Nascondi' : 'Mostra';
 }
 window.togglePassword = togglePassword;
+

@@ -7,8 +7,8 @@
   <link rel="stylesheet" href="styles/register.css" />
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
 
+<body>
   <header class="header">
     <a href="index.html" class="logo-link">
       <div class="logo">WorkSpace Pro</div>
@@ -87,8 +87,19 @@
       <p>Hai già un account? <a href="login.html">Accedi</a></p>
     </div>
   </div>
+  <div id="popup-verifica-email" class="overlay-popup" style="display: none;">
+      <div class="popup-box">
+        <h3>Verifica la tua email</h3>
+        <p>Inserisci il codice che ti abbiamo inviato per email</p>
+        <input type="text" id="codiceVerifica" placeholder="Codice a 6 cifre" />
+        <div class="popup-buttons">
+          <button class="popup-btn" id="verificaCodiceBtn">Verifica</button>
+          <button class="popup-btn-secondary" onclick="annullaVerificaEmail()">Annulla</button>
+        </div>
+      </div>
+  </div>
 
-  <script src="src/register.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+  <script type="module" src="src/register.js"></script>
 </body>
 </html>
