@@ -85,7 +85,7 @@ function updateProfileMenu() {
     logoutItem.style.display = 'flex';
   } else {
     user = null;
-    loginText.textContent = 'Accedi';
+    loginText.textContent = '🔑 Accedi';
     profileItem.style.display = 'none';
     logoutItem.style.display = 'none';
   }
@@ -127,4 +127,3 @@ document.addEventListener("DOMContentLoaded", () => {
   updateProfileMenu();   // Poi aggiorni il menu in base allo stato
   testDbConnection();    // (solo per debug)
 });
-
