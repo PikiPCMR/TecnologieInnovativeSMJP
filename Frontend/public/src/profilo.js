@@ -6,6 +6,12 @@ console.log("USER:", JSON.parse(localStorage.getItem('user')));
 document.addEventListener("DOMContentLoaded", () => {
   caricaDatiCliente();
   navigate('prenotazioni');
+  // Mostra popup finale solo se richiesto da localStorage
+  const popupFlag = localStorage.getItem("mostraPopupDecisione");
+  if (popupFlag === "true") {
+    localStorage.removeItem("mostraPopupDecisione"); // usalo solo una volta
+    mostraPopupDecisione(JSON.parse(localStorage.getItem("user")));
+  }
 });
 
 // === CARICA PROFILO ===
@@ -416,3 +422,34 @@ export function togglePassword(inputId, btn) {
 }
 window.togglePassword = togglePassword;
 
+function mostraPopupDecisione(user) {
+  const overlay = document.createElement("div");
+  overlay.classList.add("overlay-popup");
+
+  overlay.innerHTML = `
+    <div class="popup-box">
+      <h3>Registrazione completata!</h3>
+      <p>Vuoi completare il tuo profilo con più dettagli o iniziare subito a esplorare il sito?</p>
+      <div class="popup-buttons">
+        <button class="popup-btn" id="btnCompleta">Completa Profilo</button>
+        <button class="popup-btn-secondary" id="btnEsplora">Esplora il Sito</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+
+  document.getElementById("btnCompleta").addEventListener("click", () => {
+    overlay.remove();
+    navigate("generali");
+  });
+
+  document.getElementById("btnEsplora").addEventListener("click", () => {
+    overlay.remove();
+    if (user.tipo_utente === "gestore") {
+      window.location.href = "dashboard_gestore.html";
+    } else {
+      window.location.href = "index.html";
+    }
+  });
+}

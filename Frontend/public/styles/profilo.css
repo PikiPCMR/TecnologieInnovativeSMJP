@@ -359,3 +359,83 @@ body {
 #popup-email .popup-actions {
   justify-content: space-between;
 }
+
+/* Popup Decisione da mostrare dopo registrazione */
+.overlay-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.popup-box {
+  background: #fff;
+  color: #333;
+  padding: 30px;
+  border-radius: 12px;
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+  animation: popupScaleIn 0.3s ease;
+}
+
+.popup-box h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.popup-box p {
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.popup-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.popup-btn,
+.popup-btn-secondary {
+  flex: 1;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.popup-btn {
+  background-color: #7b5de3;
+  color: white;
+}
+
+.popup-btn-secondary {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.popup-btn:hover {
+  background-color: #684bd1;
+}
+
+@keyframes popupScaleIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+

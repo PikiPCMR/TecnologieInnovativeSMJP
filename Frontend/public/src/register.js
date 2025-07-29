@@ -3,7 +3,34 @@ import { supabase } from './collegamentoDb.js';
 
 const registrationForm = document.getElementById("registrationForm");
 
-document.addEventListener("DOMContentLoaded", () => {
+// ✅ Se utente autenticato da magic link: mostra popup decisione
+document.addEventListener("DOMContentLoaded", async () => {
+  const { data: { session } } = await supabase.auth.getSession();
+
+if (session && session.user && session.user.email) {
+  const { data: utenti } = await supabase
+    .from("registrazione")
+    .select("*")
+    .eq("email", session.user.email);
+
+  if (utenti && utenti.length > 0) {
+    const utente = utenti[0];
+
+    await supabase
+      .from("registrazione")
+      .update({ email_verified: true })
+      .eq("id", utente.id);
+
+    localStorage.setItem("user", JSON.stringify(utente));
+
+    // 👇 Imposto flag per mostrare il popup in profilo
+    localStorage.setItem("mostraPopupDecisione", "true");
+
+    // ✅ Redirect automatico
+    window.location.href = "profilo.html";
+  }
+}
+
   const roleSelect = document.getElementById("role");
   const submitBtn = document.getElementById("submitBtn");
 
@@ -15,7 +42,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function updateGestoreFields() {
     const isGestore = roleSelect.value === "gestore";
-
     requiredFields.forEach(({ id }) => {
       const input = document.getElementById(id);
       const marker = document.querySelector(`label[for="${id}"] .required-marker`);
@@ -27,11 +53,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   if (roleSelect && submitBtn) {
-    updateGestoreFields(); // iniziale
+    updateGestoreFields();
     roleSelect.addEventListener("change", updateGestoreFields);
   }
 });
-
 
 registrationForm?.addEventListener("submit", async function (e) {
   e.preventDefault();
@@ -100,21 +125,18 @@ registrationForm?.addEventListener("submit", async function (e) {
     nome: document.getElementById("nome").value.trim(),
     cognome: document.getElementById("cognome").value.trim(),
     nome_azienda: document.getElementById("azienda").value.trim(),
-    partita_iva: document.getElementById("piva").value.trim()
+    partita_iva: document.getElementById("piva").value.trim(),
+    email_verified: false
   };
 
   await saveUser(user);
 });
 
-
-// ✅ Salvataggio nel database e localStorage
+// ✅ Salvataggio nel database + invio Magic Link
 async function saveUser(user) {
-  const codice = Math.floor(100000 + Math.random() * 900000).toString();
-  localStorage.setItem("codice_verifica", codice); // solo in localStorage
-
   const { data, error } = await supabase
     .from('registrazione')
-    .insert([{ ...user, email_verified: false }])
+    .insert([{ ...user }])
     .select();
 
   if (error) {
@@ -124,87 +146,44 @@ async function saveUser(user) {
   }
 
   localStorage.setItem("user", JSON.stringify({ ...user, id: data[0].id }));
-  mostraPopupVerifica();
+
+  // 👇 Salva flag per mostrare popup in profilo
+  localStorage.setItem("mostraPopupDecisione", "true");
+
+  const redirectUrl = "http://localhost:3000/profilo.html"; // ✅ URL di destinazione
+
+  const { error: magicError } = await supabase.auth.signInWithOtp({
+    email: user.email,
+    options: {
+      emailRedirectTo: redirectUrl
+    }
+  });
+
+  if (magicError) {
+    console.error("Errore invio magic link:", magicError);
+    alert("Errore durante l'invio dell'email. Riprova.");
+    return;
+  }
+
+  mostraPopupVerifica(); // Mostra solo localmente il popup
 }
 
+// ✅ Mostra popup: email inviata (modificato)
 function mostraPopupVerifica() {
   const popup = document.getElementById('popup-verifica-email');
+  popup.innerHTML = `
+    <div class="popup-box">
+      <h3>Controlla la tua email</h3>
+      <p>Ti abbiamo inviato un link per verificare l'indirizzo. Cliccalo per confermare.</p>
+    </div>
+  `;
   popup.style.display = 'flex';
-
-  const codice = localStorage.getItem('codice_verifica');
-  console.log("Codice verifica (simulato):", codice);
 }
-
-
-document.getElementById('verificaCodiceBtn').addEventListener('click', async () => {
-  const codiceInserito = document.getElementById('codiceVerifica').value.trim();
-  const utente = JSON.parse(localStorage.getItem('user'));
-  const codiceSalvato = localStorage.getItem('codice_verifica');
-
-  if (codiceInserito !== codiceSalvato) {
-    alert("Codice errato. Riprova.");
-    return;
-  }
-
-  const { error } = await supabase
-    .from('registrazione')
-    .update({ email_verified: true })
-    .eq('id', utente.id);
-
-  if (error) {
-    console.error("Errore durante aggiornamento verifica:", error);
-    alert("Errore interno. Riprova.");
-    return;
-  }
-
-  utente.email_verified = true;
-  localStorage.setItem("user", JSON.stringify(utente));
-  localStorage.removeItem("codice_verifica");
-
-  document.getElementById('popup-verifica-email').style.display = 'none';
-  mostraPopupDecisione(utente);
-});
-
 
 function annullaVerificaEmail() {
   document.getElementById('popup-verifica-email').style.display = 'none';
 }
 window.annullaVerificaEmail = annullaVerificaEmail;
-
-
-// ✅ Mostra popup di conferma
-function mostraPopupDecisione(user) {
-  const overlay = document.createElement("div");
-  overlay.classList.add("overlay-popup");
-
-  overlay.innerHTML = `
-    <div class="popup-box">
-      <h3>Registrazione completata!</h3>
-      <p>Vuoi completare il tuo profilo con più dettagli o iniziare subito a esplorare il sito?</p>
-      <div class="popup-buttons">
-        <button class="popup-btn" id="btnCompleta">Completa Profilo</button>
-        <button class="popup-btn-secondary" id="btnEsplora">Esplora il Sito</button>
-      </div>
-    </div>
-  `;
-
-  document.body.appendChild(overlay);
-
-  document.getElementById("btnCompleta").addEventListener("click", () => {
-    overlay.remove();
-    window.location.href = "profilo.html";
-  });
-
-  document.getElementById("btnEsplora").addEventListener("click", () => {
-    overlay.remove();
-    if (user.tipo_utente === "gestore") {
-      window.location.href = "dashboard_gestore.html";
-    } else {
-      window.location.href = "index.html";
-    }
-  });
-}
-
 
 // ✅ Mostra/Nascondi password
 const passwordInput = document.getElementById("password");
