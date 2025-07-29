@@ -38,7 +38,6 @@ async function login() {
     return;
   }
 
-  
   localStorage.setItem('user', JSON.stringify(user));
 
   // Redirezione basata sul ruolo
@@ -61,7 +60,6 @@ if (togglePassword && passwordInput) {
     passwordInput.type = isVisible ? "password" : "text";
     togglePassword.textContent = isVisible ? "Mostra" : "Nascondi";
   });
-
 }
 
 // auth.js (autorizzazione ad entrare nelle pagine)
@@ -79,6 +77,7 @@ function requireUserRole(role) {
     window.location.href = "index.html";
   }
 }
+window.requireUserRole = requireUserRole;
 
 export { requireUserRole };
 

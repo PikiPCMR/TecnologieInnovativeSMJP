@@ -5,25 +5,13 @@ async function testDbConnection() {
   if (error) console.error("❌ Errore Supabase:", error);
   else console.log("✅ Connessione OK. Primo utente:", data[0]);
 }
+window.testDbConnection = testDbConnection;
 
 // Stato app
 let isLoggedIn = false;
 let user = null;
 
 // === FUNZIONI GLOBALI ===
-
-function toggleSidebar() {
-  document.getElementById('sidebar').classList.toggle('active');
-  document.getElementById('overlay').classList.toggle('active');
-}
-window.toggleSidebar = toggleSidebar;
-
-function closeSidebar() {
-  document.getElementById('sidebar').classList.remove('active');
-  document.getElementById('overlay').classList.remove('active');
-}
-window.closeSidebar = closeSidebar;
-
 function toggleProfileMenu() {
   document.getElementById('profileDropdown').classList.toggle('active');
 }
@@ -56,12 +44,6 @@ function handleLogout() {
   window.location.href = 'index.html';
 }
 window.handleLogout = handleLogout;
-
-function navigateTo(page) {
-  alert('Navigazione verso: ' + page);
-  closeSidebar();
-}
-window.navigateTo = navigateTo;
 
 function searchSpaces() {
   alert('Apertura pagina ricerca spazi...');
@@ -108,6 +90,7 @@ function updateProfileMenu() {
     logoutItem.style.display = 'none';
   }
 }
+window.updateProfileMenu = updateProfileMenu;
 
 
 function checkLogin() {
@@ -136,9 +119,9 @@ function checkLogin() {
     logoutItem.style.display = 'none';
   }
 }
+window.checkLogin = checkLogin;
 
 // === AVVIO PAGINA ===
-
 document.addEventListener("DOMContentLoaded", () => {
   checkLogin();          // Prima controlli se l’utente è loggato
   updateProfileMenu();   // Poi aggiorni il menu in base allo stato

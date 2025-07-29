@@ -9,7 +9,7 @@
 </head>
 
 <body onload="checkLogin()">
- <!-- Header -->
+    <!-- Header -->
     <header class="header">
         <a href="dashboard_gestore.html" class="logo-link">
             <div class="logo">WorkSpace Pro</div>
@@ -93,11 +93,13 @@
 
         </div>
     </main>
-    <script type="module" src="src/index.js"></script>
-    <script type="module" src="src/login.js"></script>
-    <script> requireUserRole("gestore"); </script>
-    
-
+    <script type="module" src="./src/index.js"></script>
+    <script type="module" src="./src/login.js"></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            requireUserRole("gestore");
+        });
+    </script>
 </body>
 
 </html>
