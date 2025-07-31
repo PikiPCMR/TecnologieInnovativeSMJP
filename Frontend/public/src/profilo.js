@@ -98,7 +98,7 @@ export async function navigate(sezione) {
             <button class="btn-edit" onclick="apriPopupPassword()">Cambia password</button>
           </div>
           <div class="dato">
-            <button class="btn-edit" onclick="attivaAutenticazione2FA()">Attiva autenticazione a due fattori</button>
+            <button class="btn-edit" onclick="apriPopupResetPassword()">Reset Password</button>
           </div>
         </div>
       `;
@@ -396,7 +396,13 @@ document.getElementById('form-modifica-password')?.addEventListener('submit', as
     user.password = nuova;
     localStorage.setItem('user', JSON.stringify(user));
     chiudiPopupPassword();
-    alert("Password aggiornata con successo.");
+    alert("Password aggiornata con successo!");
+
+    // 🔐 Disconnessione + redirect
+    await supabase.auth.signOut();
+    localStorage.removeItem('user');
+    window.location.href = 'login.html';
+
     });
 
 // Listener per il tasto "Annulla" nel popup password
@@ -453,3 +459,45 @@ function mostraPopupDecisione(user) {
     }
   });
 }
+
+// === GESTIONE POPUP RESET PASSWORD ===
+document.addEventListener("DOMContentLoaded", () => {
+  const confirmBtn = document.getElementById("confirmResetPassword");
+  const cancelBtn = document.getElementById("cancelResetPassword");
+  const popup = document.getElementById("popup-reset-password");
+
+  if (confirmBtn && cancelBtn && popup) {
+    confirmBtn.addEventListener("click", async () => {
+      const user = JSON.parse(localStorage.getItem("user"));
+      if (!user?.email) {
+        alert("Email utente non disponibile.");
+        return;
+      }
+
+      const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
+        redirectTo: "http://localhost:3000/reset_password.html"
+      });
+      if (error) {
+        alert("Errore durante l'invio: " + error.message);
+      } else {
+        alert("Email inviata con successo!");
+
+        // 🔐 Disconnessione + redirect anche dopo richiesta reset
+        await supabase.auth.signOut();
+        localStorage.removeItem("user");
+        window.location.href = "login.html";
+      }
+
+    });
+
+    cancelBtn.addEventListener("click", () => {
+      popup.style.display = "none";
+    });
+  }
+});
+
+export function apriPopupResetPassword() {
+  document.getElementById("popup-reset-password").style.display = "flex";
+}
+window.apriPopupResetPassword = apriPopupResetPassword;
+

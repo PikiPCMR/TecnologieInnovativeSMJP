@@ -4,8 +4,68 @@ document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("loginForm");
   form.addEventListener("submit", async function (e) {
     e.preventDefault();
-    await login(); // chiama la funzione normalmente
+    await login();
   });
+
+  // --- GESTIONE RESET PASSWORD ---
+  const openBtn = document.getElementById("openResetPopup");
+  const modal = document.getElementById("resetPasswordModal");
+  const closeBtn = document.getElementById("closeResetModal");
+  const sendBtn = document.getElementById("sendResetLink");
+  const emailInput = document.getElementById("resetEmail");
+  const errorBox = document.getElementById("emailError");
+
+  if (openBtn && modal && closeBtn && sendBtn && emailInput && errorBox) {
+    openBtn.addEventListener("click", () => {
+      modal.style.display = "flex";
+    });
+
+    closeBtn.addEventListener("click", () => {
+      modal.style.display = "none";
+      emailInput.value = '';
+      errorBox.textContent = '';
+    });
+
+    sendBtn.addEventListener("click", async () => {
+      const email = emailInput.value.trim();
+      errorBox.textContent = '';
+
+      if (!email) {
+        errorBox.textContent = "Inserisci un indirizzo email valido.";
+        return;
+      }
+
+      // 🔍 Verifica se la mail esiste nella tabella "registrazione"
+      const { data, error } = await supabase
+        .from("registrazione")
+        .select("*")
+        .eq("email", email);
+
+      if (error) {
+        console.error("Errore verifica email:", error.message);
+        errorBox.textContent = "Errore durante la verifica.";
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        errorBox.textContent = "Email senza account registrato.";
+        return;
+      }
+
+      // ✅ Procedi con invio reset se esiste
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: 'http://localhost:3000/reset_password.html'
+      });
+
+      if (resetError) {
+        errorBox.textContent = "Errore durante l'invio: " + resetError.message;
+      } else {
+        alert("Email di reset inviata con successo!");
+        modal.style.display = "none";
+        emailInput.value = '';
+      }
+    });
+  }
 });
 
 async function login() {
@@ -31,7 +91,7 @@ async function login() {
 
   const user = data[0];
   console.log("Utente loggato:", user);
-  console.log("Tipo utente:", user.tipo_utente); // verifica che esista
+  console.log("Tipo utente:", user.tipo_utente);
 
   if (!user.tipo_utente) {
     alert("Errore: campo tipo_utente mancante.");
@@ -40,7 +100,6 @@ async function login() {
 
   localStorage.setItem('user', JSON.stringify(user));
 
-  // Redirezione basata sul ruolo
   if (user.tipo_utente === "gestore") {
     window.location.href = "dashboard_gestore.html";
   } else if (user.tipo_utente === "cliente") {
@@ -62,13 +121,13 @@ if (togglePassword && passwordInput) {
   });
 }
 
-// auth.js (autorizzazione ad entrare nelle pagine)
+// auth.js (accesso pagine protette)
 function requireUserRole(role) {
   const user = JSON.parse(localStorage.getItem('user'));
 
   if (!user) {
     alert("Devi effettuare il login per accedere.");
-    window.location.href = "index.html"; // oppure login.html
+    window.location.href = "index.html";
     return;
   }
 
@@ -80,6 +139,3 @@ function requireUserRole(role) {
 window.requireUserRole = requireUserRole;
 
 export { requireUserRole };
-
-
-
