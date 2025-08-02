@@ -18,13 +18,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // === CARICA PROFILO ===
 export function caricaDatiCliente() {
+
   const user = JSON.parse(localStorage.getItem('user'));
-  if (!user || !user.tipo_utente) {
-    alert('Accesso non autorizzato.');
-    location = 'index.html';
+  if (!user || !user.id) {
+    console.warn('⚠️ Nessun utente loggato, esco dalla funzione.');
     return;
   }
-
+  
   const avatarSrc = user.avatarUrl || 'img/avatar-default.jpg';
   document.getElementById('avatar').src = avatarSrc;
   document.getElementById('avatar').addEventListener('click', () => apriPopup(avatarSrc));
@@ -33,7 +33,7 @@ export function caricaDatiCliente() {
   if (user.nome === null || user.nome === '') {
     saluto.textContent = `Ciao, ${user.id}`;
   } else {
-  saluto.textContent = `Ciao, ${user.nome}`;
+    saluto.textContent = `Ciao, ${user.nome}`;
   }
 
   if (user.tipo_utente === "gestore") {
@@ -258,8 +258,14 @@ window.chiudiPopup = chiudiPopup;
 
 // === CARICA AVATAR DA BUCKET ===
 export async function caricaAvatarDaDB() {
+  const user = JSON.parse(localStorage.getItem('user'));
+  if (!user || !user.id) {
+    console.warn('⚠️ Nessun utente loggato, esco dalla funzione.');
+    return;
+  }
+
   console.log('🔄 Caricamento avatar da tabella DB...');
-  
+
   const { data, error } = await supabase
     .from('avatar_profilo')
     .select('*');
@@ -328,17 +334,31 @@ async function selezionaAvatar(urlAvatar) {
 
 // === CARICA AVATAR UTENTE ALL'AVVIO ===
 export function caricaAvatarUtente() {
-  const avatarImg = document.getElementById('avatar');
-  const user = JSON.parse(localStorage.getItem('user'));
 
-  if (!user || !user.immagine_profilo) {
-    console.warn('🙈 Nessun utente o immagine trovata, uso placeholder.');
-    avatarImg.src = 'placeholder-avatar.png';
+  const user = JSON.parse(localStorage.getItem('user'));
+  if (!user || !user.id) {
+    console.warn('⚠️ Nessun utente loggato, esco dalla funzione.');
     return;
   }
 
-  console.log('📸 Immagine profilo trovata:', user.immagine_profilo);
-  avatarImg.src = user.immagine_profilo;
+  const avatarImg = document.getElementById('avatar');
+  const placeholder = 'https://sbxrdptjegjxqaklfpxq.supabase.co/storage/v1/object/public/immaginiprofilo/user.png';
+
+  try {
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    if (!user || !user.immagine_profilo || user.immagine_profilo.trim() === '') {
+      console.warn('🙈 Nessun utente o immagine trovata, uso placeholder.');
+      avatarImg.src = placeholder;
+      return;
+    }
+
+    console.log('📸 Immagine profilo trovata:', user.immagine_profilo);
+    avatarImg.src = user.immagine_profilo;
+  } catch (err) {
+    console.error('❌ Errore nel recupero utente:', err);
+    avatarImg.src = placeholder;
+  }
 }
 window.caricaAvatarUtente = caricaAvatarUtente;
 
@@ -417,7 +437,7 @@ window.chiudiPopupEmail = chiudiPopupEmail;
 
 // === POPUP MODIFICA PASSWORD ===
 export function apriPopupPassword() {
-    const popup = document.getElementById('popup-password');
+  const popup = document.getElementById('popup-password');
   popup.style.display = 'flex';
 
   // Svuota i campi password ogni volta che si apre il popup
@@ -441,40 +461,40 @@ document.getElementById('form-modifica-password')?.addEventListener('submit', as
 
   if (!vecchia || !nuova) {
     return alert("Compila entrambi i campi.");
-    }
+  }
 
-    if (vecchia === nuova) {
-        return alert("La nuova password deve essere diversa dalla vecchia.");   
-    }
+  if (vecchia === nuova) {
+    return alert("La nuova password deve essere diversa dalla vecchia.");
+  }
 
-    const isValidPassword = /^(?=.*[A-Z]).{6,}$/.test(nuova);
-    if (!isValidPassword) {
-        alert("La password deve contenere almeno 6 caratteri e una lettera maiuscola.");
-        return;
-    }
-    if (vecchia !== user.password) {
-        alert("La vecchia password non è corretta.");
-        return;
-    }
+  const isValidPassword = /^(?=.*[A-Z]).{6,}$/.test(nuova);
+  if (!isValidPassword) {
+    alert("La password deve contenere almeno 6 caratteri e una lettera maiuscola.");
+    return;
+  }
+  if (vecchia !== user.password) {
+    alert("La vecchia password non è corretta.");
+    return;
+  }
 
-    const { error } = await supabase
-        .from('registrazione')
-        .update({ password: nuova })
-        .eq('id', user.id);
+  const { error } = await supabase
+    .from('registrazione')
+    .update({ password: nuova })
+    .eq('id', user.id);
 
-    if (error) return alert("Errore durante l'aggiornamento password.");
+  if (error) return alert("Errore durante l'aggiornamento password.");
 
-    user.password = nuova;
-    localStorage.setItem('user', JSON.stringify(user));
-    chiudiPopupPassword();
-    alert("Password aggiornata con successo!");
+  user.password = nuova;
+  localStorage.setItem('user', JSON.stringify(user));
+  chiudiPopupPassword();
+  alert("Password aggiornata con successo!");
 
-    // 🔐 Disconnessione + redirect
-    await supabase.auth.signOut();
-    localStorage.removeItem('user');
-    window.location.href = 'login.html';
+  // 🔐 Disconnessione + redirect
+  await supabase.auth.signOut();
+  localStorage.removeItem('user');
+  window.location.href = 'login.html';
 
-    });
+});
 
 // Listener per il tasto "Annulla" nel popup password
 document.getElementById('btnAnnullaPassword')?.addEventListener('click', function () {
@@ -482,7 +502,7 @@ document.getElementById('btnAnnullaPassword')?.addEventListener('click', functio
 });
 
 function chiudiPopupPassword() {
-   const popup = document.getElementById('popup-password');
+  const popup = document.getElementById('popup-password');
   popup.style.display = 'none';
 
   // Pulizia aggiuntiva
