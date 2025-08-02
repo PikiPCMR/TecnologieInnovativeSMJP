@@ -269,7 +269,7 @@ body {
   max-width: 400px;
   text-align: center;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-  color: #fff;
+  color: #7b5de3;
 }
 
 .popup-container h2 {
@@ -342,12 +342,12 @@ body {
 
 .toggle-btn {
   background-color: transparent;
-  border: 1px solid #ccc;
+  border: 1px solid #7b5de3;
   padding: 4px 8px;
   border-radius: 4px;
   cursor: pointer;
   font-size: 0.9em;
-  color: white;
+  color: #7b5de3;
 }
 
 /* Sezione popup email aggiuntiva (se serve separarla) */
@@ -439,3 +439,27 @@ body {
   }
 }
 
+#popup-email .popup-actions {
+  justify-content: space-between;
+}
+
+/* === Correzione visibilità nel popup-box === */
+
+.popup-box label {
+  color: #333 !important; /* colore scuro per testi su sfondo bianco */
+  font-weight: 500;
+}
+
+.popup-box input {
+  color: #333 !important;  /* testo dell'input */
+  background-color: #f5f5f5; /* sfondo più neutro */
+  border: 1px solid #ccc;
+}
+
+.popup-box input::placeholder {
+  color: #999 !important; /* placeholder più visibile */
+}
+
+.popup-box h3 {
+  color: #222;
+}

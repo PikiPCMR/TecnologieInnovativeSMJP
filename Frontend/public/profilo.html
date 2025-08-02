@@ -43,9 +43,10 @@
       <!-- Contenuto dinamico -->
     </section>
     <!-- Popup Modifica Email -->
-    <div id="popup-email" class="popup-overlay" style="display: none;">
-      <div class="popup-container">
-        <h2>Modifica Email</h2>
+<!-- Popup Modifica Email -->
+    <div id="popup-email" class="overlay-popup" style="display: none;">
+      <div class="popup-box">
+        <h3>Modifica Email</h3>
         <form id="form-modifica-email" class="form-modifica">
           <div class="form-group">
             <label for="nuovaEmail">Nuova Email</label>
@@ -55,45 +56,45 @@
             <label for="confermaEmail">Conferma Nuova Email</label>
             <input type="email" id="confermaEmail" placeholder="Rinserisci nuova email" />
           </div>
-          <div class="popup-actions">
-            <button type="submit" class="btn-edit">Salva</button>
-            <button type="button" class="btn-cancel" onclick="chiudiPopupEmail()">Annulla</button>
+          <div class="popup-buttons">
+            <button type="submit" class="popup-btn">Salva</button>
+            <button type="button" class="popup-btn-secondary" onclick="chiudiPopupEmail()">Annulla</button>
           </div>
         </form>
       </div>
     </div>
 
 
-    <!-- Popup Modifica Password -->
-    <div id="popup-password" class="popup-overlay" style="display:none;">
-      <div class="popup-container">
-        <h2>Modifica Password</h2>
-        <form id="form-modifica-password" class="form-modifica">
-          <div class="form-group">
-            <label for="vecchiaPassword">Vecchia Password</label>
-            <div class="password-wrapper">
-              <input type="password" id="vecchiaPassword" name="vecchiaPassword" />
-              <button type="button" class="toggle-btn" onclick="togglePassword('vecchiaPassword', this)">Mostra</button>
-            </div>
-          </div>
 
-          <div class="form-group">
-            <label for="nuovaPassword">Nuova Password</label>
-            <div class="password-wrapper">
-              <input type="password" id="nuovaPassword" name="nuovaPassword" />
-              <button type="button" class="toggle-btn" onclick="togglePassword('nuovaPassword', this)">Mostra</button>
-            </div>
-          </div>
-
-          <div class="popup-actions">
-            <button type="submit" class="btn-edit">Salva Password</button>
-            <button type="button" class="btn-cancel" id="btnAnnullaPassword">Annulla</button>
-          </div>
-        </form>
-
-
+<!-- Popup Modifica Password -->
+<div id="popup-password" class="overlay-popup" style="display:none;">
+  <div class="popup-box">
+    <h3>Modifica Password</h3>
+    <form id="form-modifica-password" class="form-modifica">
+      <div class="form-group">
+        <label for="vecchiaPassword">Vecchia Password</label>
+        <div class="password-wrapper">
+          <input type="password" id="vecchiaPassword" name="vecchiaPassword" />
+          <button type="button" class="toggle-btn" onclick="togglePassword('vecchiaPassword', this)">Mostra</button>
+        </div>
       </div>
-    </div>
+
+      <div class="form-group">
+        <label for="nuovaPassword">Nuova Password</label>
+        <div class="password-wrapper">
+          <input type="password" id="nuovaPassword" name="nuovaPassword" />
+          <button type="button" class="toggle-btn" onclick="togglePassword('nuovaPassword', this)">Mostra</button>
+        </div>
+      </div>
+
+      <div class="popup-buttons">
+        <button type="submit" class="popup-btn">Salva Password</button>
+        <button type="button" class="popup-btn-secondary" id="btnAnnullaPassword">Annulla</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 
   </main>
   <!-- POPUP RESET PASSWORD DA PROFILO -->
