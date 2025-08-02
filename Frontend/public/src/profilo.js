@@ -326,6 +326,23 @@ async function selezionaAvatar(urlAvatar) {
   chiudiPopup();
 }
 
+// === CARICA AVATAR UTENTE ALL'AVVIO ===
+export function caricaAvatarUtente() {
+  const avatarImg = document.getElementById('avatar');
+  const user = JSON.parse(localStorage.getItem('user'));
+
+  if (!user || !user.immagine_profilo) {
+    console.warn('🙈 Nessun utente o immagine trovata, uso placeholder.');
+    avatarImg.src = 'placeholder-avatar.png';
+    return;
+  }
+
+  console.log('📸 Immagine profilo trovata:', user.immagine_profilo);
+  avatarImg.src = user.immagine_profilo;
+}
+window.caricaAvatarUtente = caricaAvatarUtente;
+
+
 // === POPUP MODIFICA EMAIL ===
 export function apriPopupEmail() {
   document.getElementById('popup-email').style.display = 'flex';
