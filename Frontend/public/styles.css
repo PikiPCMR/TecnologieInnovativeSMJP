@@ -306,3 +306,58 @@ body {
   margin-top: 40px; /* o anche 100px se vuoi più spazio */
 }
 
+/* Popup avatar */
+.popup-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.popup-container {
+  background: #fff;
+  padding: 20px;
+  border-radius: 16px;
+  width: 80%;
+  max-width: 600px;
+  text-align: center;
+}
+
+.avatar-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.avatar-grid img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border 0.3s ease;
+}
+
+.avatar-grid img:hover {
+  border: 2px solid #007BFF;
+}
+
+.btn-cancel {
+  background: #ccc;
+  padding: 8px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.avatar-img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+

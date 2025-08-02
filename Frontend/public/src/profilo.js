@@ -1,5 +1,7 @@
 // CONFIGURAZIONE SUPABASE
 import { supabase } from './collegamentoDb.js';
+console.log('Supabase client:', supabase);
+
 
 console.log("USER:", JSON.parse(localStorage.getItem('user')));
 
@@ -241,36 +243,88 @@ export function modificaDatiGenerali() {
 }
 window.modificaDatiGenerali = modificaDatiGenerali;
 
-// === GESTIONE AVATAR ===
-export function apriPopup(src) {
+// === APRI POPUP ===
+export function apriPopup() {
   document.getElementById('avatar-popup').style.display = 'flex';
-  document.getElementById('preview-avatar').src = src;
-  document.getElementById('upload-avatar').value = '';
+  caricaAvatarDaDB();
 }
 window.apriPopup = apriPopup;
 
+// === CHIUDI POPUP ===
 export function chiudiPopup() {
   document.getElementById('avatar-popup').style.display = 'none';
 }
 window.chiudiPopup = chiudiPopup;
 
-export function salvaAvatar() {
-  const fileInput = document.getElementById('upload-avatar');
-  const file = fileInput.files[0];
-  if (!file) return chiudiPopup();
+// === CARICA AVATAR DA BUCKET ===
+export async function caricaAvatarDaDB() {
+  console.log('🔄 Caricamento avatar da tabella DB...');
+  
+  const { data, error } = await supabase
+    .from('avatar_profilo')
+    .select('*');
 
-  const reader = new FileReader();
-  reader.onload = function (e) {
-    const base64 = e.target.result;
-    let user = JSON.parse(localStorage.getItem('user'));
-    user.avatarUrl = base64;
-    localStorage.setItem('user', JSON.stringify(user));
-    document.getElementById('avatar').src = base64;
-    chiudiPopup();
-  };
-  reader.readAsDataURL(file);
+  if (error) {
+    console.error('❌ Errore caricamento avatar dal DB:', error);
+    return;
+  }
+
+  console.log('✅ Avatar caricati dal DB:', data);
+
+  const grid = document.getElementById('avatar-grid');
+  if (!grid) {
+    console.warn('⚠️ Elemento #avatar-grid non trovato nel DOM.');
+    return;
+  }
+
+  grid.innerHTML = '';
+
+  if (!data || data.length === 0) {
+    grid.innerHTML = '<p>Nessuna immagine disponibile.</p>';
+    return;
+  }
+
+  data.forEach(avatar => {
+    const img = document.createElement('img');
+    img.src = avatar.url;  // URL preso dal DB
+    img.alt = avatar.descrizione || avatar.nome_file;
+    img.onclick = () => selezionaAvatar(avatar.url);
+    grid.appendChild(img);
+  });
+
+  console.log('✅ Avatar mostrati nel popup');
 }
-window.salvaAvatar = salvaAvatar;
+
+// === SELEZIONA AVATAR ===
+async function selezionaAvatar(urlAvatar) {
+  const user = JSON.parse(localStorage.getItem('user'));
+  const userId = user.id;
+
+  if (!userId) {
+    console.error('⚠️ ID utente non trovato nel localStorage.');
+    return;
+  }
+
+  const { error } = await supabase
+    .from('registrazione')
+    .update({ immagine_profilo: urlAvatar })
+    .eq('id', userId);
+
+  if (error) {
+    console.error('❌ Errore nel salvataggio immagine profilo nel DB:', error);
+    return;
+  }
+
+  // Aggiorna immagine nel DOM
+  document.getElementById('avatar').src = urlAvatar;
+
+  // Aggiorna localStorage
+  user.immagine_profilo = urlAvatar;
+  localStorage.setItem('user', JSON.stringify(user));
+
+  console.log('✅ Avatar selezionato e salvato:', urlAvatar);
+  chiudiPopup();
+}
 
 // === POPUP MODIFICA EMAIL ===
 export function apriPopupEmail() {
