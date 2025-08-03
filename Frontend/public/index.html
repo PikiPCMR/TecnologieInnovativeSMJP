@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles/styles.css">
+    <link rel="stylesheet" href="styles/avatar.css">
     <title>WorkSpace Pro - Prenota il tuo spazio</title>
 </head>
 
@@ -15,9 +16,9 @@
         </a>
         <div class="profile-section">
             <div class="profile-btn" onclick="toggleProfileMenu()">
-                    <img id="avatar" class="avatar avatar-small"
-                        src="https://sbxrdptjegjxqaklfpxq.supabase.co/storage/v1/object/public/immaginiprofilo//user.png"
-                        alt="Avatar" />
+                <img id="avatar" class="avatar avatar-small"
+                    src="https://sbxrdptjegjxqaklfpxq.supabase.co/storage/v1/object/public/immaginiprofilo//user.png"
+                    alt="Avatar" />
             </div>
             <div class="profile-dropdown" id="profileDropdown">
                 <div class="dropdown-item" id="loginText" onclick="accedi()">
@@ -87,7 +88,7 @@
 
     <script type="module" src="src/index.js"></script>
     <script type="module">
-        import { caricaAvatarUtente } from './src/profilo.js';
+        import { caricaAvatarUtente } from './src/gestione_avatar.js';
 
         window.addEventListener('DOMContentLoaded', () => {
             caricaAvatarUtente();

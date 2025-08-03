@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles/styles.css">
+    <link rel="stylesheet" href="styles/avatar.css">
     <title>Dashboard Gestore</title>
 </head>
 
@@ -79,8 +80,7 @@
     <script type="module" src="./src/index.js"></script>
     <script type="module" src="./src/login.js"></script>
     <script type="module">
-        import { caricaAvatarUtente } from './src/profilo.js';
-
+        import { caricaAvatarUtente } from './src/gestione_avatar.js';
 
         window.addEventListener('DOMContentLoaded', () => {
             requireUserRole("gestore");
