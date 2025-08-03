@@ -25,7 +25,7 @@ export function caricaDatiCliente() {
     return;
   }
   
-  const avatarSrc = user.avatarUrl || 'img/avatar-default.jpg';
+  const avatarSrc = user.avatarUrl || 'https://sbxrdptjegjxqaklfpxq.supabase.co/storage/v1/object/public/immaginiprofilo//user1.png';
   document.getElementById('avatar').src = avatarSrc;
   document.getElementById('avatar').addEventListener('click', () => apriPopup(avatarSrc));
 
@@ -342,7 +342,7 @@ export function caricaAvatarUtente() {
   }
 
   const avatarImg = document.getElementById('avatar');
-  const placeholder = 'https://sbxrdptjegjxqaklfpxq.supabase.co/storage/v1/object/public/immaginiprofilo/user.png';
+  const placeholder = 'https://sbxrdptjegjxqaklfpxq.supabase.co/storage/v1/object/public/immaginiprofilo//user1.png';
 
   try {
     const user = JSON.parse(localStorage.getItem('user'));
