@@ -46,7 +46,7 @@ function handleLogout() {
 window.handleLogout = handleLogout;
 
 function searchSpaces() {
-  alert('Apertura pagina ricerca spazi...');
+  window.location.href = 'cerca_spazi.html';
 }
 window.searchSpaces = searchSpaces;
 

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cerca Spazi - WorkSpace Pro</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles/spazi.css" />
+
+  <!-- Leaflet CSS per la mappa -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-sA+e2PumoefRgCnvZp3XHK5v6UepEtyfQ1gHMLWQn30="
+    crossorigin=""
+  />
+</head>
+
+<body onload="caricaSpazi()">
+  <header class="header">
+    <a href="index.html" class="logo-link"><div class="logo">WorkSpace Pro</div></a>
+    <div class="profile-section">
+      <div class="profile-btn" onclick="toggleProfileMenu()">👤</div>
+      <div class="profile-dropdown" id="profileDropdown">
+        <div class="dropdown-item" onclick="accedi()">🔑 Accedi</div>
+        <div class="dropdown-item" onclick="registrati()">📝 Registrati</div>
+        <div class="dropdown-item" id="profileItem" style="display: none;" onclick="handleProfile()">🔓 Il mio profilo</div>
+        <div class="dropdown-item" id="logoutItem" style="display: none;" onclick="handleLogout()">🚪 Esci</div>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <section class="welcome-section">
+      <h1 class="welcome-title">Trova il tuo spazio di lavoro ideale</h1>
+      <p class="welcome-subtitle">Coworking, uffici privati o sale riunioni. Filtra e prenota online.</p>
+    </section>
+
+    <div class="search-bar">
+      <input type="text" id="filtroCitta" placeholder="Dove vuoi lavorare?" />
+      <select id="filtroTipo">
+        <option value="">Qualsiasi tipo</option>
+        <option value="ufficio">Ufficio Privato</option>
+        <option value="coworking">Postazione Coworking</option>
+        <option value="sala">Sala Riunioni</option>
+      </select>
+      <button onclick="filtraSpazi()">Cerca</button>
+    </div>
+
+    <!-- Mappa -->
+    <div id="mappa" style="height: 400px; width: 100%; margin-bottom: 30px;"></div>
+
+    <div class="wrapper" id="listaSpazi">
+      <!-- Spazi caricati dinamicamente -->
+    </div>
+  </main>
+
+  <!-- Leaflet JS -->
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-o9N1jz6yTIC1+gf11hKmG3mD+L+k5pH+rdS7GZQti6o="
+    crossorigin=""
+  ></script>
+  <script type="module" src="src/cerca_spazi.js"></script>
+</body>
+</html>

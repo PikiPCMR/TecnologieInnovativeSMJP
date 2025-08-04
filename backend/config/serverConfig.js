@@ -1,7 +1,4 @@
-require('dotenv').config(); // Se vuoi usare variabili da .env
+import dotenv from 'dotenv';
+dotenv.config();
 
-module.exports = {
-  PORT: process.env.PORT || 3000
-};
-
-
+export const PORT = process.env.PORT || 3000;

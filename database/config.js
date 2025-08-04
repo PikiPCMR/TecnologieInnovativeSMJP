@@ -1,5 +1,5 @@
-const readline = require('readline');
-const { Client } = require('pg');
+import pkg from 'pg';
+const { Client } = pkg;
 
 // Configurazione della connessione
 const client = new Client({
@@ -14,70 +14,15 @@ const client = new Client({
 async function connectToDatabase() {
   try {
     await client.connect();
-    console.log('Connesso al database!');
+    console.log('✅ Connesso al database PostgreSQL');
   } catch (err) {
-    console.error('Errore di connessione al DB:', err);
+    console.error('❌ Errore di connessione al DB:', err);
     process.exit(1);
   }
 }
 
-/*Funzione per inserire una registrazione
-async function inserisciRegistrazione(nome, cognome, email, password, tipo_utente) {
-  try {
-    const insertQuery = `
-      INSERT INTO registrazione (nome, cognome, email, password, tipo_utente)
-      VALUES ($1, $2, $3, $4, $5)
-    `;
-    await client.query(insertQuery, [nome, cognome, email, password, tipo_utente]);
-    console.log('Registrazione inserita con successo!');
-  } catch (err) {
-    console.error('Errore nell\'inserimento dei dati:', err);
-  }
-}
-
-//Funzione per leggere tutte le registrazioni
-async function leggiRegistrazioni() {
-  try {
-    const res = await client.query('SELECT nome, cognome, email FROM registrazione');
-    console.log('Registrazioni trovate:');
-    res.rows.forEach(row => {
-      console.log(`Nome: ${row.nome}, Cognome: ${row.cognome}, Email: ${row.email}`);
-    });
-  } catch (err) {
-    console.error('Errore nella lettura dei dati:', err);
-  } finally {
-    await client.end();
-  }
-}
-
-// Interfaccia utente da console
-function chiediDatiUtente() {
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-  });
-
-  rl.question('Nome: ', (nome) => {
-    rl.question('Cognome: ', (cognome) => {
-      rl.question('Email: ', (email) => {
-        rl.question('Password: ', (password) => {
-          rl.question('Tipo utente: ', async (tipo_utente) => {
-            // Chiudi l'interfaccia di lettura
-            rl.close();
-            await connectToDatabase();
-            await inserisciRegistrazione(nome, cognome, email, password, tipo_utente);
-            await leggiRegistrazioni();
-          });
-        });
-       });
-    });
-  });
-}
-
-// Avvia la procedura
-chiediDatiUtente();*/
-// Connetti al database all'avvio del file
+// Connetti al database all'avvio
 connectToDatabase();
 
-// Esporta il client per l'uso in altri file
-module.exports = client;
+// Esporta il client per altri moduli
+export default client;
