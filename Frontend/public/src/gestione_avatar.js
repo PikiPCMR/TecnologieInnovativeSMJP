@@ -1,39 +1,120 @@
 import { supabase } from './collegamentoDb.js';
 
-export async function cercaContenutiBucket() {
-  console.log('🚀 Avvio ricerca contenuti nel bucket...');
+// === APRI POPUP ===
+export function apriPopup() {
+  document.getElementById('avatar-popup').style.display = 'flex';
+  caricaAvatarDaDB();
+}
+window.apriPopup = apriPopup;
 
-  if (!supabase || !supabase.storage) {
-    console.error('❌ supabase o supabase.storage non definito!');
+// === CHIUDI POPUP ===
+export function chiudiPopup() {
+  document.getElementById('avatar-popup').style.display = 'none';
+}
+window.chiudiPopup = chiudiPopup;
+
+// === CARICA AVATAR DA BUCKET ===
+export async function caricaAvatarDaDB() {
+  const user = JSON.parse(localStorage.getItem('user'));
+  if (!user || !user.id) {
+    console.warn('⚠️ Nessun utente loggato, esco dalla funzione.');
     return;
   }
 
-  try {
-    const { data, error } = await supabase
-      .storage
-      .from('immaginiprofilo')
-      .list('', { limit: 100 });
+  console.log('🔄 Caricamento avatar da tabella DB...');
 
-    if (error) {
-      console.error('❌ Errore durante il recupero file:', error);
-      return;
-    }
+  const { data, error } = await supabase
+    .from('avatar_profilo')
+    .select('*');
 
-    if (!data || data.length === 0) {
-      console.warn('⚠️ Nessun file trovato nel bucket immaginiprofilo.');
-      return;
-    }
-
-    console.log(`✅ Trovati ${data.length} file nel bucket immaginiprofilo:`);
-
-    data.forEach((file, index) => {
-      console.log(`  [${index + 1}] Nome: ${file.name}, tipo: ${file.metadata?.mime_type || 'n/d'}, size: ${file.metadata?.size || 'n/d'}`);
-    });
-
-  } catch (e) {
-    console.error('❌ Eccezione durante la ricerca contenuti:', e);
+  if (error) {
+    console.error('❌ Errore caricamento avatar dal DB:', error);
+    return;
   }
+
+  console.log('✅ Avatar caricati dal DB:', data);
+
+  const grid = document.getElementById('avatar-grid');
+  if (!grid) {
+    console.warn('⚠️ Elemento #avatar-grid non trovato nel DOM.');
+    return;
+  }
+
+  grid.innerHTML = '';
+
+  if (!data || data.length === 0) {
+    grid.innerHTML = '<p>Nessuna immagine disponibile.</p>';
+    return;
+  }
+
+  data.forEach(avatar => {
+    const img = document.createElement('img');
+    img.src = avatar.url;  // URL preso dal DB
+    img.alt = avatar.descrizione || avatar.nome_file;
+    img.onclick = () => selezionaAvatar(avatar.url);
+    grid.appendChild(img);
+  });
+
+  console.log('✅ Avatar mostrati nel popup');
 }
 
-// Per testare la funzione da console o codice:
-cercaContenutiBucket();
+// === SELEZIONA AVATAR ===
+async function selezionaAvatar(urlAvatar) {
+  const user = JSON.parse(localStorage.getItem('user'));
+  const userId = user.id;
+
+  if (!userId) {
+    console.error('⚠️ ID utente non trovato nel localStorage.');
+    return;
+  }
+
+  const { error } = await supabase
+    .from('registrazione')
+    .update({ immagine_profilo: urlAvatar })
+    .eq('id', userId);
+
+  if (error) {
+    console.error('❌ Errore nel salvataggio immagine profilo nel DB:', error);
+    return;
+  }
+
+  // Aggiorna immagine nel DOM
+  document.getElementById('avatar').src = urlAvatar;
+
+  // Aggiorna localStorage
+  user.immagine_profilo = urlAvatar;
+  localStorage.setItem('user', JSON.stringify(user));
+
+  console.log('✅ Avatar selezionato e salvato:', urlAvatar);
+  chiudiPopup();
+}
+
+// === CARICA AVATAR UTENTE ALL'AVVIO ===
+export function caricaAvatarUtente() {
+
+  const user = JSON.parse(localStorage.getItem('user'));
+  if (!user || !user.id) {
+    console.warn('⚠️ Nessun utente loggato, esco dalla funzione.');
+    return;
+  }
+
+  const avatarImg = document.getElementById('avatar');
+  const placeholder = 'https://sbxrdptjegjxqaklfpxq.supabase.co/storage/v1/object/public/immaginiprofilo//user1.png';
+
+  try {
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    if (!user || !user.immagine_profilo || user.immagine_profilo.trim() === '') {
+      console.warn('🙈 Nessun utente o immagine trovata, uso placeholder.');
+      avatarImg.src = placeholder;
+      return;
+    }
+
+    console.log('📸 Immagine profilo trovata:', user.immagine_profilo);
+    avatarImg.src = user.immagine_profilo;
+  } catch (err) {
+    console.error('❌ Errore nel recupero utente:', err);
+    avatarImg.src = placeholder;
+  }
+}
+window.caricaAvatarUtente = caricaAvatarUtente;

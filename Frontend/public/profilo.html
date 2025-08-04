@@ -6,128 +6,132 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <title>Profilo Utente | WorkSpace Pro</title>
   <link rel="stylesheet" href="styles/profilo.css" />
-  <link rel="stylesheet" href="styles.css" />
-  <script type="module" src="src/gestione_avatar.js"></script>
+  <link rel="stylesheet" href="styles/styles.css" />
+  <link rel="stylesheet" href="styles/avatar.css">
   <script type="module" src="src/profilo.js"></script>
+  <script type="module" src="src/sicurezza_profilo.js"></script>
 </head>
 
-<body onload="caricaProfiloUtente()">
+<body <!---prima era presente caricaprofiloutente()> </body>
 
-  <header class="header">
-    <a href=".html" class="logo-link">
-      <div class="logo">WorkSpace Pro</div>
-    </a>
-  </header>
+<header class="header">
+  <a href=".html" class="logo-link">
+    <div class="logo">WorkSpace Pro</div>
+  </a>
+</header>
 
-  <main class="main-content">
-    <section class="profile-overview">
-      <img id="avatar" class="avatar" src="placeholder-avatar.png" alt="Avatar" onclick="apriPopup()" />
-      <div class="profile-info">
-        <h1 id="salutoUtente">Ciao, </h1>
-        <p id="mediaRecensioni" class="ratings"></p>
-      </div>
+<main class="main-content">
 
-    </section>
-
-
-    <section class="profile-toolbar">
-      <button onclick="navigate('prenotazioni')">Prenotazioni</button>
-      <button onclick="navigate('generali')">Dati Generali</button>
-      <button onclick="navigate('sicurezza')">Accesso e Sicurezza</button>
-      <button onclick="navigate('pagamenti')">Pagamenti</button>
-      <button onclick="navigate('comunicazioni')">Comunicazioni</button>
-    </section>
-
-
-    <section id="section-content" class="section-content">
-      <!-- Contenuto dinamico -->
-    </section>
-    <!-- Popup Modifica Email -->
-<!-- Popup Modifica Email -->
-    <div id="popup-email" class="overlay-popup" style="display: none;">
-      <div class="popup-box">
-        <h3>Modifica Email</h3>
-        <form id="form-modifica-email" class="form-modifica">
-          <div class="form-group">
-            <label for="nuovaEmail">Nuova Email</label>
-            <input type="email" id="nuovaEmail" placeholder="Inserisci nuova email" />
-          </div>
-          <div class="form-group">
-            <label for="confermaEmail">Conferma Nuova Email</label>
-            <input type="email" id="confermaEmail" placeholder="Rinserisci nuova email" />
-          </div>
-          <div class="popup-buttons">
-            <button type="submit" class="popup-btn">Salva</button>
-            <button type="button" class="popup-btn-secondary" onclick="chiudiPopupEmail()">Annulla</button>
-          </div>
-        </form>
-      </div>
+  <section class="profile-overview">
+    <img id="avatar" class="avatar"
+      src="https://sbxrdptjegjxqaklfpxq.supabase.co/storage/v1/object/public/immaginiprofilo/user.png" alt="Avatar"
+      onclick="apriPopup()" />
+    <div class="profile-info">
+      <h1 id="salutoUtente">Ciao, </h1>
+      <p id="mediaRecensioni" class="ratings"></p>
     </div>
+  </section>
+
+
+  <section class="profile-toolbar">
+    <button onclick="navigate('prenotazioni')">Prenotazioni</button>
+    <button onclick="navigate('generali')">Dati Generali</button>
+    <button onclick="navigate('sicurezza')">Accesso e Sicurezza</button>
+    <button onclick="navigate('pagamenti')">Pagamenti</button>
+    <button onclick="navigate('comunicazioni')">Comunicazioni</button>
+  </section>
+
+
+  <section id="section-content" class="section-content">
+    <!-- Contenuto dinamico -->
+  </section>
+  <!-- Popup Modifica Email -->
+  <!-- Popup Modifica Email -->
+  <div id="popup-email" class="overlay-popup" style="display: none;">
+    <div class="popup-box">
+      <h3>Modifica Email</h3>
+      <form id="form-modifica-email" class="form-modifica">
+        <div class="form-group">
+          <label for="nuovaEmail">Nuova Email</label>
+          <input type="email" id="nuovaEmail" placeholder="Inserisci nuova email" />
+        </div>
+        <div class="form-group">
+          <label for="confermaEmail">Conferma Nuova Email</label>
+          <input type="email" id="confermaEmail" placeholder="Rinserisci nuova email" />
+        </div>
+        <div class="popup-buttons">
+          <button type="submit" class="popup-btn">Salva</button>
+          <button type="button" class="popup-btn-secondary" onclick="chiudiPopupEmail()">Annulla</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
 
 
-<!-- Popup Modifica Password -->
-<div id="popup-password" class="overlay-popup" style="display:none;">
+  <!-- Popup Modifica Password -->
+  <div id="popup-password" class="overlay-popup" style="display:none;">
+    <div class="popup-box">
+      <h3>Modifica Password</h3>
+      <form id="form-modifica-password" class="form-modifica">
+        <div class="form-group">
+          <label for="vecchiaPassword">Vecchia Password</label>
+          <div class="password-wrapper">
+            <input type="password" id="vecchiaPassword" name="vecchiaPassword" />
+            <button type="button" class="toggle-btn" onclick="togglePassword('vecchiaPassword', this)">Mostra</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="nuovaPassword">Nuova Password</label>
+          <div class="password-wrapper">
+            <input type="password" id="nuovaPassword" name="nuovaPassword" />
+            <button type="button" class="toggle-btn" onclick="togglePassword('nuovaPassword', this)">Mostra</button>
+          </div>
+        </div>
+
+        <div class="popup-buttons">
+          <button type="submit" class="popup-btn">Salva Password</button>
+          <button type="button" class="popup-btn-secondary" id="btnAnnullaPassword">Annulla</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+</main>
+<!-- POPUP RESET PASSWORD DA PROFILO -->
+<div id="popup-reset-password" class="overlay-popup" style="display: none;">
   <div class="popup-box">
-    <h3>Modifica Password</h3>
-    <form id="form-modifica-password" class="form-modifica">
-      <div class="form-group">
-        <label for="vecchiaPassword">Vecchia Password</label>
-        <div class="password-wrapper">
-          <input type="password" id="vecchiaPassword" name="vecchiaPassword" />
-          <button type="button" class="toggle-btn" onclick="togglePassword('vecchiaPassword', this)">Mostra</button>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="nuovaPassword">Nuova Password</label>
-        <div class="password-wrapper">
-          <input type="password" id="nuovaPassword" name="nuovaPassword" />
-          <button type="button" class="toggle-btn" onclick="togglePassword('nuovaPassword', this)">Mostra</button>
-        </div>
-      </div>
-
-      <div class="popup-buttons">
-        <button type="submit" class="popup-btn">Salva Password</button>
-        <button type="button" class="popup-btn-secondary" id="btnAnnullaPassword">Annulla</button>
-      </div>
-    </form>
+    <h3>Reset della Password</h3>
+    <p>Vuoi davvero inviare una richiesta di reset della password al tuo indirizzo email?</p>
+    <div class="popup-buttons">
+      <button class="popup-btn" id="confirmResetPassword">Invia</button>
+      <button class="popup-btn-secondary" id="cancelResetPassword">Annulla</button>
+    </div>
   </div>
 </div>
 
-
-  </main>
-  <!-- POPUP RESET PASSWORD DA PROFILO -->
-  <div id="popup-reset-password" class="overlay-popup" style="display: none;">
-    <div class="popup-box">
-      <h3>Reset della Password</h3>
-      <p>Vuoi davvero inviare una richiesta di reset della password al tuo indirizzo email?</p>
-      <div class="popup-buttons">
-        <button class="popup-btn" id="confirmResetPassword">Invia</button>
-        <button class="popup-btn-secondary" id="cancelResetPassword">Annulla</button>
-      </div>
+<!-- Popup Avatar -->
+<div id="avatar-popup" class="popup-overlay" style="display:none;">
+  <div class="popup-container">
+    <h2>Seleziona immagine profilo</h2>
+    <div id="avatar-grid" class="avatar-grid">
+      <!-- Le immagini saranno inserite qui da JS -->
+    </div>
+    <div class="popup-actions">
+      <button class="btn-cancel" onclick="chiudiPopup()">Annulla</button>
     </div>
   </div>
-
-  <!-- Popup Avatar -->
-  <div id="avatar-popup" class="popup-overlay" style="display:none;">
-    <div class="popup-container">
-      <h2>Seleziona immagine profilo</h2>
-      <div id="avatar-grid" class="avatar-grid">
-        <!-- Le immagini saranno inserite qui da JS -->
-      </div>
-      <div class="popup-actions">
-        <button class="btn-cancel" onclick="chiudiPopup()">Annulla</button>
-      </div>
-    </div>
-  </div>
+</div>
 </body>
 
 <script type="module">
-  import { caricaAvatarUtente } from './src/profilo.js';
+  import { caricaAvatarUtente } from './src/gestione_avatar.js';
 
   window.addEventListener('DOMContentLoaded', () => {
     caricaAvatarUtente();
   });
 </script>
+
 </html>
