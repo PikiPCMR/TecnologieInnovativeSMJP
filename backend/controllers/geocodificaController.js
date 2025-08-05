@@ -1,4 +1,4 @@
-import { supabase } from '../config/supabaseClient.js'; // adatta il path se necessario
+/*import { supabase } from '../config/supabaseClient.js'; // adatta il path se necessario
 import fetch from 'node-fetch';
 
 export const geocodificaSpazi = async (req, res) => {
@@ -40,4 +40,31 @@ export const geocodificaSpazi = async (req, res) => {
     console.error(err);
     res.status(500).json({ errore: err.message });
   }
+};*/
+
+const fetch = require('node-fetch');
+const { GOOGLE_GEOCODE_API_KEY, GOOGLE_GEOCODE_URL } = require('../config/geocoding');
+
+exports.geocodeAddress = async (req, res) => {
+  const { address } = req.query;
+
+  if (!address) {
+    return res.status(400).json({ error: 'Indirizzo mancante' });
+  }
+
+  try {
+    const url = `${GOOGLE_GEOCODE_URL}?address=${encodeURIComponent(address)}&key=${GOOGLE_GEOCODE_API_KEY}`;
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (data.status !== 'OK') {
+      return res.status(500).json({ error: 'Errore dalla Geocoding API', details: data.status });
+    }
+
+    const location = data.results[0].geometry.location;
+    res.json({ lat: location.lat, lng: location.lng });
+  } catch (error) {
+    res.status(500).json({ error: 'Errore nella richiesta', details: error.message });
+  }
 };
+

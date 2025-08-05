@@ -107,3 +107,24 @@ function inizializzaMappa(spazi) {
 
 window.caricaSpazi = caricaSpazi;
 window.mostraSpazi = mostraSpazi;
+
+
+
+const cercaCoordinate = async (indirizzo) => {
+  try {
+    const response = await fetch(`http://localhost:3000/api/geocode?address=${encodeURIComponent(indirizzo)}`);
+    const data = await response.json();
+
+    if (response.ok) {
+      console.log("Coordinate:", data.lat, data.lng);
+      // Puoi usarle nel tuo stato o nella mappa, ecc.
+    } else {
+      console.error("Errore:", data.error || "Errore generico");
+    }
+  } catch (error) {
+    console.error("Errore nella richiesta:", error);
+  }
+};
+
+
+cercaCoordinate("Piazza del Duomo, Milano, Italia"); // Esempio di utilizzo
