@@ -54,7 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // ✅ Procedi con invio reset se esiste
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: 'http://localhost:3000/reset_password.html'
+        redirectTo: 'http://localhost:3000/html/reset_password.html'
       });
 
       if (resetError) {
@@ -103,10 +103,10 @@ async function login() {
   if (user.tipo_utente === "gestore") {
     window.location.href = "dashboard_gestore.html";
   } else if (user.tipo_utente === "cliente") {
-    window.location.href = "index.html";
+    window.location.href = "../html/index.html";
   } else {
     alert("Tipo utente non riconosciuto: " + user.tipo_utente);
-    window.location.href = "index.html";
+    window.location.href = "../html/index.html";
   }
 }
 
@@ -127,13 +127,13 @@ function requireUserRole(role) {
 
   if (!user) {
     alert("Devi effettuare il login per accedere.");
-    window.location.href = "index.html";
+    window.location.href = "../html/index.html";
     return;
   }
 
   if (user.tipo_utente !== role) {
     alert("Accesso non autorizzato.");
-    window.location.href = "index.html";
+    window.location.href = "../html/index.html";
   }
 }
 window.requireUserRole = requireUserRole;
