@@ -18,12 +18,12 @@ function toggleProfileMenu() {
 window.toggleProfileMenu = toggleProfileMenu;
 
 function accedi() {
-  window.location.href = 'login.html';
+  window.location.href = '../html/login.html';
 }
 window.accedi = accedi;
 
 function registrati() {
-  window.location.href = 'register.html';
+  window.location.href = '../html/register.html';
 }
 window.registrati = registrati;
 
@@ -33,7 +33,7 @@ function handleProfile() {
     alert("Errore: utente non identificato.");
     return;
   }
-  window.location.href = 'profilo.html';
+  window.location.href = '../html/profilo.html';
   toggleProfileMenu();
 }
 window.handleProfile = handleProfile;
@@ -41,12 +41,12 @@ window.handleProfile = handleProfile;
 function handleLogout() {
   localStorage.removeItem('user');
   checkLogin();
-  window.location.href = 'index.html';
+  window.location.href = '../html/index.html';
 }
 window.handleLogout = handleLogout;
 
 function searchSpaces() {
-  window.location.href = 'cerca_spazi.html';
+  window.location.href = '../html/cerca_spazi.html';
 }
 window.searchSpaces = searchSpaces;
 

@@ -150,7 +150,7 @@ async function saveUser(user) {
   // 👇 Salva flag per mostrare popup in profilo
   localStorage.setItem("mostraPopupDecisione", "true");
 
-  const redirectUrl = "http://localhost:3000/profilo.html"; // ✅ URL di destinazione
+  const redirectUrl = "http://localhost:3000/html/profilo.html"; // ✅ URL di destinazione
 
   const { error: magicError } = await supabase.auth.signInWithOtp({
     email: user.email,
