@@ -1,4 +1,4 @@
-import { supabase } from '../collegamentoDb.js';
+import { supabase } from '../js/collegamentoDb.js';
 import {
   checkLogin,
   toggleProfileMenu,
@@ -6,7 +6,8 @@ import {
   registrati,
   handleProfile,
   handleLogout
-} from '../index.js';
+} from '../js/index.js';
+
 
 window.checkLogin = checkLogin;
 window.toggleProfileMenu = toggleProfileMenu;
@@ -127,4 +128,4 @@ const cercaCoordinate = async (indirizzo) => {
 };
 
 
-cercaCoordinate("Piazza del Duomo, Milano, Italia"); // Esempio di utilizzo
+cercaCoordinate("Piazza del Duomo, Milano, Italia");
