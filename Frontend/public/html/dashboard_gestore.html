@@ -6,6 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../styles/styles.css">
     <link rel="stylesheet" href="../styles/avatar.css">
+    <link rel="stylesheet" href="../styles/dashboardhtml.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+
+
     <title>Dashboard Gestore</title>
 </head>
 
@@ -45,11 +50,19 @@
                 aggiungerne di nuovi o modificarli.</p>
         </section>
 
-        <div class="card-dashboard">
-            <div class="action-card">
-                <div class="card-icon">🏢</div>
-                <h2 class="card-title">Dashboard utente</h2>
-                <p class="card-description">Qui puoi trovare il riepilogo degli ultimi 30 giorni</p>
+        <div class="action-cards">
+            <div class="action-card" id="d">
+                <!-- altri elementi già presenti -->
+                <div class="chart-container">
+                    <canvas id="chart-guadagni"></canvas>
+                </div>
+                <div class="counter-wrapper">
+                    <div class="commento">Prenotazioni da inizio anno</div>
+                    <div id="counter-prenotazioni">0</div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="chart-categorie"></canvas>
+                </div>
             </div>
         </div>
 
@@ -87,6 +100,8 @@
             caricaAvatarUtente();
         });
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="module" src="../js/dashboard_gestore.js"></script>
 </body>
 
 </html>
