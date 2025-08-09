@@ -61,15 +61,26 @@
 
         <div class="action-cards">
             <div class="action-card" id="d" onclick="openDashboardGestore()">
+                <div class="counter-wrapper">
+                    <div class="commento">Guadagni questo mese</div>
+                    <div id="counter-guadagni">0</div>
+                </div>
+                <div class="counter-wrapper">
+                    <div class="commento">Prenotazioni questo mese</div>
+                    <div id="counter-prenotazioni">0</div>
+                </div>
+                <div class="counter-wrapper">
+                    <div class="commento">Spazio più prenotato questo mese</div>
+                    <div id="counter-spazio-piu-prenotato">0</div>
+                </div>
                 <div class="chart-container">
                     <canvas id="chart-guadagni"></canvas>
                 </div>
-                <div class="counter-wrapper">
-                    <div class="commento">Prenotazioni da inizio anno</div>
-                    <div id="counter-prenotazioni">0</div>
-                </div>
                 <div class="chart-container">
                     <canvas id="chart-categorie"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="chart-fasce-orarie"></canvas>
                 </div>
             </div>
         </div>
@@ -99,4 +110,5 @@
         </div>
     </main>
 </body>
+
 </html>
