@@ -92,7 +92,6 @@ function updateProfileMenu() {
 }
 window.updateProfileMenu = updateProfileMenu;
 
-
 function checkLogin() {
   const userData = JSON.parse(localStorage.getItem('user'));
   const loginItem = document.querySelector('.dropdown-item[onclick="accedi()"]');
@@ -110,6 +109,20 @@ function checkLogin() {
     if (user.tipo_utente === "gestore" || user.tipo_utente === "cliente") {
       profileItem.style.display = 'block';
     }
+
+    // 🔄 Redirect automatico in base al ruolo
+    const currentPage = window.location.pathname;
+
+    // Se gestore ma non è sulla dashboard gestore → redirect
+    if (user.tipo_utente === "gestore" && !currentPage.includes("dashboard_gestore.html")) {
+      window.location.href = "/html/dashboard_gestore.html";
+    }
+
+    // Se cliente ma è nella dashboard gestore → redirect
+    if (user.tipo_utente === "cliente" && currentPage.includes("dashboard_gestore.html")) {
+      window.location.href = "/html/index.html";
+    }
+
   } else {
     isLoggedIn = false;
     user = null;
@@ -119,6 +132,7 @@ function checkLogin() {
     logoutItem.style.display = 'none';
   }
 }
+
 window.checkLogin = checkLogin;
 
 // === AVVIO PAGINA ===

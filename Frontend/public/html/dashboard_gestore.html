@@ -7,10 +7,16 @@
     <link rel="stylesheet" href="../styles/styles.css">
     <link rel="stylesheet" href="../styles/avatar.css">
     <link rel="stylesheet" href="../styles/dashboardhtml.css">
+    <script type="module" src="../js/index.js"></script>
+    <script type="module">
+        import { caricaAvatarUtente } from '../js/gestione_avatar.js';
 
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
-
-
+        window.addEventListener('DOMContentLoaded', () => {
+            caricaAvatarUtente();
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="module" src="../js/dashboard_gestore.js"></script>
     <title>Dashboard Gestore</title>
 </head>
 
@@ -90,18 +96,5 @@
 
         </div>
     </main>
-    <script type="module" src="../js/index.js"></script>
-    <script type="module" src="../js/login.js"></script>
-    <script type="module">
-        import { caricaAvatarUtente } from '../js/gestione_avatar.js';
-
-        window.addEventListener('DOMContentLoaded', () => {
-            requireUserRole("gestore");
-            caricaAvatarUtente();
-        });
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script type="module" src="../js/dashboard_gestore.js"></script>
 </body>
-
 </html>

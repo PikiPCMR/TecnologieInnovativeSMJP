@@ -1,36 +1,40 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cerca Spazi - WorkSpace Pro</title>
   <link rel="stylesheet" href="../styles/styles.css" />
   <link rel="stylesheet" href="../styles/spazi.css" />
+  <link rel="stylesheet" href="../styles/avatar.css">
+  <script type="module" src="../js/index.js"></script>
+
 
   <!-- Leaflet CSS per la mappa -->
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-    crossorigin=""
-  />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   <!-- Leaflet JS -->
-  <script
-    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-    crossorigin=""
-  ></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 </head>
 
 <body onload="caricaSpazi()">
   <header class="header">
-    <a href="index.html" class="logo-link"><div class="logo">WorkSpace Pro</div></a>
+    <a href="index.html" class="logo-link">
+      <div class="logo">WorkSpace Pro</div>
+    </a>
     <div class="profile-section">
-      <div class="profile-btn" onclick="toggleProfileMenu()">👤</div>
+      <div class="profile-btn" onclick="toggleProfileMenu()">
+        <img id="avatar" class="avatar avatar-small"
+          src="https://sbxrdptjegjxqaklfpxq.supabase.co/storage/v1/object/public/immaginiprofilo//user.png"
+          alt="Avatar" />
+      </div>
       <div class="profile-dropdown" id="profileDropdown">
         <div class="dropdown-item" onclick="accedi()">🔑 Accedi</div>
         <div class="dropdown-item" onclick="registrati()">📝 Registrati</div>
-        <div class="dropdown-item" id="profileItem" style="display: none;" onclick="handleProfile()">🔓 Il mio profilo</div>
+        <div class="dropdown-item" id="profileItem" style="display: none;" onclick="handleProfile()">🔓 Il mio profilo
+        </div>
         <div class="dropdown-item" id="logoutItem" style="display: none;" onclick="handleLogout()">🚪 Esci</div>
       </div>
     </div>
@@ -61,7 +65,15 @@
     </div>
   </main>
 
-  
+
   <script type="module" src="../js/cerca_spazi.js"></script>
+  <script type="module">
+    import { caricaAvatarUtente } from '../js/gestione_avatar.js';
+
+    window.addEventListener('DOMContentLoaded', () => {
+      caricaAvatarUtente();
+    });
+  </script>
 </body>
+
 </html>
