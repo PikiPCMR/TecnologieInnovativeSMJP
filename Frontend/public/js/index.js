@@ -110,17 +110,21 @@ function checkLogin() {
       profileItem.style.display = 'block';
     }
 
-    // 🔄 Redirect automatico in base al ruolo
-    const currentPage = window.location.pathname;
+    // 🔄 Redirect automatico solo alla PRIMA visita di questa sessione
+    if (!sessionStorage.getItem('redirectEffettuato')) {
+      const currentPage = window.location.pathname;
 
-    // Se gestore ma non è sulla dashboard gestore → redirect
-    if (user.tipo_utente === "gestore" && !currentPage.includes("dashboard_gestore.html")) {
-      window.location.href = "/html/dashboard_gestore.html";
-    }
+      if (user.tipo_utente === "gestore" && !currentPage.includes("dashboard_gestore.html")) {
+        sessionStorage.setItem('redirectEffettuato', 'true');
+        window.location.href = "/html/dashboard_gestore.html";
+        return;  // stop ulteriore esecuzione
+      }
 
-    // Se cliente ma è nella dashboard gestore → redirect
-    if (user.tipo_utente === "cliente" && currentPage.includes("dashboard_gestore.html")) {
-      window.location.href = "/html/index.html";
+      if (user.tipo_utente === "cliente" && currentPage.includes("dashboard_gestore.html")) {
+        sessionStorage.setItem('redirectEffettuato', 'true');
+        window.location.href = "/html/index.html";
+        return;
+      }
     }
 
   } else {
@@ -130,10 +134,13 @@ function checkLogin() {
     registerItem.style.display = 'block';
     profileItem.style.display = 'none';
     logoutItem.style.display = 'none';
+
+    // Puliamo il flag se non loggato
+    sessionStorage.removeItem('redirectEffettuato');
   }
 }
-
 window.checkLogin = checkLogin;
+
 
 // === AVVIO PAGINA ===
 document.addEventListener("DOMContentLoaded", () => {

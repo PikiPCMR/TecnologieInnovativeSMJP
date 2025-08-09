@@ -121,7 +121,7 @@ if (togglePassword && passwordInput) {
   });
 }
 
-/* auth.js (accesso pagine protette)
+// auth.js (accesso pagine protette)
 function requireUserRole(role) {
   const user = JSON.parse(localStorage.getItem('user'));
 
@@ -138,4 +138,4 @@ function requireUserRole(role) {
 }
 window.requireUserRole = requireUserRole; 
 
-export { requireUserRole }; */
+export { requireUserRole };

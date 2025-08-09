@@ -98,4 +98,3 @@ function renderPieChart(canvasId, data, title) {
 window.addEventListener('DOMContentLoaded', () => {
     fetchDashboardData();
 });
-
