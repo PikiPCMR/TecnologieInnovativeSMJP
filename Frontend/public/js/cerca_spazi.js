@@ -43,6 +43,7 @@ function mostraSpazi(lista) {
   container.innerHTML = lista.map(spazio => {
     const immagine = spazio.immagini_spazio?.[0] || 'img/placeholder.jpg';
     const indirizzo = `${spazio.indirizzo_spazio || ''}, ${spazio.Numero_Civico || ''}`;
+    aggiungiMarker(`${indirizzo}, ${spazio.Città}`);
     return `
       <div class="workspace-card">
         <img class="workspace-img" src="${immagine}" alt="${spazio.id_spazio}" />
@@ -111,21 +112,20 @@ window.mostraSpazi = mostraSpazi;
 
 
 
-const cercaCoordinate = async (indirizzo) => {
-  try {
-    const response = await fetch(`http://localhost:3000/api/geocode?address=${encodeURIComponent(indirizzo)}`);
-    const data = await response.json();
+// Funzione per aggiungere un marker alla mappa
+// Utilizza Nominatim per ottenere le coordinate da un indirizzo
+function aggiungiMarker(indirizzo) {
+  fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(indirizzo)}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.length > 0) {
+        const lat = parseFloat(data[0].lat);
+        const lon = parseFloat(data[0].lon);
 
-    if (response.ok) {
-      console.log("Coordinate:", data.lat, data.lng);
-      // Puoi usarle nel tuo stato o nella mappa, ecc.
-    } else {
-      console.error("Errore:", data.error || "Errore generico");
-    }
-  } catch (error) {
-    console.error("Errore nella richiesta:", error);
-  }
-};
-
-
-cercaCoordinate("Piazza del Duomo, Milano, Italia");
+        L.marker([lat, lon])
+          .addTo(map)
+          .bindPopup(indirizzo);
+      }
+    })
+    .catch(err => console.error("Errore nel geocoding:", err));
+}
