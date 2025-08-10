@@ -54,7 +54,7 @@ function mostraSpazi(lista) {
           <p class="services">🧭 Categoria: ${spazio.categoria}</p>
           <div class="workspace-footer">
             <div class="price">Italia</div>
-            <button class="btn-book" onclick="prenotaSpazio('${spazio.id_spazio}')">Prenota</button>
+            <button class="btn-book" onclick="vaiAScheda('${spazio.id_spazio}')">Dettagli</button>
           </div>
         </div>
       </div>
@@ -169,3 +169,8 @@ input.addEventListener("input", () => {
       });
   }, 300);
 });
+
+window.vaiAScheda = (idSpazio) => {
+  // Reindirizza alla pagina con parametro id
+  window.location.href = `spazio.html?id=${encodeURIComponent(idSpazio)}`;
+};

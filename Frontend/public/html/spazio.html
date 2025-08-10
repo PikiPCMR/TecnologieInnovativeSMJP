@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Workspace – Scheda Spazio</title>
+
+  <link rel="stylesheet" href="../styles/styles.css" />
+  <link rel="stylesheet" href="../styles/spazio.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <script type="module" src="../js/collegamentoDb.js"></script>
+  <script type="module" src="../js/index.js"></script>
+  <script type="module" src="../js/spazio.js"></script>
+</head>
+<body>
+  <!-- HEADER PRINCIPALE -->
+  <header class="header">
+    <a href="index.html" class="logo-link">
+      <div class="logo">WorkSpace Pro</div>
+    </a>
+    <div class="profile-icon" onclick="handleProfile()">
+      <img id="headerAvatar"
+        src="https://sbxrdptjegjxqaklfpxq.supabase.co/storage/v1/object/public/immaginiprofilo/user.png"
+        alt="Profilo" />
+    </div>
+  </header>
+
+  <!-- PULSANTE TORNA ALLA RICERCA -->
+  <div class="container">
+    <div class="back-button" style="margin-top:16px;">
+      <a class="btn-secondary" href="cerca_spazi.html">← Torna alla ricerca</a>
+    </div>
+  </div>
+
+  <main class="container">
+    <section class="title-row">
+      <div>
+        <h1 id="title">Nome spazio</h1>
+        <p class="sub" id="subtitle">Categoria · Città, Provincia – Italia</p>
+      </div>
+      <div class="rating-badge" id="ratingBadge" aria-label="valutazione media" hidden>
+        <span id="ratingValue">4.8</span>
+      </div>
+    </section>
+
+    <section class="gallery">
+      <div class="gallery-main">
+        <img id="hero" alt="foto principale dello spazio" />
+      </div>
+      <div class="thumbs" id="thumbs"></div>
+    </section>
+
+    <section class="content-grid">
+      <article class="details">
+        <h2>Dettagli</h2>
+        <p id="descrizione"></p>
+
+        <div class="cards-3">
+          <div class="card">
+            <h3>Capienza max</h3>
+            <p><span id="capienza">—</span> persone</p>
+          </div>
+          <div class="card">
+            <h3>Categoria</h3>
+            <p id="categoria">—</p>
+          </div>
+          <div class="card">
+            <h3>Indirizzo</h3>
+            <p id="indirizzo">—</p>
+          </div>
+        </div>
+
+        <h3>Servizi inclusi</h3>
+        <ul class="amenities" id="servizi"></ul>
+
+        <h3>Disponibilità</h3>
+        <div class="availability">
+          <input type="date" id="giorno" />
+          <div class="slots" id="slots"></div>
+          <small class="hint">Seleziona una fascia oraria disponibile.</small>
+        </div>
+
+        <h3>Recensioni</h3>
+
+        <div id="reviews-summary" class="reviews-summary" hidden>
+        <strong>Media:</strong> <span id="avg-rating">—</span> / 5
+        · <span id="reviews-count">0</span> recensioni
+        </div>
+
+        <div id="reviews-list" class="reviews-list"></div>
+
+        <div class="add-review card">
+        <h4>Lascia una recensione</h4>
+        <label>Voto:
+            <select id="review-rating">
+            <option value="">Seleziona</option>
+            <option value="1">1 ★</option>
+            <option value="2">2 ★★</option>
+            <option value="3">3 ★★★</option>
+            <option value="4">4 ★★★★</option>
+            <option value="5">5 ★★★★★</option>
+            </select>
+        </label>
+        <label>Commento:
+            <textarea id="review-comment" placeholder="Scrivi la tua recensione..."></textarea>
+        </label>
+        <button id="submit-review" class="btn-primary">Invia recensione</button>
+        </div>
+        <h3>Occupazione ultimi 30 giorni</h3>
+        <div class="sparkline-wrap">
+          <svg id="sparkline" viewBox="0 0 100 24" preserveAspectRatio="none"></svg>
+        </div>
+
+        <h3>Mappa</h3>
+        <div id="map" class="map"></div>
+      </article>
+
+      <aside class="booking" aria-label="Prenotazione">
+        <div class="booking-card">
+          <div class="price">
+            <span id="prezzo">—</span><span class="unit">/ora</span>
+          </div>
+          <label>Data
+            <input type="date" id="bk-date">
+          </label>
+          <label>Fascia oraria
+            <select id="bk-slot">
+              <option value="">Seleziona</option>
+            </select>
+          </label>
+          <button id="ctaPrenota" class="btn-primary" disabled>Prenota ora</button>
+          <p class="fine-print" id="costi">Tasse e costi mostrati al checkout.</p>
+          <div class="secure">🔒 Pagamento sicuro</div>
+        </div>
+
+        <div class="host">
+          <h3>Gestore</h3>
+          <div class="host-row">
+            <img id="hostAvatar" alt="foto gestore" />
+            <div>
+              <div id="hostName">—</div>
+              <div class="muted" id="hostMail">—</div>
+              <div class="muted" id="hostPhone">—</div>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="related">
+      <h2>Spazi simili</h2>
+      <div id="related" class="related-row"></div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <small>© Workspace Pro</small>
+  </footer>
+</body>
+</html>
