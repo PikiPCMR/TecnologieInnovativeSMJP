@@ -136,6 +136,6 @@ function requireUserRole(role) {
     window.location.href = "../html/index.html";
   }
 }
-window.requireUserRole = requireUserRole;
+window.requireUserRole = requireUserRole; 
 
 export { requireUserRole };

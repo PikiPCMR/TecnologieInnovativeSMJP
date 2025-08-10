@@ -92,7 +92,6 @@ function updateProfileMenu() {
 }
 window.updateProfileMenu = updateProfileMenu;
 
-
 function checkLogin() {
   const userData = JSON.parse(localStorage.getItem('user'));
   const loginItem = document.querySelector('.dropdown-item[onclick="accedi()"]');
@@ -110,6 +109,24 @@ function checkLogin() {
     if (user.tipo_utente === "gestore" || user.tipo_utente === "cliente") {
       profileItem.style.display = 'block';
     }
+
+    // 🔄 Redirect automatico solo alla PRIMA visita di questa sessione
+    if (!sessionStorage.getItem('redirectEffettuato')) {
+      const currentPage = window.location.pathname;
+
+      if (user.tipo_utente === "gestore" && !currentPage.includes("dashboard_gestore.html")) {
+        sessionStorage.setItem('redirectEffettuato', 'true');
+        window.location.href = "/html/dashboard_gestore.html";
+        return;  // stop ulteriore esecuzione
+      }
+
+      if (user.tipo_utente === "cliente" && currentPage.includes("dashboard_gestore.html")) {
+        sessionStorage.setItem('redirectEffettuato', 'true');
+        window.location.href = "/html/index.html";
+        return;
+      }
+    }
+
   } else {
     isLoggedIn = false;
     user = null;
@@ -117,9 +134,13 @@ function checkLogin() {
     registerItem.style.display = 'block';
     profileItem.style.display = 'none';
     logoutItem.style.display = 'none';
+
+    // Puliamo il flag se non loggato
+    sessionStorage.removeItem('redirectEffettuato');
   }
 }
 window.checkLogin = checkLogin;
+
 
 // === AVVIO PAGINA ===
 document.addEventListener("DOMContentLoaded", () => {
