@@ -11,6 +11,17 @@
   box-shadow: 0 4px 10px rgba(0,0,0,0.05);
 }
 
+.input-group {
+  position: relative;
+  flex: 1;
+  min-width: 180px;
+}
+
+.search-bar select {
+  flex: 1;
+  min-width: 180px;
+}
+
 .search-bar input,
 .search-bar select {
   padding: 12px;
@@ -122,4 +133,40 @@
     flex-direction: column;
     gap: 10px;
   }
+}
+
+
+#mappa {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto 30px auto;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  height: 400px;
+}
+
+#filtroCitta {
+  width: 100%;
+  padding: 12px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+#suggerimenti {
+  border: 1px solid #ccc;
+  width: 100%;
+  margin-top: 0;
+  padding: 0;
+  list-style: none;
+  position: absolute;
+  background: white;
+  z-index: 999;
+}
+#suggerimenti li {
+  list-style-type: none;
+  padding: 8px;
+  cursor: pointer;
+}
+#suggerimenti li:hover {
+  background: #f0f0f0;
 }

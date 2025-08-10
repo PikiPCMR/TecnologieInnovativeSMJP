@@ -67,7 +67,7 @@ window.filtraSpazi = () => {
   const tipo = document.getElementById('filtroTipo')?.value.toLowerCase() || '';
 
   const filtrati = spazi.filter(s =>
-    (!citta || s.Città.toLowerCase().includes(citta)) &&
+    (!citta || citta.includes(s.Città.toLowerCase())) &&
     (!tipo || s.categoria?.toLowerCase() === tipo)
   );
 
@@ -129,3 +129,43 @@ function aggiungiMarker(indirizzo) {
     })
     .catch(err => console.error("Errore nel geocoding:", err));
 }
+
+const input = document.getElementById("filtroCitta");
+const suggerimenti = document.getElementById("suggerimenti");
+
+let timeout = null;
+
+input.addEventListener("input", () => {
+  clearTimeout(timeout);
+  const query = input.value.trim();
+
+  if (query.length < 2) {
+    suggerimenti.style.display = "none";
+    return;
+  }
+
+  timeout = setTimeout(() => {
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&addressdetails=1&limit=5`)
+      .then(res => res.json())
+      .then(data => {
+        suggerimenti.innerHTML = "";
+        data.forEach(place => {
+          const item = document.createElement("div");
+          item.className = "suggestion-item";
+          item.innerHTML = `
+            <div class="text">
+              <span class="title">${place.display_name.split(",")[0]}, </span>
+              <span class="subtitle">${place.address.city || place.address.town || place.address.village || ""}, </span>
+              <span class="subtitle">${place.address.country || ""}</span>
+            </div>
+          `;
+          item.addEventListener("click", () => {
+            input.value = `${place.display_name.split(",")[0]}, ${place.address.city || place.address.town || place.address.village || ""}, ${place.address.country || ""}`;
+            suggerimenti.style.display = "none";
+          });
+          suggerimenti.appendChild(item);
+        });
+        suggerimenti.style.display = "block";
+      });
+  }, 300);
+});
