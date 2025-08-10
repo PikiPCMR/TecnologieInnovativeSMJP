@@ -6,6 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../styles/styles.css">
     <link rel="stylesheet" href="../styles/avatar.css">
+    <link rel="stylesheet" href="../styles/internal_dashboard.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="module" src="../js/internal_dashboard.js"></script>
     <script type="module" src="../js/index.js"></script>
     <script type="module">
         import { caricaAvatarUtente } from '../js/gestione_avatar.js';
@@ -44,5 +48,50 @@
             </div>
         </div>
     </header>
+
+    <main class="main-content">
+        <section class="welcome-section">
+            <h1 class="welcome-title">Riepilogo statistiche</h1>
+            <p class="welcome-subtitle">Benvenuto nella pagina statistiche, qui potrai consultare l'andamento dei tuoi
+                spazi. </p>
+        </section>
+
+        <section class="statistica_tempo">
+            <h3>Riepilogo andamento ultimo anno</h3>
+        </section>
+
+        <div class="action-cards">
+            <div class="action-card" id="c">
+
+                <div class="table-container">
+                    <table id="tabella-prenotazioni"></table>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="chart-grafico-prenotazioni-barre"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="chart-grafico-economico-barre"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="chart-tipi-spazi-prenotati"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="chart-andamento-economico"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="chart-fasce-prenotate"></canvas>
+                </div>
+
+            </div>
+        </div>
+
+
+    </main>
 </body>
+
 </html>
