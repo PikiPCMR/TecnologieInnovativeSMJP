@@ -127,3 +127,12 @@ document.addEventListener("DOMContentLoaded", () => {
   updateProfileMenu();   // Poi aggiorni il menu in base allo stato
   testDbConnection();    // (solo per debug)
 });
+
+export{
+  checkLogin,
+  toggleProfileMenu,
+  accedi,
+  registrati,
+  handleProfile,
+  handleLogout
+}

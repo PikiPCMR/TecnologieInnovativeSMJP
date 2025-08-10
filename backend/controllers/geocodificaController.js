@@ -43,7 +43,7 @@ export const geocodificaSpazi = async (req, res) => {
 };*/
 
 import fetch from 'node-fetch';
-import { GOOGLE_GEOCODE_API_KEY } from '../config/geocoding.js';
+import { GOOGLE_GEOCODE_API_KEY, GOOGLE_GEOCODE_URL } from '../config/geocoding.js';
 
 export const geocodificaSpazi = async (req, res) => {
   const { address } = req.query;
