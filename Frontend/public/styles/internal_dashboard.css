@@ -23,52 +23,48 @@
 }
 
 .table-container {
-    overflow-x: auto;
-    overflow-y: auto;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    background: white;
+    max-width: 100%;     
+    max-height: 100%;     
+    overflow-x: auto !important;    
+    overflow-y: auto !important;      
+    background-color: #ffffff80 !important;
+    border: 2px solid #bfbfbf !important;
 }
 
-.tabella-prenotazioni table {
+#tabella-prenotazioni table {
     width: max-content; /* evita compressione colonne */
     border-collapse: collapse;
 }
 
-.tabella-prenotazioni th,
-.tabella-prenotazioni td {
+#tabella-prenotazioni th,
+#tabella-prenotazioni td {
     padding: 8px 20px;
     border: 1px solid #ddd;
+    background-color: #ffffff90;
     text-align: left;
     white-space: nowrap; /* niente a capo */
     min-width: 100px;
 }
 
-.tabella-prenotazioni th {
-    background-color: #f2f2f2;
+#tabella-prenotazioni th { /* intestazioni */
+    background-color: #f2f2f290; 
     position: sticky;
     top: 0;
     z-index: 10;
 }
 
-
-/* Grafici — li facciamo riempire il box */
-.statistica_tempochart-grafico-prenotazioni-barre,
-.chart-grafico-economico-barre,
-.chart-tipi-spazi-prenotati,
-.chart-andamento-economico,
-.chart-fasce-prenotate {
-    width: 100%;
-    height: 100%;
-}
-
 /* Canvas dei grafici */
 .statistica_tempochart-grafico-prenotazioni-barre canvas,
-.chart-grafico-economico-barre canvas,
-.chart-tipi-spazi-prenotati canvas,
-.chart-andamento-economico canvas,
-.chart-fasce-prenotate canvas {
+#chart-grafico-economico-barre canvas,
+#chart-tipi-spazi-prenotati canvas,
+#chart-andamento-economico canvas,
+#chart-fasce-prenotate canvas {
     width: 100% !important;
     height: 100% !important;
+}
+
+#p {
+    background-color: #ffffff80;
+    border: 2px solid #bfbfbf;
 }
 

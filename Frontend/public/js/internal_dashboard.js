@@ -1,8 +1,6 @@
 import { supabase } from './collegamentoDb.js';
 
 const userId = localStorage.getItem('user');
-const currentYear = new Date().getFullYear();
-const startOfYear = `${currentYear}-01-01`;
 const user = JSON.parse(localStorage.getItem('user'))?.id;
 
 function openDashboardGestore() {
@@ -15,6 +13,14 @@ async function fetchInternalDashboardData() {
 
     const now = new Date();
     const startOfYear = new Date(now.getFullYear(), 0, 1).toISOString().slice(0, 10);
+
+    // === Ordine mesi ===
+    const ordineMesi = ["Gen", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    function sortByMonth(obj) {
+        return Object.fromEntries(
+            Object.entries(obj).sort((a, b) => ordineMesi.indexOf(a[0]) - ordineMesi.indexOf(b[0]))
+        );
+    }
 
     // === 1. Spazi del gestore loggato ===
     const { data: spazi, error: spaziError } = await supabase
@@ -84,7 +90,7 @@ async function fetchInternalDashboardData() {
     }
 
     // === 6. Grafico prenotazioni mensili ===
-    const prenotazioniMensili = groupByMonth(prenotazioni, null, false);
+    const prenotazioniMensili = sortByMonth(groupByMonth(prenotazioni, null, false));
     renderBarChart('chart-grafico-prenotazioni-barre', prenotazioniMensili, 'Prenotazioni per mese');
     console.log('Prenotazioni mensili:', prenotazioniMensili);
 
@@ -93,7 +99,7 @@ async function fetchInternalDashboardData() {
         const pren = prenotazioni.find(p => p.id_prenotazione === pg.id_prenotazione);
         return { ...pg, giorno: pren?.giorno };
     });
-    const guadagniMensili = groupByMonth(pagamentiConData, 'importo', true);
+    const guadagniMensili = sortByMonth(groupByMonth(pagamentiConData, 'importo', true));
     renderBarChart('chart-grafico-economico-barre', guadagniMensili, 'Guadagni per mese');
     console.log('Guadagni mensili:', guadagniMensili);
 
@@ -105,7 +111,7 @@ async function fetchInternalDashboardData() {
         if (!fasceOrarieMensili[month][p.fascia_oraria]) fasceOrarieMensili[month][p.fascia_oraria] = 0;
         fasceOrarieMensili[month][p.fascia_oraria]++;
     });
-    renderLineChart('chart-fasce-prenotate', fasceOrarieMensili, 'Prenotazioni per fascia oraria');
+    renderLineChart('chart-fasce-prenotate', sortByMonth(fasceOrarieMensili), 'Prenotazioni per fascia oraria');
     console.log('Prenotazioni per fascia oraria:', fasceOrarieMensili);
 
     // === 9. Line chart: Prenotazioni per categoria ===
@@ -118,7 +124,7 @@ async function fetchInternalDashboardData() {
         if (!categorieMensili[month][cat]) categorieMensili[month][cat] = 0;
         categorieMensili[month][cat]++;
     });
-    renderLineChart('chart-tipi-spazi-prenotati', categorieMensili, 'Prenotazioni per categoria');
+    renderLineChart('chart-tipi-spazi-prenotati', sortByMonth(categorieMensili), 'Prenotazioni per categoria');
     console.log('Prenotazioni per categoria:', categorieMensili);
 
     // === 10. Line chart: Andamento economico cumulato ===
@@ -129,11 +135,22 @@ async function fetchInternalDashboardData() {
         cumulato += guadagniMensili[m];
         guadagniCumulati[m] = cumulato;
     });
-    renderLineChartSimple('chart-andamento-economico', guadagniCumulati, 'Andamento Economico YTD');
+    renderLineChartSimple('chart-andamento-economico', sortByMonth(guadagniCumulati), 'Andamento Economico YTD');
     console.log('Andamento economico cumulato:', guadagniCumulati);
 }
 
 // === Funzioni grafici ===
+const colorPalette = [
+  '#FF6384', // rosso-rosa
+  '#36A2EB', // blu
+  '#FFCE56', // giallo
+  '#4BC0C0', // turchese
+  '#9966FF', // viola
+  '#FF9F40', // arancione
+  '#E7E9ED', // grigio chiaro
+  '#8AFF33'  // verde lime
+];
+
 function renderBarChart(canvasId, data, title) {
     new Chart(document.getElementById(canvasId), {
         type: 'bar',
@@ -142,7 +159,7 @@ function renderBarChart(canvasId, data, title) {
             datasets: [{
                 label: title,
                 data: Object.values(data),
-                backgroundColor: '#36A2EB'
+                backgroundColor: colorPalette[1] // usa il blu fisso
             }]
         },
         options: { responsive: true, plugins: { legend: { display: false } } }
@@ -152,20 +169,29 @@ function renderBarChart(canvasId, data, title) {
 function renderLineChart(canvasId, groupedData, title) {
     const labels = Object.keys(groupedData);
     const datasets = [];
-    const categories = new Set();
-    labels.forEach(m => Object.keys(groupedData[m]).forEach(c => categories.add(c)));
-    categories.forEach(cat => {
+    const categories = Array.from(new Set(labels.flatMap(m => Object.keys(groupedData[m]))));
+    
+    categories.forEach((cat, i) => {
         datasets.push({
             label: cat,
             data: labels.map(m => groupedData[m][cat] || 0),
-            borderColor: getRandomColor(),
-            fill: false
+            borderColor: colorPalette[i % colorPalette.length],
+            backgroundColor: colorPalette[i % colorPalette.length],
+            fill: false,
+            tension: 0.3
         });
     });
+
     new Chart(document.getElementById(canvasId), {
         type: 'line',
         data: { labels, datasets },
-        options: { responsive: true, plugins: { title: { display: true, text: title } } }
+        options: { 
+            responsive: true, 
+            plugins: { 
+                title: { display: true, text: title },
+                legend: { position: 'top' }
+            }
+        }
     });
 }
 
@@ -177,17 +203,14 @@ function renderLineChartSimple(canvasId, data, title) {
             datasets: [{
                 label: title,
                 data: Object.values(data),
-                borderColor: '#FF6384',
-                fill: false
+                borderColor: colorPalette[0], // rosso
+                backgroundColor: colorPalette[0],
+                fill: false,
+                tension: 0.3
             }]
         },
         options: { responsive: true }
     });
 }
 
-function getRandomColor() {
-    return `hsl(${Math.floor(Math.random()*360)}, 70%, 50%)`;
-}
-
 window.addEventListener('DOMContentLoaded', fetchInternalDashboardData);
-
