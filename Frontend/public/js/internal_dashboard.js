@@ -213,4 +213,67 @@ function renderLineChartSimple(canvasId, data, title) {
     });
 }
 
+async function fetchAllTimeData() {
+    if (!userId) return;
+
+    // === 1. Prendo gli spazi del gestore ===
+    const { data: spazi, error: spaziError } = await supabase
+        .from('spazi_lavoro')
+        .select('id_spazio')
+        .eq('id_gestore', user);
+
+    if (spaziError) {
+        console.error('Errore spazi:', spaziError);
+        return;
+    }
+
+    const spazioIds = spazi.map(s => s.id_spazio);
+    if (spazioIds.length === 0) {
+        console.log('Nessuno spazio trovato per il gestore');
+        document.getElementById('counter-guadagni-alltime').textContent = '0 €';
+        document.getElementById('counter-prenotazioni-alltime').textContent = '0';
+        return;
+    }
+
+    // === 2. Prendo tutte le prenotazioni per quegli spazi (all time) ===
+    const { data: prenotazioni, error: prenotazioniError } = await supabase
+        .from('prenotazione')
+        .select('id_prenotazione')
+        .in('id_spazio', spazioIds);
+
+    if (prenotazioniError) {
+        console.error('Errore prenotazioni:', prenotazioniError);
+        return;
+    }
+
+    // Aggiorno contatore prenotazioni
+    document.getElementById('counter-prenotazioni-alltime').textContent = prenotazioni.length;
+
+    if (prenotazioni.length === 0) {
+        document.getElementById('counter-guadagni-alltime').textContent = '0 €';
+        return;
+    }
+
+    const prenotazioneIds = prenotazioni.map(p => p.id_prenotazione);
+
+    // === 3. Prendo tutti i pagamenti relativi alle prenotazioni ===
+    const { data: pagamenti, error: pagamentiError } = await supabase
+        .from('pagamenti')
+        .select('importo')
+        .in('id_prenotazione', prenotazioneIds);
+
+    if (pagamentiError) {
+        console.error('Errore pagamenti:', pagamentiError);
+        return;
+    }
+
+    // Sommo tutti gli importi pagati
+    const totaleGuadagni = pagamenti.reduce((acc, pg) => acc + (pg.importo || 0), 0);
+
+    // Aggiorno contatore guadagni (formattato con 2 decimali e €)
+    document.getElementById('counter-guadagni-alltime').textContent = totaleGuadagni.toFixed(2) + ' €';
+}
+
+
 window.addEventListener('DOMContentLoaded', fetchInternalDashboardData);
+window.addEventListener('DOMContentLoaded', fetchAllTimeData);

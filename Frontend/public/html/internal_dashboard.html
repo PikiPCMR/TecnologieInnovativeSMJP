@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="../styles/styles.css">
     <link rel="stylesheet" href="../styles/avatar.css">
     <link rel="stylesheet" href="../styles/internal_dashboard.css">
+    <link rel="stylesheet" href="../styles/dashboardhtml.css">
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script type="module" src="../js/internal_dashboard.js"></script>
@@ -62,33 +63,56 @@
 
         <div class="action-cards">
             <div class="action-card" id="c">
-
                 <div class="table-container">
                     <table id="tabella-prenotazioni"></table>
                 </div>
 
-                <div class="chart-container" id="p">
+                <div class="pcontainer">
                     <canvas id="chart-grafico-prenotazioni-barre"></canvas>
                 </div>
 
-                <div class="chart-container" id="p">
+                <div class="pcontainer">
                     <canvas id="chart-grafico-economico-barre"></canvas>
                 </div>
 
-                <div class="chart-container" id="p">
+                <div class="pcontainer">
                     <canvas id="chart-tipi-spazi-prenotati"></canvas>
                 </div>
 
-                <div class="chart-container" id="p">
+                <div class="pcontainer">
                     <canvas id="chart-andamento-economico"></canvas>
                 </div>
 
-                <div class="chart-container" id="p">
+                <div class="pcontainer">
                     <canvas id="chart-fasce-prenotate"></canvas>
                 </div>
-
             </div>
         </div>
+
+        <section class="statistica_tempo">
+            <h3>Statistiche all time</h3>
+        </section>
+
+        <div class="action-cards">
+            <div class="action-card" id="a">
+                <div class="counter-wrapper">
+                    <div class="commento">Guadagni</div>
+                    <div id="counter-guadagni-alltime">0</div>
+                </div>
+                <div class="counter-wrapper">
+                    <div class="commento">Prenotazioni</div>
+                    <div id="counter-prenotazioni-alltime">0</div>
+                </div>
+            </div>
+        </div>
+
+        <section>
+            <h4 style="text-align: center;">
+                <a href="profilo.html" style="color: whitesmoke; text-decoration: none;">
+                    Vuoi stampare le statistiche degli incassi e prenotazioni? clicca qui
+                </a>
+            </h4>
+        </section>
 
 
     </main>

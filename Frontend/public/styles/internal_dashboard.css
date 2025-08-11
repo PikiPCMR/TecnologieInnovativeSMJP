@@ -1,9 +1,17 @@
 .statistica_tempo {
     display: flex;
-    font-size: 1rem;
-    color: rgba(255, 255, 255, 0.8);
-    margin: 25px 30px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 3rem 0 1rem 0;
+    padding-bottom: 0.5rem;
+    color: whitesmoke;
     justify-content: center;
+    text-decoration: underline;
+}
+
+/* Per creare un effetto “intestazione” che sembra parte della card */
+.statistica_tempo+.action-cards {
+    margin-top: 0;
 }
 
 #c {
@@ -11,28 +19,31 @@
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(3, minmax(0, 1fr));
     gap: 10px;
-    height: 100%; /* riempie il contenitore */
+    height: 100%;
+    /* riempie il contenitore */
 }
 
 /* Stile base per ogni elemento della grid */
-#c > * {
+#c>* {
     border: 1px solid #ddd;
     padding: 10px;
-    overflow: hidden; /* non far sbordare */
+    overflow: hidden;
+    /* non far sbordare */
     box-sizing: border-box;
 }
 
 .table-container {
-    max-width: 100%;     
-    max-height: 100%;     
-    overflow-x: auto !important;    
-    overflow-y: auto !important;      
+    max-width: 100%;
+    max-height: 100%;
+    overflow-x: auto !important;
+    overflow-y: auto !important;
     background-color: #ffffff80 !important;
     border: 2px solid #bfbfbf !important;
 }
 
 #tabella-prenotazioni table {
-    width: max-content; /* evita compressione colonne */
+    width: max-content;
+    /* evita compressione colonne */
     border-collapse: collapse;
 }
 
@@ -42,19 +53,20 @@
     border: 1px solid #ddd;
     background-color: #ffffff90;
     text-align: left;
-    white-space: nowrap; /* niente a capo */
+    white-space: nowrap;
+    /* niente a capo */
     min-width: 100px;
 }
 
-#tabella-prenotazioni th { /* intestazioni */
-    background-color: #f2f2f290; 
+#tabella-prenotazioni th {
+    /* intestazioni */
+    background-color: #f2f2f290;
     position: sticky;
     top: 0;
     z-index: 10;
 }
 
 /* Canvas dei grafici */
-.statistica_tempochart-grafico-prenotazioni-barre canvas,
 #chart-grafico-economico-barre canvas,
 #chart-tipi-spazi-prenotati canvas,
 #chart-andamento-economico canvas,
@@ -63,8 +75,38 @@
     height: 100% !important;
 }
 
-#p {
+.pcontainer {
     background-color: #ffffff80;
     border: 2px solid #bfbfbf;
 }
 
+/* css per i guadagni alltime */
+#a {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+#counter-prenotazioni-alltime {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    font-weight: bold;
+    color: white;
+    width: 90%;
+    height: 100%;
+    margin-bottom: 20px;
+}
+
+#counter-guadagni-alltime {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    font-weight: bold;
+    color: white;
+    width: 90%;
+    height: 100%;
+    margin-bottom: 20px;
+}
