@@ -33,7 +33,6 @@
     overflow-x: auto !important;
     overflow-y: auto !important;
     background-color: #ffffff80 !important;
-    border: 2px solid #bfbfbf !important;
 }
 
 #tabella-prenotazioni table {
@@ -68,6 +67,7 @@
 #chart-fasce-prenotate canvas {
     width: 100% !important;
     height: 100% !important;
+    
 }
 
 .pcontainer {
