@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Prenotazione</title>
+  <link rel="stylesheet" href="../styles/styles.css" /> <!-- Per stile coerente -->
+  <link rel="stylesheet" href="../styles/prenotazione.css" /> <!-- Stile specifico per prenotazione -->
+  <script type="module" src="../js/prenotazione.js"></script>
+</head> 
+
+<body>
+
+    <header class="header">
+        <a href="index.html" class="logo-link">
+        <div class="logo">WorkSpace Pro</div>
+        </a>
+    </header>
+    <div class="welcome-section">
+        <h1 class="welcome-title">Prenotazione Spazio di Lavoro</h1>
+        <p class="welcome-subtitle">Compila il modulo per prenotare il tuo spazio di lavoro.</p>
+    </div>
+    <div class="wrapper">
+        <div class="booking-container">
+            
+            <div class="booking-info">
+                <h2>Dettagli Prenotazione</h2>
+                <form id="bookingForm">
+
+                    <!-- Riepilogo informazioni passate -->
+                     <div class="summery">
+                        <label>Nome Spazio di Lavoro:</label>
+                        <p class="bookingSummary"><span id="spazio-id"></span></p>
+                    </div>
+                    <div class="summery">
+                        <label>Data Prenotazione:</label>
+                        <p class="bookingSummary"><span id="giorno"></span></p>
+                    </div>
+
+                    <div class="summery">
+                        <label>Orario Prenotazione:</label>
+                        <p class="bookingSummary"><span id="fascia"></span></p>
+                    </div>
+
+                    <!-- Nuovi campi -->
+                    <div class="summery">
+                        <label for="fullName">Nome e Cognome:</label>
+                        <input type="text" id="fullName" name="fullName" required />
+                    </div>
+
+                    <div class="summery">
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" name="email" required />
+                    </div>
+
+                    <div class="summery">
+                        <label for="phone">Telefono (opzionale):</label>
+                        <input type="tel" id="phone" name="phone" />
+                    </div>
+
+                    <div class="summery">
+                        <label for="notes">Note o richieste particolari:</label>
+                        <textarea id="notes" name="notes" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="button-container">
+                        <!-- Pulsante conferma -->
+                        <button class="button-sub" type="submit">Procedi al pagamento</button>
+                        <!-- Pulsante annulla -->
+                        <button type="button" class="button-secondary" onclick="window.location.href='cerca_spazi.html'">Annulla</button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</body>

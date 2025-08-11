@@ -215,8 +215,12 @@ function bindCTA(){
 
     const { error } = await supabase.from("prenotazione").insert(payload);
     if(error){ alert("Errore prenotazione"); console.error(error); return; }
-    alert("Prenotazione creata!");
+    //alert("Prenotazione creata!");
     await refreshAvailability();
+
+
+    if(!giorno || !fascia) return;
+    window.location.href= `prenotazione.html?id=${encodeURIComponent(spazioId)}&giorno=${encodeURIComponent(giorno)}&fascia=${encodeURIComponent(fascia)}`;
   });
 }
 
