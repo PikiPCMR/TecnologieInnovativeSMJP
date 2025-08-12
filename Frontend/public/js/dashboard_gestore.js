@@ -119,7 +119,8 @@ function renderPieChart(canvasId, data, title) {
                 data: Object.values(data),
                 backgroundColor: [
                     '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'
-                ]
+                ],
+                borderWidth: "0.5"
             }]
         },
         options: {
@@ -128,10 +129,14 @@ function renderPieChart(canvasId, data, title) {
             plugins: {
                 title: {
                     display: true,
-                    text: title
+                    text: title,
+                    color: 'white'
                 },
                 legend: {
-                    position: 'bottom'
+                    labels: {
+                        color: 'white'
+                    },
+                    position: 'bottom',
                 }
             }
         }

@@ -9,11 +9,6 @@
     text-decoration: underline;
 }
 
-/* Per creare un effetto “intestazione” che sembra parte della card */
-.statistica_tempo+.action-cards {
-    margin-top: 0;
-}
-
 #c {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -38,7 +33,6 @@
     overflow-x: auto !important;
     overflow-y: auto !important;
     background-color: #ffffff80 !important;
-    border: 2px solid #bfbfbf !important;
 }
 
 #tabella-prenotazioni table {
@@ -73,6 +67,7 @@
 #chart-fasce-prenotate canvas {
     width: 100% !important;
     height: 100% !important;
+    
 }
 
 .pcontainer {
@@ -110,3 +105,5 @@
     height: 100%;
     margin-bottom: 20px;
 }
+
+

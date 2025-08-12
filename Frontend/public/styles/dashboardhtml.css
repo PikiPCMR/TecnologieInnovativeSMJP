@@ -73,3 +73,37 @@
     height: 100%;
     margin-bottom: 20px;
 }
+
+/* responsive sia per dashboardhtml e internaldashboard*/
+@media (max-width: 768px) {
+    /* Griglia #d */
+    #d {
+        grid-template-columns: 1fr; /* una colonna */
+        grid-template-rows: auto;   /* righe automatiche */
+    }
+
+    /* Griglia #c */
+    #c {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+    }
+
+    /* Griglia #a */
+    #a {
+        grid-template-columns: 1fr;
+    }
+
+    /* Elementi interni per evitare overflow */
+    .chart-container,
+    .counter-wrapper,
+    .table-container {
+        max-width: 100%;
+        height: auto;
+    }
+
+    /* Tabelle: scroll orizzontale su mobile */
+    #tabella-prenotazioni table {
+        width: 100%;
+        min-width: unset; /* lascia che si adatti */
+    }
+}
