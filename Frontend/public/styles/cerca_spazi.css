@@ -33,7 +33,8 @@ body {
 }
 
 .search-bar input,
-.search-bar select {
+.search-bar select{
+  height: 40px;
   padding: 12px;
   font-size: 1rem;
   border-radius: 8px;
@@ -42,11 +43,18 @@ body {
   color: white;
 }
 
+
+#filtroTipo option {
+  background-color: #ffffff; /* Potrebbe non funzionare */
+  color: #000000; /* Potrebbe funzionare */
+}
+
 .search-bar input::placeholder {
   color: var(--muted);
 }
 
 .search-bar button {
+  height: 40px;
   background: linear-gradient(135deg, var(--brand-start), var(--brand-end));
   color: white;
   padding: 12px 20px;
