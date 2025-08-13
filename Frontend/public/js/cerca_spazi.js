@@ -42,14 +42,14 @@ function mostraSpazi(lista) {
 
   container.innerHTML = lista.map(spazio => {
     const immagine = spazio.immagini_spazio?.[0] || 'img/placeholder.jpg';
-    const indirizzo = `${spazio.indirizzo_spazio || ''}, ${spazio.Numero_Civico || ''}`;
-    aggiungiMarker(`${indirizzo}, ${spazio.Città}`);
+    const indirizzo = `${spazio.indirizzo_spazio || ''}, ${spazio.numero_civico || ''}`;
+    aggiungiMarker(`${indirizzo}, ${spazio.città}`);
     return `
       <div class="workspace-card">
         <img class="workspace-img" src="${immagine}" alt="${spazio.id_spazio}" />
         <div class="workspace-info">
           <h3>${spazio.id_spazio}</h3>
-          <p class="location">${spazio.Città}, ${spazio.Provincia}</p>
+          <p class="location">${spazio.città}, ${spazio.provincia}</p>
           <p class="services">📍 ${indirizzo}</p>
           <p class="services">🧭 Categoria: ${spazio.categoria}</p>
           <div class="workspace-footer">
