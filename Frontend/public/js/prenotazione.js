@@ -15,3 +15,11 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('giorno').textContent = giorno;
   document.getElementById('fascia').textContent = fascia;
 });
+
+document.getElementById('button-sub').addEventListener('click', async () => {
+  const nome= document.getElementById('fullName').value.trim();
+  const email = document.getElementById('email').value.trim();
+
+  
+  window.location.href = `pagamento.html?nome=${encodeURIComponent(nome)}&email=${encodeURIComponent(email)}`;
+});
