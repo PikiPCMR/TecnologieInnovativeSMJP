@@ -125,14 +125,6 @@ export function requireUserRole() {
   const user = JSON.parse(localStorage.getItem('user'));
   const path = window.location.pathname;
 
-  if (!user || !user.tipo_utente) {
-    if (path !== "/html/index.html") {
-      window.location.href = "../html/index.html";
-      alert("Devi effettuare il login per poter accedere alle funzioni!");
-    }
-    return;
-  }
-
   // Pagine consentite per gestore
   const gestorePages = [
     "/html/dashboard_gestore.html",
@@ -146,17 +138,19 @@ export function requireUserRole() {
     "/html/prenota_spazio.html",
     "/html/prenotazione.html",
     "/html/spazio.html",
-    "html/cerca_spazi.html"
+    "/html/cerca_spazi.html",
+    "/html/index.html"
   ];
 
   if (user.tipo_utente === "gestore" && !gestorePages.includes(path)) {
-    window.location.href = "../html/dashboard_gestore.html";
+    window.location.href = "/html/dashboard_gestore.html";
     return;
   }
 
   if (user.tipo_utente === "cliente" && !clientePages.includes(path)) {
-    window.location.href = "../html/index.html";
+    window.location.href = "/html/index.html";
     return;
   }
 }
+
 window.requireUserRole = requireUserRole;
