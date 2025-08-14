@@ -3,7 +3,7 @@ import { supabase } from './collegamentoDb.js';
 const userId = localStorage.getItem('user');
 const user = JSON.parse(localStorage.getItem('user'))?.id;
 
-function openDashboardGestore() {
+export function openDashboardGestore() {
     window.location.href = "../html/internal_dashboard.html";
 }
 window.openDashboardGestore = openDashboardGestore;
@@ -55,6 +55,7 @@ async function fetchInternalDashboardData() {
     // === 4. Tabella prenotazioni+pagamenti ===
     const tabella = document.getElementById('tabella-prenotazioni');
     tabella.innerHTML = `
+    <thead>
         <tr>
             <th>ID Prenotazione</th>
             <th>Spazio</th>
@@ -63,19 +64,22 @@ async function fetchInternalDashboardData() {
             <th>ID Stripe</th>
             <th>Importo</th>
         </tr>
-    `;
+    </thead>
+    <tbody></tbody>
+`;
+    const tbody = tabella.querySelector('tbody');
     prenotazioni.forEach(p => {
         const pagamento = pagamenti.find(pg => pg.id_prenotazione === p.id_prenotazione) || {};
-        tabella.innerHTML += `
-            <tr>
-                <td>${p.id_prenotazione}</td>
-                <td>${p.id_spazio}</td>
-                <td>${p.giorno}</td>
-                <td>${p.fascia_oraria}</td>
-                <td>${pagamento.id_stripe || ''}</td>
-                <td>${pagamento.importo ? pagamento.importo.toFixed(2) + ' €' : ''}</td>
-            </tr>
-        `;
+        const row = document.createElement('tr');
+        row.innerHTML = `
+        <td>${p.id_prenotazione}</td>
+        <td>${p.id_spazio}</td>
+        <td>${p.giorno}</td>
+        <td>${p.fascia_oraria}</td>
+        <td>${pagamento.id_stripe || ''}</td>
+        <td>${pagamento.importo ? pagamento.importo.toFixed(2) + ' €' : ''}</td>
+    `;
+        tbody.appendChild(row);
     });
 
     // === 5. Raggruppamento helper ===
@@ -141,14 +145,14 @@ async function fetchInternalDashboardData() {
 
 // === Funzioni grafici ===
 const colorPalette = [
-  '#FF6384', // rosso-rosa
-  '#36A2EB', // blu
-  '#FFCE56', // giallo
-  '#4BC0C0', // turchese
-  '#9966FF', // viola
-  '#FF9F40', // arancione
-  '#E7E9ED', // grigio chiaro
-  '#8AFF33'  // verde lime
+    '#FF6384', // rosso-rosa
+    '#36A2EB', // blu
+    '#FFCE56', // giallo
+    '#4BC0C0', // turchese
+    '#9966FF', // viola
+    '#FF9F40', // arancione
+    '#E7E9ED', // grigio chiaro
+    '#8AFF33'  // verde lime
 ];
 
 function renderBarChart(canvasId, data, title) {
@@ -170,7 +174,7 @@ function renderLineChart(canvasId, groupedData, title) {
     const labels = Object.keys(groupedData);
     const datasets = [];
     const categories = Array.from(new Set(labels.flatMap(m => Object.keys(groupedData[m]))));
-    
+
     categories.forEach((cat, i) => {
         datasets.push({
             label: cat,
@@ -185,9 +189,9 @@ function renderLineChart(canvasId, groupedData, title) {
     new Chart(document.getElementById(canvasId), {
         type: 'line',
         data: { labels, datasets },
-        options: { 
-            responsive: true, 
-            plugins: { 
+        options: {
+            responsive: true,
+            plugins: {
                 title: { display: true, text: title },
                 legend: { position: 'top' }
             }

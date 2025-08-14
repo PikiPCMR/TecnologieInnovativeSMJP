@@ -9,8 +9,6 @@
     <link rel="stylesheet" href="../styles/dashboardhtml.css">
     <script type="module" src="../js/index.js"></script>
     <script type="module" src="../js/internal_dashboard.js"></script>
-
-
     <script type="module">
         import { caricaAvatarUtente } from '../js/gestione_avatar.js';
 
@@ -23,7 +21,7 @@
     <title>Dashboard Gestore</title>
 </head>
 
-<body onload="checkLogin()">
+<body>
     <!-- Header -->
     <header class="header">
         <a href="dashboard_gestore.html" class="logo-link">
@@ -85,27 +83,8 @@
         </div>
 
         <!-- SEZIONE SPAZI -->
-        <div class="action-cards">
-            <!-- Esempi di spazi esistenti (saranno generati dinamicamente da JS/database) -->
-            <div class="action-card">
-                <div class="card-icon">🏢</div>
-                <h3 class="card-title">Spazio 1</h3>
-                <p class="card-description">Roma - Postazioni flessibili, Wi-Fi ultra veloce incluso.</p>
-            </div>
-
-            <div class="action-card">
-                <div class="card-icon">🏢</div>
-                <h3 class="card-title">Spazio 2</h3>
-                <p class="card-description">Roma - Postazioni flessibili, Wi-Fi ultra veloce incluso.</p>
-            </div>
-
-            <!-- Card per aggiunta -->
-            <div class="action-card">
-                <div class="card-icon">➕</div>
-                <h3 class="card-title">Aggiungi Spazio</h3>
-                <p class="card-description">Crea un nuovo spazio di coworking e inseriscilo nella rete.</p>
-            </div>
-
+        <div class="action-cards" id="spazi-cards-container">
+            <!-- Le card degli spazi e la card aggiungi spazio saranno aggiunte qui -->
         </div>
     </main>
 </body>

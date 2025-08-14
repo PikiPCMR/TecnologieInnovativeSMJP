@@ -1,8 +1,6 @@
 import { supabase } from './collegamentoDb.js';
 
 const userId = localStorage.getItem('user');
-//const currentYear = new Date().getFullYear();
-//const startOfYear = `${currentYear}-01-01`;
 const user = JSON.parse(localStorage.getItem('user'))?.id;
 
 async function fetchDashboardData() {
@@ -15,10 +13,48 @@ async function fetchDashboardData() {
     // 1. Ottieni tutti gli spazi del gestore loggato, con nome
     const { data: spazi, error: spaziError } = await supabase
         .from('spazi_lavoro')
-        .select('id_spazio, categoria, id_gestore')
+        .select('id_spazio, categoria, id_gestore, categoria, indirizzo_spazio, numero_civico, città, prezzo_ora')
         .eq('id_gestore', user);
 
     if (spaziError) return console.error('Errore spazi:', spaziError);
+
+    // --- Rendering dinamico degli spazi ---
+    const container = document.getElementById('spazi-cards-container');
+    container.innerHTML = '';
+    spazi.forEach(spazio => {
+        const card = document.createElement('div');
+        card.className = 'action-card spazio-card';
+        card.onclick = () => {
+            window.location.href = `../html/contenuti_gestore/modifica_spazio.html?id_spazio=${spazio.id_spazio}`;
+        };
+
+        let emoji = '​💼​';
+        if (spazio.categoria === 'sala riunioni') emoji = '📞​';
+        else if (spazio.categoria === 'postazione coworking') emoji = '💻';
+
+        card.innerHTML = `
+            <div class="card-icon">${emoji}</div>
+            <h3 class="card-title">${spazio.id_spazio}</h3>
+            <p class="card-description">
+                <strong>${spazio.categoria}</strong> in ${spazio.indirizzo_spazio} ${spazio.numero_civico}, ${spazio.città}, costo ${spazio.prezzo_ora}€ <br>
+            </p>
+        `;
+        container.appendChild(card);
+    });
+
+    // Card per aggiunta spazio
+    const aggiungiCard = document.createElement('div');
+    aggiungiCard.className = 'action-card';
+    aggiungiCard.id = 'aggiungi-spazio-card';
+    aggiungiCard.innerHTML = `
+        <div class="card-icon">➕</div>
+        <h3 class="card-title">Aggiungi Spazio</h3>
+        <p class="card-description">Crea un nuovo spazio di coworking e inseriscilo nella rete.</p>
+    `;
+    aggiungiCard.onclick = () => {
+        window.location.href = '../html/contenuti_gestore/crea_nuovo_spazio.html';
+    };
+    container.appendChild(aggiungiCard);
 
     const spazioIds = spazi.map(s => s.id_spazio);
     if (spazioIds.length === 0) return console.log('Nessuno spazio trovato per il gestore');

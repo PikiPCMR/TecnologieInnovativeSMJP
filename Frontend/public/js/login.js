@@ -121,21 +121,36 @@ if (togglePassword && passwordInput) {
   });
 }
 
-// auth.js (accesso pagine protette)
-function requireUserRole(role) {
+export function requireUserRole() {
   const user = JSON.parse(localStorage.getItem('user'));
+  const path = window.location.pathname;
 
-  if (!user) {
-    alert("Devi effettuare il login per accedere.");
-    window.location.href = "../html/index.html";
+  // Pagine consentite per gestore
+  const gestorePages = [
+    "/html/dashboard_gestore.html",
+    "/html/contenuti_gestore/modifica_spazio.html",
+    "/html/contenuti_gestore/crea_nuovo_spazio.html",
+    "/html/internal_dashboard.html"
+  ];
+
+  // Pagine consentite per cliente
+  const clientePages = [
+    "/html/prenota_spazio.html",
+    "/html/prenotazione.html",
+    "/html/spazio.html",
+    "/html/cerca_spazi.html",
+    "/html/index.html"
+  ];
+
+  if (user.tipo_utente === "gestore" && !gestorePages.includes(path)) {
+    window.location.href = "/html/dashboard_gestore.html";
     return;
   }
 
-  if (user.tipo_utente !== role) {
-    alert("Accesso non autorizzato.");
-    window.location.href = "../html/index.html";
+  if (user.tipo_utente === "cliente" && !clientePages.includes(path)) {
+    window.location.href = "/html/index.html";
+    return;
   }
 }
-window.requireUserRole = requireUserRole; 
 
-export { requireUserRole };
+window.requireUserRole = requireUserRole;

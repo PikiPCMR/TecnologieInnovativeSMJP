@@ -52,11 +52,11 @@ async function loadSpazio(){
   const titolo = spazio.title || spazio.id_spazio;
   setText("title", titolo);
   setText("bc-title", titolo);
-  setText("subtitle", `${spazio.categoria || ""} · ${spazio["Città"] || ""}, ${spazio.Provincia || ""} – ${spazio.Nazione || ""}`);
+  setText("subtitle", `${spazio.categoria || ""} · ${spazio["Città"] || ""}, ${spazio.provincia || ""} – ${spazio.nazione || ""}`);
   setText("categoria", spazio.categoria || "—");
 
   // Indirizzo
-  const indirizzo = [spazio.indirizzo_spazio, spazio.Numero_Civico, spazio["Città"]].filter(Boolean).join(" ");
+  const indirizzo = [spazio.indirizzo_spazio, spazio.numero_civico, spazio["Città"]].filter(Boolean).join(" ");
   setText("indirizzo", indirizzo || "—");
 
   // Capienza & descrizione
@@ -227,7 +227,7 @@ function bindCTA(){
 // ====== RELATED ======
 async function loadRelated(){
   const { data: rows } = await supabase.from("spazi_lavoro")
-    .select("id_spazio, title, immagini_spazio, categoria, Città")
+    .select("id_spazio, title, immagini_spazio, categoria, città")
     .neq("id_spazio", spazioId)
     .limit(4);
 
