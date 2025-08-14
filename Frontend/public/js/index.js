@@ -141,7 +141,6 @@ function checkLogin() {
 }
 window.checkLogin = checkLogin;
 
-
 // === AVVIO PAGINA ===
 document.addEventListener("DOMContentLoaded", () => {
   checkLogin();          // Prima controlli se l’utente è loggato

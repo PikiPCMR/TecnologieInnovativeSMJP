@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../../styles/styles.css">
+    <link rel="stylesheet" href="../../styles/avatar.css">
+    <script type="module" src="../../js/index.js"></script>
+    <script type="module">
+        import { caricaAvatarUtente } from '../../js/gestione_avatar.js';
+
+        window.addEventListener('DOMContentLoaded', () => {
+            caricaAvatarUtente();
+        });
+    </script>
+    <script type="module">
+        import { requireUserRole } from '../../js/login.js';
+
+        window.addEventListener('DOMContentLoaded', () => {
+            requireUserRole('gestore');
+        });
+    </script>
+    <title>WorkSpace Pro - Prenota il tuo spazio</title>
+</head>
+
+<body>
+    <header class="header">
+        <a href="../index.html" class="logo-link">
+            <div class="logo">WorkSpace Pro</div>
+        </a>
+        <div class="profile-section">
+            <div class="profile-btn" onclick="toggleProfileMenu()">
+                <img id="avatar" class="avatar avatar-small"
+                    src="https://sbxrdptjegjxqaklfpxq.supabase.co/storage/v1/object/public/immaginiprofilo//user.png"
+                    alt="Avatar" />
+            </div>
+            <div class="profile-dropdown" id="profileDropdown">
+                <div class="dropdown-item" id="loginText" onclick="accedi()">
+                    <span>🔑 Accedi&nbsp;&nbsp;</span>
+                </div>
+                <div class="dropdown-item" onclick="registrati()">
+                    <span>📝 Registrati&nbsp;&nbsp;</span>
+                </div>
+                <div class="dropdown-item" id="profileItem" style="display: none;" onclick="handleProfile()">
+                    <span>🔓 Il mio profilo&nbsp;&nbsp;</span>
+                </div>
+                <div class="dropdown-item" id="logoutItem" style="display: none;" onclick="handleLogout()">
+                    <span>🚪 Esci&nbsp;&nbsp;</span>
+                </div>
+            </div>
+        </div>
+    </header>
