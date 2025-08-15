@@ -1,0 +1,151 @@
+/* Stile del corpo per centrare tutto il contenuto della pagina */
+main {
+    display: flex;
+    flex-direction: column; /* Organizza gli elementi verticalmente */
+    align-items: center;    /* Centra orizzontalmente */
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+/* Contenitore principale del carosello */
+#image-carousel-container {
+    width: 1100px;
+    height: 620px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Contenitore interno delle immagini, per gestire l'aspetto 16:9 */
+#image-preview-container {
+    width: 100%;
+    padding-top: 56.25%; 
+    position: relative;
+}
+
+/* Carosello interno */
+.image-carousel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+}
+
+.image-carousel img {
+    min-width: 100%;
+    height: 100%;
+    object-fit:contain;
+    border-radius: 5px;
+    scroll-snap-align: start;
+}
+
+/* Stile del form */
+#form-nuovo-spazio {
+    width: 900px;
+    background-color: #fff;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Contenitore per le due colonne, usa display grid per un controllo preciso */
+#form-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Due colonne di uguale larghezza */
+    gap: 20px 40px;
+}
+
+/* Stile per i gruppi di form */
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group.images-group {
+    grid-column: 1 / -1; /* Questo elemento occupa tutte le colonne */
+}
+
+/* Contenitore per l'input file e il bottone "Rimuovi" */
+.file-input-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+/* Stile dei vari elementi del form */
+#form-nuovo-spazio label {
+    font-weight: bold;
+    display: block;
+}
+
+#form-nuovo-spazio input,
+#form-nuovo-spazio select,
+#form-nuovo-spazio textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    box-sizing: border-box;
+    margin-top: 5px;
+}
+
+#form-nuovo-spazio textarea {
+    resize: vertical;
+}
+
+/* Stile del pulsante "Crea Spazio" fuori dal form */
+#submit-btn {
+    width: 200px; /* Stessa larghezza del form */
+    height: 50px;
+    margin-top: 20px;
+    padding: 12px 20px;
+    background-color: #c82333;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    border-radius: 25px;
+}
+
+#submit-btn:hover {
+    background-color: #a21c29;
+}
+
+/* Stile del bottone "Rimuovi" */
+#rimuovi-immagini-btn {
+    padding: 10px 15px;
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#rimuovi-immagini-btn:hover {
+    background-color: #c82333;
+}
+
+#form-nuovo-spazio .column label {
+    margin-top: 15px;
+}
