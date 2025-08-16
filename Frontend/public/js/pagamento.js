@@ -1,3 +1,5 @@
+
+
 // 1) Inserisci la tua Publishable Key di Stripe (TEST o LIVE a seconda dell'ambiente)
 const stripe = Stripe("pk_test_51RvLUiJdCSwFSGzc72wVxTayWpUec8aCIDV5WzHbh1UyZ7lmzVT4nOVfaQ90MlHK6zvwwkrvLFZhOqUO5EoMh3HF00khxXbetg");
 
@@ -5,28 +7,36 @@ let elements; // istanza Elements condivisa
 const submitBtn = document.getElementById('submit');
 const errorBox = document.getElementById('error-message');
 
+
+const queryString = window.location.search;
+const params = new URLSearchParams(queryString);
+
+const name = params.get('nome') || '';
+const email = params.get('email') || '';
+const prezzo = params.get('prezzo') || '';
+
 // 2) All'avvio, chiedi al backend di creare un PaymentIntent e restituisci il clientSecret
 document.addEventListener('DOMContentLoaded', async () => {
     try {
-    // Qui puoi inviare dati dell’ordine: es. amount, currency, items, customerId, ecc.
-    const resp = await fetch('http://localhost:3000/create-payment-intent', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-        // esempio: amount e currency sono decisi sul server, non fidarti del client!
-        // amount: 2000, currency: 'eur'
-        })
-    });
-    const { clientSecret, error } = await resp.json();
-    if (!resp.ok || !clientSecret) throw new Error(error || 'Impossibile inizializzare il pagamento');
+        prezzo = data.prezzo * 100;
+        // Qui puoi inviare dati dell’ordine: es. amount, currency, items, customerId, ecc.
+        const resp = await fetch('http://localhost:3000/create-payment-intent', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                prezzo: prezzo
+            })
+        });
+        const { clientSecret, error } = await resp.json();
+        if (!resp.ok || !clientSecret) throw new Error(error || 'Impossibile inizializzare il pagamento');
 
-    // 3) Inizializza Elements con il clientSecret del PaymentIntent
-    const appearance = { theme: 'stripe' }; // aspetto base; personalizzabile
-    elements = stripe.elements({ clientSecret, appearance });
+        // 3) Inizializza Elements con il clientSecret del PaymentIntent
+        const appearance = { theme: 'stripe' }; // aspetto base; personalizzabile
+        elements = stripe.elements({ clientSecret, appearance });
 
-    // 4) Crea e monta il Payment Element (gestisce carta, 3DS ecc.)
-    const paymentElement = elements.create('payment');
-    paymentElement.mount('#payment-element');
+        // 4) Crea e monta il Payment Element (gestisce carta, 3DS ecc.)
+        const paymentElement = elements.create('payment');
+        paymentElement.mount('#payment-element');
     } catch (err) {
     showError(err.message);
     submitBtn.disabled = true;
@@ -39,11 +49,8 @@ document.getElementById('submit').addEventListener('click', async () => {
     setLoading(true);
 
     try {
-        const queryString = window.location.search;
-
-        const params = new URLSearchParams(queryString);
-        const name = params.get('nome') || '';
-        const email = params.get('email') || '';
+        
+        
 
         const { error } = await stripe.confirmPayment({
             elements,

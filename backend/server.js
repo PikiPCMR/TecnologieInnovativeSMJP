@@ -22,9 +22,14 @@ app.use(express.json());
 // 1) Endpoint per creare PaymentIntent e restituire il client_secret
 app.post('/create-payment-intent', async (req, res) => {
   try {
+    const { prezzo } = req.body;
+    if (!prezzo) {
+      return res.status(400).json({ error: 'prezzo mancante' });
+    }
+
     // Qui decidi importo e valuta in modo sicuro (mai fidarti di valori dal client!)
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: 2000, // €20 in centesimi
+      amount: prezzo, // €20 in centesimi
       currency: 'eur',
       automatic_payment_methods: { enabled: true }, // abilita carte + altri metodi supportati
     });
