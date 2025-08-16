@@ -6,7 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../../styles/styles.css">
     <link rel="stylesheet" href="../../styles/avatar.css">
+    <link rel="stylesheet" href="../../styles/stilecontenutigestore.css">
     <script type="module" src="../../js/index.js"></script>
+    <script type="module" src="../../js/contenuti_gestore/crea_nuovo_spazio.js"></script>
     <script type="module">
         import { caricaAvatarUtente } from '../../js/gestione_avatar.js';
 
@@ -44,3 +46,97 @@
             </div>
         </div>
     </header>
+    <main>
+    <div id="image-carousel-container">
+        <div id="image-preview-container"></div>
+    </div>
+
+    <form id="form-nuovo-spazio" enctype="multipart/form-data">
+        <div class="form-group images-group">
+            <label>Immagini dello spazio:</label>
+            <div class="file-input-container">
+                <input type="file" id="immagini-input" name="immagini" multiple accept="image/*">
+                <button type="button" id="rimuovi-immagini-btn" style="display:none;">Rimuovi</button>
+            </div>
+        </div>
+
+        <div id="form-columns">
+            <div class="column">
+                <label>
+                    Indirizzo:
+                    <input type="text" name="indirizzo_spazio" required>
+                </label>
+                <label>
+                    Numero civico:
+                    <input type="text" name="numero_civico" required>
+                </label>
+                <label>
+                    Città:
+                    <input type="text" name="città" required>
+                </label>
+                <label>
+                    Provincia:
+                    <input type="text" name="provincia" required>
+                </label>
+                <label>
+                    Nazione:
+                    <input type="text" name="nazione" required>
+                </label>
+            </div>
+            <div class="column">
+                <label>
+                    Categoria:
+                    <select name="categoria" required>
+                        <option value="sala riunioni">sala riunioni</option>
+                        <option value="ufficio privato">ufficio privato</option>
+                        <option value="postazione coworking">postazione coworking</option>
+                    </select>
+                </label>
+                <label>
+                    Capienza massima:
+                    <input type="number" name="capienza_max" min="1" required>
+                </label>
+                <label>
+                    Prezzo/ora (€):
+                    <input type="number" name="prezzo_ora" min="0" step="0.01" required>
+                </label>
+                <label>
+                    Descrizione breve:
+                    <input type="text" name="descrizione_breve" maxlength="100" required>
+                </label>
+            </div>
+        </div>
+
+        <label>
+            Descrizione lunga:
+            <textarea name="descrizione_lunga" rows="4" required></textarea>
+        </label>
+    </form>
+
+    <button type="submit" id="submit-btn" form="form-nuovo-spazio">Crea Spazio</button>
+</main>
+    <script type="module" src="../../js/contenuti_gestore/crea_nuovo_spazio.js"></script>
+    <script type="module">
+        import { aggiungiSpazio } from '../../js/contenuti_gestore/crea_nuovo_spazio.js';
+        document.getElementById('form-nuovo-spazio').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const formData = {
+                indirizzo_spazio: form.indirizzo_spazio.value,
+                numero_civico: form.numero_civico.value,
+                città: form.città.value,
+                provincia: form.provincia.value,
+                nazione: form.nazione.value,
+                categoria: form.categoria.value,
+                capienza_max: parseInt(form.capienza_max.value),
+                prezzo_ora: parseFloat(form.prezzo_ora.value),
+                descrizione_breve: form.descrizione_breve.value,
+                descrizione_lunga: form.descrizione_lunga.value
+            };
+            const files = form.immagini.files;
+            await aggiungiSpazio(formData, files);
+        });
+    </script>
+</body>
+
+</html>
