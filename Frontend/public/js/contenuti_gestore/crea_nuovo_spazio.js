@@ -1,5 +1,3 @@
-// crea_nuovo_spazio.js
-
 import { supabase } from '../collegamentoDb.js';
 
 // Variabili per gestire le immagini lato client
@@ -73,31 +71,32 @@ export async function uploadSpazioImages(files, id_spazio) {
 }
 
 // Funzione principale per aggiungere uno spazio
-export async function aggiungiSpazio(formData) {
+export async function aggiungiSpazio(formData, selectedFiles) {
     const user = JSON.parse(localStorage.getItem('user'))?.id;
     if (!user) {
         alert('Gestore non loggato!');
         return;
     }
 
-    const id_spazio = `spazio_${Date.now()}`;
+    const id_spazio = document.getElementById('nomespazio').value.trim(); 
 
-    // Usa le immagini selezionate dal form
+    // Upload immagini
     const immaginiUrls = await uploadSpazioImages(selectedFiles, id_spazio);
-    
+
     if (immaginiUrls.length === 0 && selectedFiles.length > 0) {
         alert('Si è verificato un errore durante l\'upload di alcune immagini.');
         return;
     }
 
+    // Uniamo i dati del form con id e immagini
     const spazioData = {
-        // ... (i tuoi dati del form rimangono gli stessi)
+        ...formData,
         id_spazio,
         id_gestore: user,
         immagini_spazio: immaginiUrls
     };
 
-    // Salva nel database
+    // Salvataggio nel DB
     const { error } = await supabase
         .from('spazi_lavoro')
         .insert([spazioData]);
@@ -107,16 +106,7 @@ export async function aggiungiSpazio(formData) {
         console.error(error);
         return;
     }
-    alert('Spazio creato con successo!');
-    window.location.reload(); // Per resettare il form
-}
 
-// Sostituisci l'event listener nella parte <script> del tuo HTML con questo
-document.getElementById('form-nuovo-spazio').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const form = e.target;
-    const formData = {
-        // ... (la tua logica di raccolta dati rimane la stessa)
-    };
-    await aggiungiSpazio(formData);
-});
+    alert('Spazio creato con successo!');
+    window.location.reload(); // reset del form
+}
