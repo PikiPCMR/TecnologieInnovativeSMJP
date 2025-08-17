@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Pagmento Riuscito</title>
   <link rel="stylesheet" href="../styles/styles.css" /> <!-- Per stile coerente -->
+  <script type="module" src="../js/pagamento_riuscito.js"></script>
 </head>
 
 <body>
@@ -13,7 +14,29 @@
         <div class="logo">WorkSpace Pro</div>
         </a>
     </header>
+    <section class="welcome-section">
+        <h1 class="welcome-title">Prenotazione Completata</h1>
+        <p class="welcome-subtitle">Il pagamento è stato completato con successo.</p>
+    </section>
+    <div class="action-cards">
+        <div class="action-card" onclick="home()">
+          <div class="card-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>home</title>
+                <path d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z" />
+              </svg>
+          </div>
+          <h3 class="card-title">Torna alla Home</h3>
+        </div>
 
-    <h1 class="welcome-title" style="text-align: center;">Esito pagamento</h1>
-    <p class="welcome-subtitle" style="text-align: center;">Il pagamento è stato completato con successo.</p>
+        <div class="action-card" onclick="viewBookings()">
+          <div class="card-icon">
+              <svg viewBox="0 0 24 24">
+                  <path
+                      d="M19,3H18V1H16V3H8V1H6V3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M19,19H5V8H19V19M16,10V12H14V14H16V16H14V18H12V16H10V14H12V12H10V10H12V8H14V10H16Z" />
+              </svg>
+          </div>
+          <h3 class="card-title">Le Mie Prenotazioni</h3>
+        </div>
+    </div>
+    
 </body>
