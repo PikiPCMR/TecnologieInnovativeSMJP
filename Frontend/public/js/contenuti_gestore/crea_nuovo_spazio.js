@@ -50,7 +50,6 @@ function updatePreviewCarousel() {
 export async function uploadSpazioImages(files, id_spazio) {
     const urls = [];
     for (const file of files) {
-        // ... (la tua logica di upload rimane la stessa)
         const filePath = `${id_spazio}/${Date.now()}_${file.name}`;
         const { error: uploadError } = await supabase.storage
             .from('immaginispazio')

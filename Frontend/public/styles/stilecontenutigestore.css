@@ -1,73 +1,82 @@
-/* Stile del corpo per centrare tutto il contenuto della pagina */
+/* Stile del corpo principale per centrare il contenuto */
 main {
     display: flex;
-    flex-direction: column; /* Organizza gli elementi verticalmente */
-    align-items: center;    /* Centra orizzontalmente */
+    flex-direction: column;
+    align-items: center;
     padding: 20px;
     font-family: Arial, sans-serif;
 }
 
-/* Contenitore principale del carosello */
+/* Contenitore principale delle immagini (Carosello) */
 #image-carousel-container {
-    width: 1100px;
-    height: 620px;
+    width: clamp(300px, 90%, 1100px); /* Usa clamp per la reattività */
+    height: auto;
     background-color: #fff;
     border-radius: 10px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
     position: relative;
     overflow: hidden;
+    aspect-ratio: 16 / 9; /* Mantieni le proporzioni 16:9 in modo nativo */
 }
 
-/* Contenitore interno delle immagini, per gestire l'aspetto 16:9 */
+/* Contenitore interno delle immagini */
 #image-preview-container {
     width: 100%;
-    padding-top: 56.25%; 
-    position: relative;
+    height: 100%;
 }
 
-/* Carosello interno */
+/* Stile del carosello interno */
 .image-carousel {
-    position: absolute;
-    top: 0;
-    left: 0;
+    display: flex;
     width: 100%;
     height: 100%;
-    display: flex;
     gap: 10px;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
+    scrollbar-width: none; /* Nascondi la scrollbar per Firefox */
+    -ms-overflow-style: none; /* Nascondi la scrollbar per IE e Edge */
+}
+
+.image-carousel::-webkit-scrollbar {
+    display: none; /* Nascondi la scrollbar per Chrome, Safari e Opera */
 }
 
 .image-carousel img {
     min-width: 100%;
     height: 100%;
-    object-fit:contain;
+    object-fit: contain;
     border-radius: 5px;
-    scroll-snap-align: start;
+    scroll-snap-align: center; /* Centra l'immagine nel carosello */
 }
 
-/* Stile del form */
-#form-nuovo-spazio {
-    width: 900px;
+/* Stile comune per i form */
+#form-nuovo-spazio,
+#form-modifica-spazio {
+    width: clamp(300px, 90%, 900px);
     background-color: #fff;
     padding: 40px;
     border-radius: 10px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 15px; /* Aumentato il gap per una migliore spaziatura */
 }
 
-/* Contenitore per le due colonne, usa display grid per un controllo preciso */
+/* Contenitore per le due colonne */
 #form-columns {
     display: grid;
-    grid-template-columns: 1fr 1fr; /* Due colonne di uguale larghezza */
+    grid-template-columns: 1fr; /* Default a una colonna per mobile */
     gap: 20px 40px;
+}
+
+@media (min-width: 768px) {
+    #form-columns {
+        grid-template-columns: 1fr 1fr; /* Due colonne su schermi più grandi */
+    }
 }
 
 /* Stile per i gruppi di form */
@@ -77,7 +86,7 @@ main {
 }
 
 .form-group.images-group {
-    grid-column: 1 / -1; /* Questo elemento occupa tutte le colonne */
+    grid-column: 1 / -1; /* Occupa tutte le colonne */
 }
 
 /* Contenitore per l'input file e il bottone "Rimuovi" */
@@ -88,46 +97,57 @@ main {
     margin-top: 5px;
 }
 
-/* Stile dei vari elementi del form */
-#form-nuovo-spazio label {
-    font-weight: bold;
-    display: block;
-}
-
+/* Stile comune per tutti gli elementi di input */
 #form-nuovo-spazio input,
 #form-nuovo-spazio select,
-#form-nuovo-spazio textarea {
+#form-nuovo-spazio textarea,
+#form-modifica-spazio input,
+#form-modifica-spazio select,
+#form-modifica-spazio textarea {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     border: 1px solid #ccc;
-    border-radius: 5px;
+    border-radius: 8px; /* Angoli più arrotondati */
     font-size: 16px;
     box-sizing: border-box;
     margin-top: 5px;
+    transition: border-color 0.3s ease;
 }
 
-#form-nuovo-spazio textarea {
+#form-nuovo-spazio input:focus,
+#form-nuovo-spazio select:focus,
+#form-nuovo-spazio textarea:focus,
+#form-modifica-spazio input:focus,
+#form-modifica-spazio select:focus,
+#form-modifica-spazio textarea:focus {
+    border-color: #007bff; /* Evidenzia il focus con un colore blu */
+    outline: none;
+}
+
+#form-nuovo-spazio textarea,
+#form-modifica-spazio textarea {
     resize: vertical;
 }
 
-/* Stile del pulsante "Crea Spazio" fuori dal form */
+/* Stile del pulsante di submit comune */
 #submit-btn {
-    width: 200px; /* Stessa larghezza del form */
+    width: clamp(150px, 50%, 250px);
     height: 50px;
     margin-top: 20px;
     padding: 12px 20px;
-    background-color: #c82333;
+    background-color: #007bff; /* Cambiato il colore per un aspetto più moderno */
     color: #fff;
     border: none;
-    border-radius: 5px;
+    border-radius: 25px;
     font-size: 20px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
-    border-radius: 25px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    align-self: center; /* Centra il pulsante rispetto al main */
 }
 
 #submit-btn:hover {
-    background-color: #a21c29;
+    background-color: #0056b3;
+    transform: translateY(-2px); /* Aggiunto un leggero effetto hover */
 }
 
 /* Stile del bottone "Rimuovi" */
@@ -144,8 +164,4 @@ main {
 
 #rimuovi-immagini-btn:hover {
     background-color: #c82333;
-}
-
-#form-nuovo-spazio .column label {
-    margin-top: 15px;
 }
