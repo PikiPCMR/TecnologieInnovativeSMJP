@@ -29,7 +29,7 @@
 
 .table-container {
     max-width: 100%;
-    max-height: 100%;
+    max-height: 300px;
     overflow-x: auto !important;
     overflow-y: auto !important;
     background-color: #ffffff80 !important;
