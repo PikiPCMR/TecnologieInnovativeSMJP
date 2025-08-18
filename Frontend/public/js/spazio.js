@@ -20,6 +20,7 @@ const FASCE = [
 let valuta = "€";
 let selectedSlot = null;
 let user = null;
+let selectedSlots = [];
 
 document.addEventListener("DOMContentLoaded", async () => {
   user = JSON.parse(localStorage.getItem('user'));
@@ -159,26 +160,26 @@ async function refreshAvailability(){
 
   const wrap = $("#slots"); if (!wrap) return;
   wrap.innerHTML = "";
-  FASCE.forEach(f=>{
+  FASCE.forEach(f => {
     const btn = document.createElement("button");
     btn.className = "slot";
     btn.type = "button";
     btn.textContent = f.label;
     const busy = occupate.has(String(f.id));
-    btn.setAttribute("aria-disabled", busy?"true":"false");
-    if(!busy){
-      btn.addEventListener("click", ()=>{
-        wrap.querySelectorAll(".slot[aria-selected='true']").forEach(n=>n.setAttribute("aria-selected","false"));
-        btn.setAttribute("aria-selected","true");
-        selectedSlot = f.id;
-        if (bkSel) bkSel.value = f.id;
+    btn.setAttribute("aria-disabled", busy ? "true" : "false");
+    if (!busy) {
+      btn.addEventListener("click", () => {
+        // Toggle selezione multipla
+        if (selectedSlots.includes(f.id)) {
+          selectedSlots = selectedSlots.filter(id => id !== f.id);
+          btn.setAttribute("aria-selected", "false");
+        } else {
+          selectedSlots.push(f.id);
+          btn.setAttribute("aria-selected", "true");
+        }
         toggleCTA();
       });
-      if (bkSel){
-        const opt = document.createElement("option");
-        opt.value = f.id; opt.text = f.label;
-        bkSel.appendChild(opt);
-      }
+      btn.setAttribute("aria-selected", selectedSlots.includes(f.id) ? "true" : "false");
     }
     wrap.appendChild(btn);
   });
@@ -187,42 +188,52 @@ async function refreshAvailability(){
   drawSparkline(await occupancyLast30());
 }
 
-function toggleCTA(){
-  const enabled = Boolean($("#bk-date")?.value && (selectedSlot || $("#bk-slot")?.value));
+function toggleCTA() {
+  const enabled = Boolean($("#bk-date")?.value && selectedSlots.length > 0);
   const btn = $("#ctaPrenota");
   if (btn) btn.disabled = !enabled;
 }
 
 // ====== PRENOTAZIONE ======
 function bindCTA(){
-  $("#ctaPrenota")?.addEventListener("click", async ()=>{
+   document.getElementById("ctaPrenota")?.addEventListener("click", async ()=> {
     if(!user || !user.id){
       alert("Devi essere loggato per prenotare.");
       return;
     }
     const giorno = $("#bk-date")?.value;
-    const fascia = Number($("#bk-slot")?.value || selectedSlot);
-    if(!giorno || !fascia) return;
+    if (!giorno || !selectedSlots.length) return;
 
-    const payload = {
-      id_prenotazione: crypto.randomUUID(),
-      id_utente: user.id,
-      id_spazio: spazioId,
-      giorno,
-      fascia_oraria: fascia,
-      timestamp: new Date().toISOString()
-    };
+    let errorOccurred = false;
 
-    const { error } = await supabase.from("prenotazione").insert(payload);
-    if(error){ alert("Errore prenotazione"); console.error(error); return; }
-    //alert("Prenotazione creata!");
+    for (const fascia of selectedSlots) {
+      const payload = {
+        id_prenotazione: crypto.randomUUID(),
+        id_utente: user.id,
+        id_spazio: spazioId,
+        giorno,
+        fascia_oraria: fascia,
+        timestamp: new Date().toISOString()
+      };
+
+      const { error } = await supabase.from("prenotazione").insert(payload);
+      if (error) {
+        alert("Errore prenotazione");
+        console.error(error);
+        errorOccurred = true;
+        break;
+      }
+    }
+
     await refreshAvailability();
 
-
-    if(!giorno || !fascia) return;
-    window.location.href= `prenotazione.html?id=${encodeURIComponent(spazioId)}&giorno=${encodeURIComponent(giorno)}&fascia=${encodeURIComponent(fascia)}`;
+    if (!errorOccurred) {
+      window.location.href = `prenotazione.html?id=${encodeURIComponent(spazioId)}&giorno=${encodeURIComponent(giorno)}&selectedSlots=${encodeURIComponent(selectedSlots)}`;
+    }
   });
+    
 }
+
 
 // ====== RELATED ======
 async function loadRelated(){
