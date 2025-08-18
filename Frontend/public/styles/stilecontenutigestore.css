@@ -21,6 +21,7 @@ main {
     position: relative;
     overflow: hidden;
     aspect-ratio: 16 / 9; /* Mantieni le proporzioni 16:9 in modo nativo */
+    margin-top:20px;
 }
 
 /* Contenitore interno delle immagini */
@@ -164,4 +165,31 @@ main {
 
 #rimuovi-immagini-btn:hover {
     background-color: #c82333;
+}
+
+#titolo-modifica-spazio {
+    margin-top: 40px;
+    font-size: 2rem;
+    color: white;
+    font-weight: 300;
+}
+
+#delete-btn {
+    width: clamp(150px, 50%, 250px);
+    height: 50px;
+    margin-top: 35px;
+    padding: 12px 20px;
+    background-color: #d80b0b; /* Cambiato il colore per un aspetto più moderno */
+    color: #fff;
+    border: none;
+    border-radius: 25px;
+    font-size: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    align-self: center; /* Centra il pulsante rispetto al main */
+}
+
+#delete-btn:hover {
+    background-color: #b11111;
+    transform: translateY(-2px); /* Aggiunto un leggero effetto hover */
 }

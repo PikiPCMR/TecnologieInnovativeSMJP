@@ -107,5 +107,5 @@ export async function aggiungiSpazio(formData, selectedFiles) {
     }
 
     alert('Spazio creato con successo!');
-    window.location.reload(); // reset del form
+    window.location.href = '../dashboard_gestore.html';
 }
