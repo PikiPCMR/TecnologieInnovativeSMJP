@@ -100,7 +100,7 @@ export async function loadSpazioData(id_spazio) {
         return;
     }
 
-    document.getElementById('titolo-modifica-spazio').textContent = `Benvenuto nella pagina di modifica di ${spazio.id_spazio}. Potrai scegliere di modificare o eliminare lo spazio.`;
+    document.getElementById('titolo-modifica-spazio').textContent = `Benvenuto nella pagina di modifica di ${spazio.id_spazio}.`;
 
     document.querySelector('input[name="indirizzo_spazio"]').value = spazio.indirizzo_spazio;
     document.querySelector('input[name="numero_civico"]').value = spazio.numero_civico;
