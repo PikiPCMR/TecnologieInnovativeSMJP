@@ -6,7 +6,7 @@ const params = new URLSearchParams(queryString);
 const spazioId = params.get('id');
 const giorno = params.get('giorno');
 const selectedSlots = params.get('selectedSlots');
-
+let prezzo=0;
 
 document.addEventListener('DOMContentLoaded', async() => {
   try{
@@ -16,11 +16,11 @@ document.addEventListener('DOMContentLoaded', async() => {
     .eq('id_spazio', spazioId)
     .single();
     if (fetchError) throw new Error(fetchError.message);
-    const prezzo = data.prezzo_ora;
+    prezzo = data.prezzo_ora * selectedSlots.length;
     document.getElementById('spazio-id').textContent = spazioId;
     document.getElementById('giorno').textContent = giorno;
     document.getElementById('fascia').textContent = fasciaOrariaToString(selectedSlots);
-    document.getElementById('prezzo').textContent = `€ ${prezzo* selectedSlots.length}`;
+    document.getElementById('prezzo').textContent = `€ ${prezzo}`;
   }catch (error) {
     console.error('Errore nel recupero dei dati dello spazio:', error);
   }

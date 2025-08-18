@@ -29,7 +29,7 @@ app.post('/create-payment-intent', async (req, res) => {
 
     // Qui decidi importo e valuta in modo sicuro (mai fidarti di valori dal client!)
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: prezzo, // €20 in centesimi
+      amount: prezzo,
       currency: 'eur',
       automatic_payment_methods: { enabled: true }, // abilita carte + altri metodi supportati
     });

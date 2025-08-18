@@ -18,28 +18,27 @@ const prezzo = params.get('prezzo') || '';
 // 2) All'avvio, chiedi al backend di creare un PaymentIntent e restituisci il clientSecret
 document.addEventListener('DOMContentLoaded', async () => {
     try {
-        prezzo = data.prezzo * 100;
-        // Qui puoi inviare dati dell’ordine: es. amount, currency, items, customerId, ecc.
-        const resp = await fetch('http://localhost:3000/create-payment-intent', {
+        const importo = parseInt(prezzo) * 100; // in centesimi
+
+        const resp = await fetch('https://tecnologieinnovativesmjp.onrender.com/create-payment-intent', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                prezzo: prezzo
+                prezzo: importo
             })
         });
+
         const { clientSecret, error } = await resp.json();
         if (!resp.ok || !clientSecret) throw new Error(error || 'Impossibile inizializzare il pagamento');
 
-        // 3) Inizializza Elements con il clientSecret del PaymentIntent
-        const appearance = { theme: 'stripe' }; // aspetto base; personalizzabile
+        const appearance = { theme: 'stripe' };
         elements = stripe.elements({ clientSecret, appearance });
 
-        // 4) Crea e monta il Payment Element (gestisce carta, 3DS ecc.)
         const paymentElement = elements.create('payment');
         paymentElement.mount('#payment-element');
     } catch (err) {
-    showError(err.message);
-    submitBtn.disabled = true;
+        showError(err.message);
+        submitBtn.disabled = true;
     }
 });
 
@@ -56,7 +55,7 @@ document.getElementById('submit').addEventListener('click', async () => {
             elements,
             confirmParams: {
             // Inserisci la tua pagina di successo pubblica
-            return_url: `${window.location.origin}/Frontend/public/html/pagamento_riuscito.html`,
+            return_url: `https://tecnologieinnovativesmjp.onrender.com/html/pagamento_riuscito.html`,
 
             payment_method_data: {
                 billing_details: {
