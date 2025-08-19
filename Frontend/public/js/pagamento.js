@@ -1,5 +1,3 @@
-
-
 // 1) Inserisci la tua Publishable Key di Stripe (TEST o LIVE a seconda dell'ambiente)
 const stripe = Stripe("pk_test_51RvLUiJdCSwFSGzc72wVxTayWpUec8aCIDV5WzHbh1UyZ7lmzVT4nOVfaQ90MlHK6zvwwkrvLFZhOqUO5EoMh3HF00khxXbetg");
 
@@ -14,6 +12,10 @@ const params = new URLSearchParams(queryString);
 const name = params.get('nome') || '';
 const email = params.get('email') || '';
 const prezzo = params.get('prezzo') || '';
+const spazioId = params.get('spazioId') || '';
+const giorno = params.get('giorno') || '';
+const fascia = params.get('orario') || '';
+const id_gestore = params.get('id_gestore') || '';
 
 // 2) All'avvio, chiedi al backend di creare un PaymentIntent e restituisci il clientSecret
 document.addEventListener('DOMContentLoaded', async () => {
@@ -55,7 +57,7 @@ document.getElementById('submit').addEventListener('click', async () => {
             elements,
             confirmParams: {
             // Inserisci la tua pagina di successo pubblica
-            return_url: `https://tecnologieinnovativesmjp.onrender.com/html/pagamento_riuscito.html`,
+            return_url: `https://tecnologieinnovativesmjp.onrender.com/html/pagamento_riuscito.html?spazioId=${encodeURIComponent(spazioId)}&giorno=${encodeURIComponent(giorno)}&orario=${encodeURIComponent(fascia)}&prezzo=${encodeURIComponent(prezzo)}&id_gestore=${encodeURIComponent(id_gestore)}`,
 
             payment_method_data: {
                 billing_details: {

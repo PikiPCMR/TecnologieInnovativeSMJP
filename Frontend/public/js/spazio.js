@@ -18,10 +18,9 @@ const FASCE = [
 ];
 
 let valuta = "€";
-let selectedSlot = null;
 let user = null;
 let selectedSlots = [];
-
+let gestore_id = null;
 document.addEventListener("DOMContentLoaded", async () => {
   user = JSON.parse(localStorage.getItem('user'));
   if (!spazioId) { alert("ID spazio mancante (?id=...)"); return; }
@@ -83,6 +82,7 @@ setText("prezzo", Number.isFinite(prezzoDb) ? formatPrice(prezzoDb, valuta) : "�
 
   // Dati gestore (in "registrazione" la chiave è "id")
   if (spazio.id_gestore){
+    gestore_id = spazio.id_gestore;
     const { data: host } = await supabase.from("registrazione")
       .select("id, nome, cognome, email , numero_telefono, immagine_profilo")
       .eq("id", spazio.id_gestore)
@@ -144,8 +144,7 @@ function initDateInputs(){
   });
 }
 
-async function refreshAvailability(){
-  selectedSlot = null;
+async function refreshAvailability() {
   const bkSel = $("#bk-slot");
   if (bkSel) bkSel.innerHTML = `<option value="">Seleziona</option>`;
   const day = $("#giorno")?.value;
@@ -156,7 +155,36 @@ async function refreshAvailability(){
     .eq("id_spazio", spazioId)
     .eq("giorno", day);
 
-  const occupate = new Set((prenotazioni||[]).map(p=>String(p.fascia_oraria)));
+  // Mappa: id -> [inizio, fine]
+  const fasceOrarie = {
+    1: ['08:00', '09:00'],
+    2: ['09:00', '10:00'],
+    3: ['10:00', '11:00'],
+    4: ['11:00', '12:00'],
+    5: ['14:00', '15:00'],
+    6: ['15:00', '16:00'],
+    7: ['16:00', '17:00'],
+    8: ['17:00', '18:00'],
+  };
+
+  // Trova tutti gli id occupati
+  const occupate = new Set();
+  (prenotazioni || []).forEach(p => {
+    if (!p.fascia_oraria) return;
+    // Split per " e " (più intervalli)
+    const intervalli = String(p.fascia_oraria).split(" e ");
+    intervalli.forEach(intv => {
+      // Split per "-" (es: "10:00-15:00")
+      const [inizio, fine] = intv.split("-").map(s => s.trim());
+      if (!inizio || !fine) return;
+      // Segna occupate tutte le fasce che rientrano nell'intervallo
+      Object.entries(fasceOrarie).forEach(([id, [start, end]]) => {
+        if (start >= inizio && end <= fine) {
+          occupate.add(id);
+        }
+      });
+    });
+  });
 
   const wrap = $("#slots"); if (!wrap) return;
   wrap.innerHTML = "";
@@ -206,7 +234,7 @@ function bindCTA(){
 
     let errorOccurred = false;
 
-    for (const fascia of selectedSlots) {
+    /*for (const fascia of selectedSlots) {
       const payload = {
         id_prenotazione: crypto.randomUUID(),
         id_utente: user.id,
@@ -223,12 +251,12 @@ function bindCTA(){
         errorOccurred = true;
         break;
       }
-    }
+    }*/
 
-    await refreshAvailability();
+    //await refreshAvailability();
 
     if (!errorOccurred) {
-      window.location.href = `prenotazione.html?id=${encodeURIComponent(spazioId)}&giorno=${encodeURIComponent(giorno)}&selectedSlots=${encodeURIComponent(selectedSlots)}`;
+      window.location.href = `prenotazione.html?id=${encodeURIComponent(spazioId)}&giorno=${encodeURIComponent(giorno)}&selectedSlots=${encodeURIComponent(selectedSlots)}&id_gestore=${encodeURIComponent(id_gestore)}`;
     }
   });
     

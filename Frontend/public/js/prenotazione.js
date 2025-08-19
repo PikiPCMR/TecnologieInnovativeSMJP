@@ -6,8 +6,9 @@ const params = new URLSearchParams(queryString);
 const spazioId = params.get('id');
 const giorno = params.get('giorno');
 const selectedSlots = params.get('selectedSlots');
+const id_gestore = params.get('id_gestore');
 let prezzo=0;
-
+let orario="";
 document.addEventListener('DOMContentLoaded', async() => {
   try{
     const{data, error: fetchError} = await supabase
@@ -19,7 +20,8 @@ document.addEventListener('DOMContentLoaded', async() => {
     prezzo = data.prezzo_ora * selectedSlots.length;
     document.getElementById('spazio-id').textContent = spazioId;
     document.getElementById('giorno').textContent = giorno;
-    document.getElementById('fascia').textContent = fasciaOrariaToString(selectedSlots);
+    orario = fasciaOrariaToString(selectedSlots);
+    document.getElementById('fascia').textContent = orario;
     document.getElementById('prezzo').textContent = `€ ${prezzo}`;
   }catch (error) {
     console.error('Errore nel recupero dei dati dello spazio:', error);
@@ -81,5 +83,5 @@ document.getElementById('button-sub').addEventListener('click', async () => {
   const email = document.getElementById('email').value.trim();
 
   
-  window.location.href = `pagamento.html?nome=${encodeURIComponent(nome)}&email=${encodeURIComponent(email)}&prezzo=${prezzo}`;
+  window.location.href = `pagamento.html?nome=${encodeURIComponent(nome)}&email=${encodeURIComponent(email)}&prezzo=${prezzo}&id=${spazioId}&giorno=${encodeURIComponent(giorno)}&orario=${encodeURIComponent(orario)}&id_gestore=${encodeURIComponent(id_gestore)}`;
 });
