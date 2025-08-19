@@ -1,6 +1,13 @@
+/**
+ * @fileoverview Questo script gestisce l'interazione con gli input di tipo file per le immagini,
+ * la loro anteprima lato client e l'upload su un bucket di storage di Supabase.
+ * Include anche la logica per salvare i dati di un "spazio di lavoro" nel database.
+ * @author [Nome del tuo team o tuo nome]
+ */
+
 import { supabase } from '../collegamentoDb.js';
 
-// Variabili per gestire le immagini lato client
+// Variabili globali per gestire lo stato delle immagini selezionate
 let selectedFiles = [];
 
 const immaginiInput = document.getElementById('immagini-input');
@@ -20,7 +27,11 @@ rimuoviBtn.addEventListener('click', () => {
     updatePreviewCarousel();
 });
 
-// Funzione per mostrare le immagini in un carosello (o una singola immagine)
+/**
+ * Aggiorna il carosello di anteprima delle immagini selezionate.
+ * Crea un carosello dinamico che mostra le immagini caricate dall'utente.
+ * Se non ci sono immagini, nasconde il pulsante di rimozione.
+ */
 function updatePreviewCarousel() {
     previewContainer.innerHTML = ''; // Pulisci il contenitore
     if (selectedFiles.length > 0) {
@@ -46,7 +57,13 @@ function updatePreviewCarousel() {
     }
 }
 
-// Carica immagini nel bucket e restituisce array di URL
+/**
+ * Carica un array di file immagine su un bucket di storage di Supabase.
+ * Le immagini vengono salvate in una sottocartella il cui nome è `id_spazio`.
+ * @param {File[]} files Un array di oggetti File da caricare.
+ * @param {string} id_spazio L'ID dello spazio di lavoro, usato come nome della cartella nel bucket.
+ * @returns {Promise<string[]>} Una promessa che si risolve in un array di URL pubblici delle immagini caricate con successo.
+ */
 export async function uploadSpazioImages(files, id_spazio) {
     const urls = [];
     for (const file of files) {
@@ -69,7 +86,14 @@ export async function uploadSpazioImages(files, id_spazio) {
     return urls;
 }
 
-// Funzione principale per aggiungere uno spazio
+/**
+ * Gestisce il processo completo di aggiunta di un nuovo spazio di lavoro.
+ * Esegue il caricamento delle immagini, recupera i dati dell'utente loggato,
+ * unisce i dati del form e salva il tutto nel database.
+ * @param {Object} formData Un oggetto che contiene i dati del form.
+ * @param {File[]} selectedFiles Un array di oggetti File con le immagini da caricare.
+ * @returns {Promise<void>} Una promessa che non restituisce un valore ma gestisce alert e reindirizzamento.
+ */
 export async function aggiungiSpazio(formData, selectedFiles) {
     const user = JSON.parse(localStorage.getItem('user'))?.id;
     if (!user) {

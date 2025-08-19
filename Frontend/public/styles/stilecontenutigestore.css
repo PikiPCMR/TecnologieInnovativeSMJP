@@ -140,7 +140,7 @@ main {
     color: #fff;
     border: none;
     border-radius: 25px;
-    font-size: 20px;
+    font-size: 18px;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease;
     align-self: center; /* Centra il pulsante rispetto al main */
@@ -183,7 +183,7 @@ main {
     color: #fff;
     border: none;
     border-radius: 25px;
-    font-size: 20px;
+    font-size: 18px;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease;
     align-self: center; /* Centra il pulsante rispetto al main */

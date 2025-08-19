@@ -2,9 +2,8 @@ import { supabase } from '../collegamentoDb.js';
 
 // Variabili per gestire le immagini lato client
 let selectedFiles = [];
-export let existingImageUrls = []; // Aggiunto "export" per rendere la variabile accessibile
+export let existingImageUrls = []; 
 
-const immaginiInput = document.getElementById('immagini-input');
 const rimuoviBtn = document.getElementById('rimuovi-immagini-btn');
 const previewContainer = document.getElementById('image-preview-container');
 
@@ -12,12 +11,12 @@ const previewContainer = document.getElementById('image-preview-container');
 function updatePreviewCarousel() {
     previewContainer.innerHTML = '';
     const allFiles = [...existingImageUrls, ...selectedFiles]; // Combina immagini esistenti e nuove
-    
+
     if (allFiles.length > 0) {
         rimuoviBtn.style.display = 'block';
         const carousel = document.createElement('div');
         carousel.className = 'image-carousel';
-        
+
         allFiles.forEach(fileOrUrl => {
             const img = document.createElement('img');
             if (typeof fileOrUrl === 'string') {
@@ -47,7 +46,6 @@ function updatePreviewCarousel() {
  * @returns {Promise<Array<string>>} Un array con gli URL pubblici delle nuove immagini.
  */
 export async function uploadSpazioImages(files, id_spazio) {
-    // Non è necessario passare oldUrls come argomento, lo prendiamo dal modulo.
     if (existingImageUrls && existingImageUrls.length > 0) {
         const pathsToDelete = existingImageUrls.map(url => {
             const pathStartIndex = url.indexOf('immaginispazio/') + 'immaginispazio/'.length;
@@ -160,6 +158,8 @@ export async function modificaSpazio(formData, newFiles, id_spazio) {
     }
 
     alert('Spazio modificato con successo!');
+    window.location.href = '../dashboard_gestore.html';
+
 }
 
 /**

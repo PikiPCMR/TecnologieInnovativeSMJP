@@ -1,6 +1,16 @@
+/**
+ * @fileoverview Questo modulo gestisce la logica per la selezione e la visualizzazione degli avatar utente.
+ * Include funzioni per aprire e chiudere un popup, caricare avatar predefiniti da un database,
+ * salvare la selezione dell'utente e aggiornare l'interfaccia.
+ * @author [Nome del tuo team o tuo nome]
+ */
+
 import { supabase } from './collegamentoDb.js';
 
 // === APRI POPUP ===
+/**
+ * Rende visibile il popup per la selezione dell'avatar e avvia il caricamento degli avatar disponibili dal database.
+ */
 export function apriPopup() {
   document.getElementById('avatar-popup').style.display = 'flex';
   caricaAvatarDaDB();
@@ -8,12 +18,21 @@ export function apriPopup() {
 window.apriPopup = apriPopup;
 
 // === CHIUDI POPUP ===
+/**
+ * Rende invisibile il popup per la selezione dell'avatar.
+ */
 export function chiudiPopup() {
   document.getElementById('avatar-popup').style.display = 'none';
 }
 window.chiudiPopup = chiudiPopup;
 
 // === CARICA AVATAR DA BUCKET ===
+/**
+ * Recupera la lista degli URL degli avatar disponibili dalla tabella `avatar_profilo` del database
+ * e li visualizza in una griglia all'interno del popup.
+ * In caso di errore o di assenza di avatar, gestisce la visualizzazione di un messaggio appropriato.
+ * @returns {Promise<void>} Una promessa che si risolve una volta che gli avatar sono stati caricati e visualizzati.
+ */
 export async function caricaAvatarDaDB() {
   const user = JSON.parse(localStorage.getItem('user'));
   if (!user || !user.id) {
@@ -59,6 +78,12 @@ export async function caricaAvatarDaDB() {
 }
 
 // === SELEZIONA AVATAR ===
+/**
+ * Salva l'URL dell'avatar selezionato nella colonna `immagine_profilo` della tabella `registrazione`
+ * per l'utente loggato. Aggiorna anche l'interfaccia utente e il `localStorage`.
+ * @param {string} urlAvatar L'URL dell'immagine dell'avatar selezionato.
+ * @returns {Promise<void>} Una promessa che si risolve al termine dell'operazione di salvataggio.
+ */
 async function selezionaAvatar(urlAvatar) {
   const user = JSON.parse(localStorage.getItem('user'));
   const userId = user.id;
@@ -90,6 +115,11 @@ async function selezionaAvatar(urlAvatar) {
 }
 
 // === CARICA AVATAR UTENTE ALL'AVVIO ===
+/**
+ * Carica e visualizza l'avatar dell'utente attualmente loggato.
+ * L'URL dell'immagine viene recuperato dal `localStorage`. Se non viene trovato un avatar,
+ * viene usato un'immagine placeholder predefinita.
+ */
 export function caricaAvatarUtente() {
 
   const user = JSON.parse(localStorage.getItem('user'));

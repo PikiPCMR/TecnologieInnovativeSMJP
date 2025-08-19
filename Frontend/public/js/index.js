@@ -33,7 +33,7 @@ function handleProfile() {
     alert("Errore: utente non identificato.");
     return;
   }
-  window.location.href = '../html/profilo.html';
+  window.location.href = '../profilo.html';
   toggleProfileMenu();
 }
 window.handleProfile = handleProfile;
@@ -41,7 +41,7 @@ window.handleProfile = handleProfile;
 function handleLogout() {
   localStorage.removeItem('user');
   checkLogin();
-  window.location.href = '../html/index.html';
+  window.location.href = '../';
 }
 window.handleLogout = handleLogout;
 
