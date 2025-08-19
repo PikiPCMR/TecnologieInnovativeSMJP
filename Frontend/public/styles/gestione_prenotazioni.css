@@ -1,0 +1,52 @@
+.fc-toolbar-title {
+  color: white;
+  font-size: 2rem;
+  font-weight: bold;
+
+}
+
+.fc .fc-button {
+  background-color: white;
+  color: black;
+  border: none;
+}
+
+/* Cambia il colore dei giorni della settimana (intestazione) */
+.fc-col-header-cell {
+  background-color: #8e7cc3;
+  color: #fff;
+  font-weight: bold;
+  padding: 3px 0 !important;
+  font-size: 0.9rem;
+}
+
+
+/* Giorni del mese */
+.fc-daygrid-day-number {
+  color: #f0f0f0;  /* testo chiaro */
+  font-weight: 500;
+}
+
+/* Giorni fuori dal mese */
+.fc-day-other .fc-daygrid-day-number {
+  color: #b3b3b3;  /* grigio tenue */
+}
+
+/* Oggi */
+.fc-day-today {
+  background: #a29bfe !important;  /* sfondo azzurro */
+  color: #fff !important;          /* testo bianco */
+}
+
+
+#calendar {
+  max-width: 1400px;     /* limite di larghezza */
+  margin: 40px auto;     /* centrato con spazio sopra/sotto */
+  padding: 20px;         /* distacco interno dai bordi */
+  background: #ffffff10; /* leggero sfondo trasparente (opzionale) */
+  border-radius: 16px;   /* angoli arrotondati */
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15); 
+}
+
+
+
