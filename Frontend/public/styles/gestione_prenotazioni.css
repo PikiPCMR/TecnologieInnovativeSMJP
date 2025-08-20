@@ -48,5 +48,18 @@
   box-shadow: 0 4px 20px rgba(0,0,0,0.15); 
 }
 
+#event-popup button {
+  margin: 8px 8px 0 0;
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  background: #8e7cc3;
+  color: #fff;
+  cursor: pointer;
+}
+#event-popup button:hover {
+  background: #764ba2;
+}
+
 
 
