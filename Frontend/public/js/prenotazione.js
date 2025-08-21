@@ -73,7 +73,7 @@ function fasciaOrariaToString(fascia) {
 
   // Costruisci stringa intervalli
   let ris = intervalli.map(([inizio, fine]) => {
-    return `${fasceOrarie[inizio][0]} - ${fasceOrarie[fine][1]}`;
+    return `${fasceOrarie[inizio][0]}-${fasceOrarie[fine][1]}`;
   }).join(' e ');
 
   return ris;

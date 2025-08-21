@@ -2,11 +2,12 @@ import { supabase } from './collegamentoDb.js';
 
 const queryString = window.location.search;
 const params = new URLSearchParams(queryString);
-const spazioId= "ciaociao";//params.get('spazioId') || '';
-const giorno = new Date().toISOString().slice(0, 10); //params.get('giorno') || '';
-const fascia = "10:00 - 11:00"//params.get('orario') || '';
-const prezzo = 20//params.get('prezzo') || '';
-const id_gestore = "bigluca69"//params.get('id_gestore') || '';
+const spazioId= params.get('spazioId') || '';
+const giorno = params.get('giorno') || '';
+const fascia = params.get('orario') || '';
+const prezzo = params.get('prezzo') || '';
+const id_gestore = params.get('id_gestore') || '';
+const idPagamento = params.get('id_pagamento') || '';
 let user= null;
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -48,7 +49,7 @@ async function inserisciPrenotazione(prenotazioneId) {
 
 async function insericiPagamento(prenotazioneId) {
     const payload = {
-        id_stripe: crypto.randomUUID(),
+        id_pagamento: idPagamento,
         id_utente: user.id,
         id_prenotazione: prenotazioneId,
         importo: prezzo,

@@ -16,7 +16,7 @@ const spazioId = params.get('spazioId') || '';
 const giorno = params.get('giorno') || '';
 const fascia = params.get('orario') || '';
 const id_gestore = params.get('id_gestore') || '';
-
+let idPagamento = null;
 // 2) All'avvio, chiedi al backend di creare un PaymentIntent e restituisci il clientSecret
 document.addEventListener('DOMContentLoaded', async () => {
     try {
@@ -29,8 +29,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 prezzo: importo
             })
         });
-
-        const { clientSecret, error } = await resp.json();
+        const data = await resp.json();
+        const clientSecret = data.clientSecret;
+        idPagamento = data.paymentIntentId;
         if (!resp.ok || !clientSecret) throw new Error(error || 'Impossibile inizializzare il pagamento');
 
         const appearance = { theme: 'stripe' };
@@ -57,7 +58,7 @@ document.getElementById('submit').addEventListener('click', async () => {
             elements,
             confirmParams: {
             // Inserisci la tua pagina di successo pubblica
-            return_url: `https://tecnologieinnovativesmjp.onrender.com/html/pagamento_riuscito.html?spazioId=${encodeURIComponent(spazioId)}&giorno=${encodeURIComponent(giorno)}&orario=${encodeURIComponent(fascia)}&prezzo=${encodeURIComponent(prezzo)}&id_gestore=${encodeURIComponent(id_gestore)}`,
+            return_url: `https://tecnologieinnovativesmjp.onrender.com/html/pagamento_riuscito.html?spazioId=${encodeURIComponent(spazioId)}&giorno=${encodeURIComponent(giorno)}&orario=${encodeURIComponent(fascia)}&prezzo=${encodeURIComponent(prezzo)}&id_gestore=${encodeURIComponent(id_gestore)}&id_pagamento=${encodeURIComponent(idPagamento)}`,
 
             payment_method_data: {
                 billing_details: {

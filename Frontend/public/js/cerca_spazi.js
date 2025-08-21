@@ -8,7 +8,10 @@ import {
   handleLogout
 } from '../js/index.js';
 
+const queryString = window.location.search;
 
+const params = new URLSearchParams(queryString);
+let editMode = params.get('edit') === 'true';
 window.checkLogin = checkLogin;
 window.toggleProfileMenu = toggleProfileMenu;
 window.accedi = accedi;
@@ -44,21 +47,40 @@ function mostraSpazi(lista) {
     const immagine = spazio.immagini_spazio?.[0] || 'img/placeholder.jpg';
     const indirizzo = `${spazio.indirizzo_spazio || ''}, ${spazio.numero_civico || ''}`;
     aggiungiMarker(`${indirizzo}, ${spazio.città}`);
-    return `
-      <div class="workspace-card">
-        <img class="workspace-img" src="${immagine}" alt="${spazio.id_spazio}" />
-        <div class="workspace-info">
-          <h3>${spazio.id_spazio}</h3>
-          <p class="location">${spazio.città}, ${spazio.provincia}</p>
-          <p class="services">📍 ${indirizzo}</p>
-          <p class="services">🧭 Categoria: ${spazio.categoria}</p>
-          <div class="workspace-footer">
-            <div class="price">Italia</div>
-            <button class="btn-book" onclick="vaiAScheda('${spazio.id_spazio}')">Dettagli</button>
+    if(editMode) {
+      return `
+        <div class="workspace-card">
+          <img class="workspace-img" src="${immagine}" alt="${spazio.id_spazio}" />
+          <div class="workspace-info">
+            <h3>${spazio.id_spazio}</h3>
+            <p class="location">${spazio.città}, ${spazio.provincia}</p>
+            <p class="services">📍 ${indirizzo}</p>
+            <p class="services">🧭 Categoria: ${spazio.categoria}</p>
+            <div class="workspace-footer">
+              <div class="price">Italia</div>
+              <button class="btn-book" onclick="Seleziona('${spazio.id_spazio}')">Seleziona</button>
+            </div>
           </div>
         </div>
-      </div>
-    `;
+      `;
+    }else{
+      return `
+        <div class="workspace-card">
+          <img class="workspace-img" src="${immagine}" alt="${spazio.id_spazio}" />
+          <div class="workspace-info">
+            <h3>${spazio.id_spazio}</h3>
+            <p class="location">${spazio.città}, ${spazio.provincia}</p>
+            <p class="services">📍 ${indirizzo}</p>
+            <p class="services">🧭 Categoria: ${spazio.categoria}</p>
+            <div class="workspace-footer">
+              <div class="price">Italia</div>
+              <button class="btn-book" onclick="vaiAScheda('${spazio.id_spazio}')">Dettagli</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+    
   }).join('');
 }
 
@@ -174,3 +196,8 @@ window.vaiAScheda = (idSpazio) => {
   // Reindirizza alla pagina con parametro id
   window.location.href = `spazio.html?id=${encodeURIComponent(idSpazio)}`;
 };
+
+window.Seleziona = (idSpazio) => {
+  // Reindirizza alla pagina di prenotazione con parametro id
+  window.location.href = `gestione_prenotazioni.html?id=${encodeURIComponent(idSpazio)}`;
+}

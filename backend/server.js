@@ -34,7 +34,10 @@ app.post('/create-payment-intent', async (req, res) => {
       automatic_payment_methods: { enabled: true }, // abilita carte + altri metodi supportati
     });
 
-    res.json({ clientSecret: paymentIntent.client_secret });
+    res.json({ 
+      clientSecret: paymentIntent.client_secret,
+      paymentIntentId: paymentIntent.id
+    });
   } catch (err) {
     console.error('Errore creazione PaymentIntent:', err);
     res.status(500).json({ error: 'Errore creazione PaymentIntent' });
@@ -57,7 +60,7 @@ app.post('/webhook', bodyParser.raw({ type: 'application/json' }), (req, res) =>
     case 'payment_intent.succeeded':
       const paymentIntent = event.data.object;
       console.log('Pagamento riuscito per', paymentIntent.id);
-      // Qui puoi segnare l’ordine come pagato nel tuo DB
+      
       break;
     default:
       console.log(`Evento non gestito: ${event.type}`);
@@ -68,6 +71,64 @@ app.post('/webhook', bodyParser.raw({ type: 'application/json' }), (req, res) =>
 
 app.listen(PORT, () => console.log(`Server in ascolto su http://localhost:${PORT}`));
 
+// 3) Endpoint per emettere un rimborso
+app.post('/refund', async (req, res) => {
+  try {
+    const { paymentIntentId, amount } = req.body;
+
+    if (!paymentIntentId) {
+      return res.status(400).json({ error: 'paymentIntentId mancante' });
+    }
+
+    // Recupera il PaymentIntent per ottenere il charge associato
+    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+
+    if (!paymentIntent.charges?.data[0]) {
+      return res.status(400).json({ error: 'Nessun charge trovato per questo PaymentIntent' });
+    }
+
+    const chargeId = paymentIntent.charges.data[0].id;
+
+    // Crea il rimborso (se amount non è passato, rimborsa tutto)
+    const refund = await stripe.refunds.create({
+      charge: chargeId,
+      ...(amount && { amount }), // opzionale: importo in centesimi
+    });
+
+    res.json({ refund });
+  } catch (err) {
+    console.error('Errore creazione rimborso:', err);
+    res.status(500).json({ error: 'Errore creazione rimborso' });
+  }
+});
+
+app.post("/charge-extra", async (req, res) => {
+  try {
+    const { paymentIntentId, amount } = req.body;
+
+    // Recupera il PaymentIntent originale
+    const originalPI = await stripe.paymentIntents.retrieve(paymentIntentId);
+
+    if (!originalPI.payment_method) {
+      return res.status(400).json({ error: "Nessun metodo di pagamento associato" });
+    }
+
+    // Crea un nuovo PaymentIntent per l'importo aggiuntivo
+    const extraPI = await stripe.paymentIntents.create({
+      amount: amount, // in centesimi (es. 1000 = €10.00)
+      currency: originalPI.currency,
+      customer: originalPI.customer, // riusa il customer originale se esiste
+      payment_method: originalPI.payment_method, // riusa la carta
+      off_session: true, // perché non serve che il cliente sia presente
+      confirm: true      // conferma subito l’addebito
+    });
+
+    res.json({ newPaymentIntent: extraPI });
+  } catch (err) {
+    console.error("Errore addebito extra:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
 
 
 // Avvia il server

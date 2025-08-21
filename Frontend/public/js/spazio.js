@@ -234,29 +234,10 @@ function bindCTA(){
 
     let errorOccurred = false;
 
-    /*for (const fascia of selectedSlots) {
-      const payload = {
-        id_prenotazione: crypto.randomUUID(),
-        id_utente: user.id,
-        id_spazio: spazioId,
-        giorno,
-        fascia_oraria: fascia,
-        timestamp: new Date().toISOString()
-      };
-
-      const { error } = await supabase.from("prenotazione").insert(payload);
-      if (error) {
-        alert("Errore prenotazione");
-        console.error(error);
-        errorOccurred = true;
-        break;
-      }
-    }*/
-
-    //await refreshAvailability();
+    
 
     if (!errorOccurred) {
-      window.location.href = `prenotazione.html?id=${encodeURIComponent(spazioId)}&giorno=${encodeURIComponent(giorno)}&selectedSlots=${encodeURIComponent(selectedSlots)}&id_gestore=${encodeURIComponent(id_gestore)}`;
+      window.location.href = `prenotazione.html?id=${encodeURIComponent(spazioId)}&giorno=${encodeURIComponent(giorno)}&selectedSlots=${encodeURIComponent(selectedSlots)}&id_gestore=${encodeURIComponent(gestore_id)}`;
     }
   });
     
