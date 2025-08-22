@@ -98,10 +98,6 @@ async function waitForPrenotazione(prenotazioneId, timeoutMs = 15000) {
 }
 
 function viewBookings() {
-    if (!isLoggedIn) {
-        alert('Effettua il login per visualizzare prenotazioni');
-        return;
-    }
     window.location.href = '/html/gestione_prenotazioni.html';
 }
 window.viewBookings = viewBookings;

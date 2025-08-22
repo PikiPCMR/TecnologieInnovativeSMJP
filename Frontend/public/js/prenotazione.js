@@ -5,7 +5,7 @@ const params = new URLSearchParams(queryString);
 
 const spazioId = params.get('id');
 const giorno = params.get('giorno');
-const selectedSlots = params.get('selectedSlots');
+const selectedSlots = params.get('selectedSlots').replaceAll(",","");
 const id_gestore = params.get('id_gestore');
 let prezzo=0;
 let orario="";
