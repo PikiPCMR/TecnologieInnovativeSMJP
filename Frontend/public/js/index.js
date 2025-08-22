@@ -64,7 +64,7 @@ function viewBookings() {
     alert('Effettua il login per visualizzare prenotazioni');
     return;
   }
-  alert('Gestione prenotazioni...');
+  window.location.href = '/html/gestione_prenotazioni.html';
 }
 window.viewBookings = viewBookings;
 

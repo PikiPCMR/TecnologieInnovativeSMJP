@@ -6,6 +6,7 @@ const params = new URLSearchParams(location.search);
 const spazioId = params.get("id");
 let spazioIdAttuale=null;
 let prezzoAttuale=0;
+let date=null;
 document.addEventListener('DOMContentLoaded', async function() {
     user = JSON.parse(localStorage.getItem('user'));
     var calendarEl = document.getElementById('calendar');
@@ -19,6 +20,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         eventClick: function(info) {
             // Mostra popup personalizzato
             showEventPopup(info.event);
+            date = info.event.start.toLocaleDateString('fr-CA'); // formato YYYY-MM-DD
         }
     });
     calendar.render();
@@ -142,15 +144,25 @@ async function showEventPopup(event) {
             await supabase.from('prenotazione').delete().eq('id_prenotazione', event.extendedProps.id_prenotazione);
             event.remove();
             popup.style.display = 'none';
+            overlay.style.display = 'none';
+            if (popup) popup.remove();
+            if (overlay) overlay.style.display = 'none';
+            spazioIdAttuale=null;
+            prezzoAttuale=0;
         }
     };
     document.getElementById('btn-modifica').onclick = () => {
         showEditPopup(event);
         popup.style.display = 'none';
+        if (popup) popup.remove();
     };
     document.getElementById('btn-indietro').onclick = () => {
         popup.style.display = 'none';
         overlay.style.display = 'none';
+        if (popup) popup.remove();
+        if (overlay) overlay.style.display = 'none';
+        spazioIdAttuale=null;
+        prezzoAttuale=0;
     };
 }
 
@@ -193,10 +205,10 @@ function showEditPopup(event, datiSalvati = null) {
     popup.style.transform = 'translate(-50%, -50%) scale(0.9)';
     popup.style.zIndex = 9999;
     popup.style.background = 'rgba(255,255,255,0.95)';
-    popup.style.padding = '24px';
+    popup.style.padding = '32px';
     popup.style.borderRadius = '16px';
     popup.style.boxShadow = '0 8px 30px rgba(0,0,0,0.25)';
-    popup.style.width = '320px';
+    popup.style.width = '480px';
     popup.style.textAlign = 'center';
     popup.style.fontFamily = 'sans-serif';
     popup.style.transition = 'all 0.2s ease';
@@ -229,6 +241,9 @@ function showEditPopup(event, datiSalvati = null) {
           </div>
       </form>
     `;
+
+    const inputGiorno = popup.querySelector("#edit-giorno");
+    inputGiorno.value = date;
 
     document.body.appendChild(popup);
 
@@ -374,9 +389,9 @@ function showEditPopup(event, datiSalvati = null) {
         }
 
     // init date field
-    const today = new Date().toISOString().slice(0,10);
+    //const today = new Date().toISOString().slice(0,10);
     const dateInput = document.getElementById("edit-giorno");
-    dateInput.value = today;
+    //dateInput.value = today;
     dateInput.addEventListener("change", refreshAvailability);
 
     refreshAvailability();
@@ -396,8 +411,12 @@ function showEditPopup(event, datiSalvati = null) {
     });
     // === chiusura popup ===
     document.getElementById('btn-annulla').addEventListener('click', () => {
-      popup.style.display = 'none';
-      overlay.style.display = 'none';
+        popup.style.display = 'none';
+        overlay.style.display = 'none';
+        if (popup) popup.remove();
+        if (overlay) overlay.style.display = 'none';
+        spazioIdAttuale=null;
+        prezzoAttuale=0;
     });
 
     // === submit form ===
