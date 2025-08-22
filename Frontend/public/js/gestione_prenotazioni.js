@@ -141,7 +141,18 @@ async function showEventPopup(event) {
     // Gestione pulsanti
     document.getElementById('btn-cancella').onclick = async () => {
         if (confirm("Sei sicuro di voler cancellare questa prenotazione?")) {
+
+            
+            const resp = await fetch('https://tecnologieinnovativesmjp.onrender.com/refund', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        id_pagamento: event.extendedProps.id_pagamento,
+                        importo: prezzoAttuale
+                    })
+                });
             await supabase.from('prenotazione').delete().eq('id_prenotazione', event.extendedProps.id_prenotazione);
+            alert("La prenotazione è stata cancellata. Verrai rimborsato dell'importo pagato.");
             event.remove();
             popup.style.display = 'none';
             overlay.style.display = 'none';
@@ -149,6 +160,7 @@ async function showEventPopup(event) {
             if (overlay) overlay.style.display = 'none';
             spazioIdAttuale=null;
             prezzoAttuale=0;
+
         }
     };
     document.getElementById('btn-modifica').onclick = () => {
