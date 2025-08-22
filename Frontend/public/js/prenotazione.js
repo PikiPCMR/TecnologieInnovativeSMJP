@@ -32,8 +32,8 @@ document.addEventListener('DOMContentLoaded', async() => {
 function fasciaOrariaToString(fascia) {
   // Mappa delle fasce: id → [inizio, fine]
   const fasceOrarie = {
-    1: ['08:00', '9:00'],
-    2: ['9:00', '10:00'],
+    1: ['08:00', '09:00'],
+    2: ['09:00', '10:00'],
     3: ['10:00', '11:00'],
     4: ['11:00', '12:00'],
     5: ['14:00', '15:00'],

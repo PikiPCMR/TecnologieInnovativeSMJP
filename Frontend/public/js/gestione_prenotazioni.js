@@ -288,7 +288,7 @@ function showEditPopup(event, datiSalvati = null) {
         7: ['16:00', '17:00'],
         8: ['17:00', '18:00'],
       };
-
+      console.log(prenotazioni);
       const occupate = new Set();
       (prenotazioni || []).forEach(p => {
         if (!p.fascia_oraria) return;
@@ -353,8 +353,8 @@ function showEditPopup(event, datiSalvati = null) {
     function fasciaOrariaToString(fascia) {
         // Mappa delle fasce: id → [inizio, fine]
         const fasceOrarie = {
-            1: ['08:00', '9:00'],
-            2: ['9:00', '10:00'],
+            1: ['08:00', '09:00'],
+            2: ['09:00', '10:00'],
             3: ['10:00', '11:00'],
             4: ['11:00', '12:00'],
             5: ['14:00', '15:00'],
@@ -398,7 +398,7 @@ function showEditPopup(event, datiSalvati = null) {
         }).join(' e ');
 
         return ris;
-        }
+    }
 
     // init date field
     //const today = new Date().toISOString().slice(0,10);

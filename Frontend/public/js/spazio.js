@@ -229,7 +229,7 @@ function bindCTA(){
       alert("Devi essere loggato per prenotare.");
       return;
     }
-    const giorno = $("#bk-date")?.value;
+    const giorno = $("#giorno")?.value;
     if (!giorno || !selectedSlots.length) return;
 
     let errorOccurred = false;
