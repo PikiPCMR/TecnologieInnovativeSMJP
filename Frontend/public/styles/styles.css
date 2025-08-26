@@ -121,6 +121,7 @@ body {
 }
 
 .dropdown-item {
+    color: black;
     padding: 15px 20px;
     cursor: pointer;
     transition: background 0.2s ease;

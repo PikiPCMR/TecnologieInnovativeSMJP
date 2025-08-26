@@ -1,4 +1,4 @@
-import { supabase } from './collegamentoDb.js';
+import { supabase } from '../collegamentoDb.js';
 
 // === POPUP MODIFICA EMAIL ===
 export function apriPopupEmail() {
@@ -129,7 +129,7 @@ document.getElementById('form-modifica-password')?.addEventListener('submit', as
   // 🔐 Disconnessione + redirect
   await supabase.auth.signOut();
   localStorage.removeItem('user');
-  window.location.href = '../html/login.html';
+  window.location.href = '../html/profilo/login.html';
 
 });
 
@@ -213,7 +213,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // 🔐 Disconnessione + redirect anche dopo richiesta reset
         await supabase.auth.signOut();
         localStorage.removeItem("user");
-        window.location.href = "../html/login.html";
+        window.location.href = "../html/profilo/login.html";
       }
 
     });

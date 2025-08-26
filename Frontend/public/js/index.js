@@ -18,12 +18,12 @@ function toggleProfileMenu() {
 window.toggleProfileMenu = toggleProfileMenu;
 
 function accedi() {
-  window.location.href = '/html/login.html';
+  window.location.href = '/html/profilo/login.html';
 }
 window.accedi = accedi;
 
 function registrati() {
-  window.location.href = '/html/register.html';
+  window.location.href = '/html/profilo/register.html';
 }
 window.registrati = registrati;
 
@@ -33,7 +33,7 @@ function handleProfile() {
     alert("Errore: utente non identificato.");
     return;
   }
-  window.location.href = '/html/profilo.html';
+  window.location.href = '/html/profilo/profilo.html';
   toggleProfileMenu();
 }
 window.handleProfile = handleProfile;
@@ -41,30 +41,23 @@ window.handleProfile = handleProfile;
 function handleLogout() {
   localStorage.removeItem('user');
   checkLogin();
-  window.location.href = '../';
+  window.location.href = '/';
 }
 window.handleLogout = handleLogout;
 
 function searchSpaces() {
-  window.location.href = '/html/cerca_spazi.html';
+  window.location.href = '/html/ricerca_spazio/cerca_spazi.html';
 }
 window.searchSpaces = searchSpaces;
 
-function quickBooking() {
-  if (!isLoggedIn) {
-    alert('Effettua il login per prenotare');
-    return;
-  }
-  alert('Prenotazione rapida...');
-}
-window.quickBooking = quickBooking;
+
 
 function viewBookings() {
   if (!isLoggedIn) {
     alert('Effettua il login per visualizzare prenotazioni');
     return;
   }
-  window.location.href = '/html/gestione_prenotazioni.html';
+  window.location.href = '/html/prenotazione/gestione_prenotazioni.html';
 }
 window.viewBookings = viewBookings;
 

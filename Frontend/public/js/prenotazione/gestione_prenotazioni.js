@@ -419,7 +419,7 @@ function showEditPopup(event, datiSalvati = null) {
         id_prenotazione: event.extendedProps.id_prenotazione
       };
       localStorage.setItem('editPopupState', JSON.stringify(statoPopup));
-      window.location.href = 'cerca_spazi.html?edit=true';
+      window.location.href = 'ricerca_spazio/cerca_spazi.html?edit=true';
     });
     // === chiusura popup ===
     document.getElementById('btn-annulla').addEventListener('click', () => {

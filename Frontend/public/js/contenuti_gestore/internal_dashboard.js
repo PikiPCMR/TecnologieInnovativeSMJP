@@ -1,4 +1,4 @@
-import { supabase } from './collegamentoDb.js';
+import { supabase } from '../collegamentoDb.js';
 
 // Ottiene l'ID utente dal localStorage. Se non è presente, il codice non procede.
 const userId = localStorage.getItem('user');
@@ -9,7 +9,7 @@ const user = JSON.parse(localStorage.getItem('user'))?.id;
  * Viene esportata per essere accessibile globalmente.
  */
 export function openDashboardGestore() {
-    window.location.href = "../html/internal_dashboard.html";
+    window.location.href = "../html/contenuti_gestore/internal_dashboard.html";
 }
 window.openDashboardGestore = openDashboardGestore;
 

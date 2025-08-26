@@ -1,50 +1,4 @@
-<!DOCTYPE html>
-<html lang="it">
-<head>
-  <meta charset="UTF-8" />
-  <title>Reimposta Password</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <link rel="stylesheet" href="../styles/login.css" />
-  <link rel="stylesheet" href="../styles/styles.css" />
-</head>
-<body>
-  <div class="wrapper">
-    <div class="login-container">
-      <h2>Reimposta la tua password</h2>
-
-     <div id="resetForm" style="display: none;">
-        <div class="form-group">
-          <label for="newPassword">Nuova Password</label>
-          <div class="password-wrapper">
-            <input type="password" id="newPassword" placeholder="Inserisci nuova password" />
-            <button type="button" class="toggle-password" onclick="togglePasswordVisibility('newPassword', this)">Mostra</button>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="confirmPassword">Conferma Nuova Password</label>
-          <div class="password-wrapper">
-            <input type="password" id="confirmPassword" placeholder="Ripeti nuova password" />
-            <button type="button" class="toggle-password" onclick="togglePasswordVisibility('confirmPassword', this)">Mostra</button>
-          </div>
-        </div>
-
-        <div id="errorMessage" style="color: #e63946; font-size: 0.9rem; margin-bottom: 10px;"></div>
-
-        <div class="popup-buttons">
-          <button class="popup-btn-secondary" id="cancelBtn">Annulla</button>
-          <button class="popup-btn" id="saveBtn">Salva</button>
-        </div>
-      </div>
-
-      <div id="waitMessage" style="text-align: center;">
-        <p>Attendere... stiamo verificando il link.</p>
-      </div>
-    </div>
-  </div>
-
-  <script type="module">
-    import { supabase } from '../js/collegamentoDb.js';
+ import { supabase } from '../js/collegamentoDb.js';
 
   (async () => {
     const newPassword = document.getElementById("newPassword");
@@ -66,7 +20,7 @@
     }
 
     document.getElementById("cancelBtn").addEventListener("click", () => {
-      window.location.href = "index.html";
+      window.location.href = "/";
     });
 
     document.getElementById("saveBtn").addEventListener("click", async () => {
@@ -112,7 +66,7 @@
       }
 
       alert("Password aggiornata con successo!");
-      window.location.href = "login.html";
+      window.location.href = "profilo/login.html";
     });
 
     supabase.auth.onAuthStateChange((event, session) => {
@@ -128,8 +82,3 @@
 }
 
 window.togglePasswordVisibility = togglePasswordVisibility;
-
-</script>
-
-</body>
-</html>

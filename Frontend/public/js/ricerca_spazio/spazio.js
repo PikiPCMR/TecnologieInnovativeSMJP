@@ -1,5 +1,5 @@
 // spazio.js
-import { supabase } from './collegamentoDb.js';
+import { supabase } from '../collegamentoDb.js';
 
 const $ = (s)=>document.querySelector(s);
 const params = new URLSearchParams(location.search);
@@ -237,7 +237,7 @@ function bindCTA(){
     
 
     if (!errorOccurred) {
-      window.location.href = `prenotazione.html?id=${encodeURIComponent(spazioId)}&giorno=${encodeURIComponent(giorno)}&selectedSlots=${encodeURIComponent(selectedSlots)}&id_gestore=${encodeURIComponent(gestore_id)}`;
+      window.location.href = `prenotazione/prenotazione.html?id=${encodeURIComponent(spazioId)}&giorno=${encodeURIComponent(giorno)}&selectedSlots=${encodeURIComponent(selectedSlots)}&id_gestore=${encodeURIComponent(gestore_id)}`;
     }
   });
     

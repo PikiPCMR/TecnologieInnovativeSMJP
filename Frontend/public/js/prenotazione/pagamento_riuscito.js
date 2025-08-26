@@ -1,4 +1,4 @@
-import { supabase } from './collegamentoDb.js';
+import { supabase } from '../collegamentoDb.js';
 
 const queryString = window.location.search;
 const params = new URLSearchParams(queryString);
@@ -98,7 +98,7 @@ async function waitForPrenotazione(prenotazioneId, timeoutMs = 15000) {
 }
 
 function viewBookings() {
-    window.location.href = '/html/gestione_prenotazioni.html';
+    window.location.href = '/html/prenotazione/gestione_prenotazioni.html';
 }
 window.viewBookings = viewBookings;
 

@@ -1,4 +1,4 @@
-import { supabase } from '../js/collegamentoDb.js';
+import { supabase } from '../collegamentoDb.js';
 import {
   checkLogin,
   toggleProfileMenu,
@@ -6,7 +6,7 @@ import {
   registrati,
   handleProfile,
   handleLogout
-} from '../js/index.js';
+} from '../index.js';
 
 const queryString = window.location.search;
 
@@ -199,5 +199,5 @@ window.vaiAScheda = (idSpazio) => {
 
 window.Seleziona = (idSpazio) => {
   // Reindirizza alla pagina di prenotazione con parametro id
-  window.location.href = `gestione_prenotazioni.html?id=${encodeURIComponent(idSpazio)}`;
+  window.location.href = `/prenotazione/gestione_prenotazioni.html?id=${encodeURIComponent(idSpazio)}`;
 }

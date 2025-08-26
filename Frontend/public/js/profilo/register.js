@@ -1,5 +1,5 @@
 // CONFIGURAZIONE SUPABASE
-import { supabase } from './collegamentoDb.js';
+import { supabase } from '../collegamentoDb.js';
 
 const registrationForm = document.getElementById("registrationForm");
 
@@ -27,7 +27,7 @@ if (session && session.user && session.user.email) {
     localStorage.setItem("mostraPopupDecisione", "true");
 
     // ✅ Redirect automatico
-    window.location.href = "profilo.html";
+    window.location.href = "profilo/profilo.html";
   }
 }
 
