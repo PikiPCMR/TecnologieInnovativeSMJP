@@ -12,6 +12,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script type="module">
+        import { caricaAvatarUtente } from '/js/profilo/gestione_avatar.js';
+
+        window.addEventListener('DOMContentLoaded', () => {
+            caricaAvatarUtente();
+        });
+    </script>
 
   <script type="module" src="/js/collegamentoDb.js"></script>
   <script type="module" src="/js/index.js"></script>
@@ -20,7 +27,7 @@
 <body>
   <!-- HEADER PRINCIPALE -->
   <header class="header">
-        <a href="../" class="logo-link"> <!-- ricordarsi di mettere ../ per tornare alla root -->
+        <a href="/html/index.html" class="logo-link"> <!-- ricordarsi di mettere ../ per tornare alla root -->
             <div class="logo">WorkSpace Pro</div>
         </a>
         <div class="profile-section">
