@@ -4,14 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../../styles/styles.css">
-    <link rel="stylesheet" href="../../styles/profilo/avatar.css">
-    <link rel="stylesheet" href="../../styles/contenuti_gestore/stilecontenutigestore.css">
-    <script type="module" src="../../js/index.js"></script>
-    <script type="module" src="../../js/contenuti_gestore/modifica_spazio.js"></script>
+    <link rel="stylesheet" href="/styles/styles.css">
+    <link rel="stylesheet" href="/styles/profilo/avatar.css">
+    <link rel="stylesheet" href="/styles/contenuti_gestore/stilecontenutigestore.css">
+    <script type="module" src="/js/index.js"></script>
+    <script type="module" src="/js/contenuti_gestore/modifica_spazio.js"></script>
     <script type="module">
-        import { caricaAvatarUtente } from '../../js/gestione_avatar.js';
-        import { loadSpazioData } from '../../js/contenuti_gestore/modifica_spazio.js';
+        import { caricaAvatarUtente } from '/js/profilo/gestione_avatar.js';
+        import { loadSpazioData } from '/js/contenuti_gestore/modifica_spazio.js';
 
         window.addEventListener('DOMContentLoaded', () => {
             caricaAvatarUtente();
@@ -21,7 +21,7 @@
                 loadSpazioData(spazioId);
             } else {
                 alert('ID dello spazio non fornito.');
-                window.location.href = '../dashboard_gestore.html';
+                window.location.href = '/html/dashboard_gestore.html';
             }
         });
     </script>
@@ -31,7 +31,7 @@
 
 <body>
     <header class="header">
-        <a href="../dashboard_gestore.html" class="logo-link">
+        <a href="/html/dashboard_gestore.html" class="logo-link">
             <div class="logo">WorkSpace Pro</div>
         </a>
         <div class="profile-section">
@@ -134,8 +134,8 @@
 
     </main>
     <script type="module">
-        import { modificaSpazio, rimuoviSpazio, loadSpazioData } from '../../js/contenuti_gestore/modifica_spazio.js';
-        import { caricaAvatarUtente } from '../../js/gestione_avatar.js';
+        import { modificaSpazio, rimuoviSpazio, loadSpazioData } from '/js/contenuti_gestore/modifica_spazio.js';
+        import { caricaAvatarUtente } from '/js/gestione_avatar.js';
 
         window.addEventListener('DOMContentLoaded', () => {
             caricaAvatarUtente();

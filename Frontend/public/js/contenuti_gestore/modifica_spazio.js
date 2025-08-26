@@ -1,4 +1,5 @@
-import { supabase } from '../collegamentoDb.js';
+import { supabase } from '/js/collegamentoDb.js';
+console.log(localStorage.getItem('user'));
 
 // Variabili per gestire le immagini lato client
 let selectedFiles = [];

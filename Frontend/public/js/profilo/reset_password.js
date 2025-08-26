@@ -1,4 +1,4 @@
- import { supabase } from '../js/collegamentoDb.js';
+ import { supabase } from '/js/collegamentoDb.js';
 
   (async () => {
     const newPassword = document.getElementById("newPassword");

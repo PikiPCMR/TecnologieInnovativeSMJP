@@ -1,11 +1,11 @@
-s/**
+/**
  * @fileoverview Questo modulo gestisce la logica per la selezione e la visualizzazione degli avatar utente.
  * Include funzioni per aprire e chiudere un popup, caricare avatar predefiniti da un database,
  * salvare la selezione dell'utente e aggiornare l'interfaccia.
  * @author [Nome del tuo team o tuo nome]
  */
 
-import { supabase } from '../collegamentoDb.js';
+import { supabase } from '/js/collegamentoDb.js';
 
 // === APRI POPUP ===
 /**

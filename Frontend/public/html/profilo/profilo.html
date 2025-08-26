@@ -5,18 +5,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <title>Profilo Utente | WorkSpace Pro</title>
-  <link rel="stylesheet" href="../styles/profilo/profilo.css" />
-  <link rel="stylesheet" href="../styles/styles.css" />
-  <link rel="stylesheet" href="../styles/profilo/avatar.css">
-  <script type="module" src="../js/profilo/profilo.js"></script>
-  <script type="module" src="../js/profilo/sicurezza_profilo.js"></script>
+  <link rel="stylesheet" href="/styles/profilo/profilo.css" />
+  <link rel="stylesheet" href="/styles/styles.css" />
+  <link rel="stylesheet" href="/styles/profilo/avatar.css">
+  <script type="module" src="/js/profilo/profilo.js"></script>
+  <script type="module" src="/js/profilo/sicurezza_profilo.js"></script>
 </head>
 
-<body <!---prima era presente caricaprofiloutente()> </body>
+<body>
 
 <header class="header">
-  <a href=".html" class="logo-link">
-    <div class="logo">WorkSpace Pro</div>
+  <a href="/" class="logo-link">
+    <div class="logo">WorkSpace Pro</div> 
   </a>
 </header>
 
@@ -127,7 +127,7 @@
 </body>
 
 <script type="module">
-  import { caricaAvatarUtente } from '../js/gestione_avatar.js';
+  import { caricaAvatarUtente } from '/js//gestione_avatar.js';
 
   window.addEventListener('DOMContentLoaded', () => {
     caricaAvatarUtente();
