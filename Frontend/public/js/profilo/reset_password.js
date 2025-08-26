@@ -16,7 +16,7 @@
       waitMessage.style.display = "none";
       resetForm.style.display = "block";
     } else {
-      waitMessage.innerHTML = "<p>Link non valido o già usato.</p><a href='login.html'>Torna al login</a>";
+      waitMessage.innerHTML = "<p>Link non valido o già usato.</p><a href='/html/profilo/login.html'>Torna al login</a>";
     }
 
     document.getElementById("cancelBtn").addEventListener("click", () => {
@@ -66,7 +66,7 @@
       }
 
       alert("Password aggiornata con successo!");
-      window.location.href = "profilo/login.html";
+      window.location.href = "html/profilo/login.html";
     });
 
     supabase.auth.onAuthStateChange((event, session) => {

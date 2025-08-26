@@ -54,7 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // ✅ Procedi con invio reset se esiste
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: 'http://localhost:3000/html/reset_password.html'
+        redirectTo: '/html/profilo/reset_password.html'
       });
 
       if (resetError) {
@@ -135,7 +135,7 @@ async function login() {
   localStorage.setItem('user', JSON.stringify(user));
 
   if (user.tipo_utente === "gestore") {
-    window.location.href = "dashboard_gestore.html";
+    window.location.href = "/html/dashboard_gestore.html";
   } else if (user.tipo_utente === "cliente") {
     window.location.href = "/html/index.html";
   } else {
