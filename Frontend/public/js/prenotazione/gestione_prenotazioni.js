@@ -1,4 +1,4 @@
-import { supabase } from './collegamentoDb.js';
+import { supabase } from '/js/collegamentoDb.js';
 let user = null;
 let prenotList = [];
 const $ = (s)=>document.querySelector(s);
@@ -455,13 +455,12 @@ function showEditPopup(event, datiSalvati = null) {
             .from('spazi_lavoro')
             .select('prezzo_ora')
             .eq('id_spazio', spazio);
-        
-        const nuovo_prezzo=prezzo_nuovo_spazio[0]* document.getElementById('edit-fascia').value.length;
+        let diffOre=differenzaOre(fascia);
+        const nuovo_prezzo=prezzo_nuovo_spazio[0].prezzo_ora* diffOre;
         
         if (prezzoAttuale != nuovo_prezzo) {
             if( prezzoAttuale > nuovo_prezzo) {
-                alert("Il prezzo della prenotazione è stato ridotto da ${prezzoAttuale} a ${nuovo_prezzo}, a breve verrà rimborsata la differenza.");
-                
+                alert(`Il prezzo della prenotazione è stato ridotto da ${prezzoAttuale} a ${nuovo_prezzo}, a breve verrà rimborsata la differenza.`);
                 const resp = await fetch('https://tecnologieinnovativesmjp.onrender.com/refund', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -516,6 +515,22 @@ function calcolaOreTotali(fasciaOrariaString) {
             const hStart = parseInt(inizio.split(':')[0], 10);
             const hEnd = parseInt(fine.split(':')[0], 10);
             ore += (hEnd - hStart);
+        }
+    });
+    return ore;
+}
+
+function differenzaOre(fasciaOrariaString) {
+    if (!fasciaOrariaString) return 0;
+    let ore = 0;
+    const intervalli = fasciaOrariaString.split(' e ');
+    intervalli.forEach(intv => {
+        const [inizio, fine] = intv.split('-').map(s => s.trim());
+        if (inizio && fine) {
+            const [hStart, mStart] = inizio.split(':').map(Number);
+            const [hEnd, mEnd] = fine.split(':').map(Number);
+            // Calcola la differenza in ore (inclusi i minuti)
+            ore += (hEnd + mEnd/60) - (hStart + mStart/60);
         }
     });
     return ore;
