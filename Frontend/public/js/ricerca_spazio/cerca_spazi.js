@@ -194,10 +194,10 @@ input.addEventListener("input", () => {
 
 window.vaiAScheda = (idSpazio) => {
   // Reindirizza alla pagina con parametro id
-  window.location.href = `spazio.html?id=${encodeURIComponent(idSpazio)}`;
+  window.location.href = `/html/ricerca_spazio/spazio.html?id=${encodeURIComponent(idSpazio)}`;
 };
 
 window.Seleziona = (idSpazio) => {
   // Reindirizza alla pagina di prenotazione con parametro id
-  window.location.href = `/prenotazione/gestione_prenotazioni.html?id=${encodeURIComponent(idSpazio)}`;
+  window.location.href = `/html/prenotazione/gestione_prenotazioni.html?id=${encodeURIComponent(idSpazio)}`;
 }

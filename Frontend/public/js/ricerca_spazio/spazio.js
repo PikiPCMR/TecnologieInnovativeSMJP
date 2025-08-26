@@ -237,7 +237,7 @@ function bindCTA(){
     
 
     if (!errorOccurred) {
-      window.location.href = `prenotazione/prenotazione.html?id=${encodeURIComponent(spazioId)}&giorno=${encodeURIComponent(giorno)}&selectedSlots=${encodeURIComponent(selectedSlots)}&id_gestore=${encodeURIComponent(gestore_id)}`;
+      window.location.href = `/html/prenotazione/prenotazione.html?id=${encodeURIComponent(spazioId)}&giorno=${encodeURIComponent(giorno)}&selectedSlots=${encodeURIComponent(selectedSlots)}&id_gestore=${encodeURIComponent(gestore_id)}`;
     }
   });
     

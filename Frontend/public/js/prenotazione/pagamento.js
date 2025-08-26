@@ -58,7 +58,7 @@ document.getElementById('submit').addEventListener('click', async () => {
             elements,
             confirmParams: {
             // Inserisci la tua pagina di successo pubblica
-            return_url: `https://tecnologieinnovativesmjp.onrender.com/html/pagamento_riuscito.html?spazioId=${encodeURIComponent(spazioId)}&giorno=${encodeURIComponent(giorno)}&orario=${encodeURIComponent(fascia)}&prezzo=${encodeURIComponent(prezzo)}&id_gestore=${encodeURIComponent(id_gestore)}&id_pagamento=${encodeURIComponent(idPagamento)}`,
+            return_url: `https://tecnologieinnovativesmjp.onrender.com/html/prenotazione/pagamento_riuscito.html?spazioId=${encodeURIComponent(spazioId)}&giorno=${encodeURIComponent(giorno)}&orario=${encodeURIComponent(fascia)}&prezzo=${encodeURIComponent(prezzo)}&id_gestore=${encodeURIComponent(id_gestore)}&id_pagamento=${encodeURIComponent(idPagamento)}`,
 
             payment_method_data: {
                 billing_details: {
