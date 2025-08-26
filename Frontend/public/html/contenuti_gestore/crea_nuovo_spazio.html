@@ -60,7 +60,7 @@
 
         <form id="form-nuovo-spazio" enctype="multipart/form-data">
             <div class="form-group images-group">
-                <label>Immagini dello spazio:</label>
+                <label id="labelform">Immagini dello spazio:</label>
                 <div class="file-input-container">
                     <input type="file" id="immagini-input" name="immagini" multiple accept="image/*">
                     <button type="button" id="rimuovi-immagini-btn" style="display:none;">Rimuovi</button>
@@ -69,29 +69,29 @@
 
             <div id="form-columns">
                 <div class="column">
-                    <label>
+                    <label id="labelform">
                         Indirizzo:
                         <input type="text" name="indirizzo_spazio" required>
                     </label>
-                    <label>
+                    <label id="labelform">
                         Numero civico:
                         <input type="text" name="numero_civico" required>
                     </label>
-                    <label>
+                    <label id="labelform">
                         Città:
                         <input type="text" name="città" required>
                     </label>
-                    <label>
+                    <label id="labelform">
                         Provincia:
                         <input type="text" name="provincia" required>
                     </label>
-                    <label>
+                    <label id="labelform">
                         Nazione:
                         <input type="text" name="nazione" required>
                     </label>
                 </div>
                 <div class="column">
-                    <label>
+                    <label id="labelform">
                         Categoria:
                         <select name="categoria" required>
                             <option value="sala riunioni">sala riunioni</option>
@@ -99,26 +99,26 @@
                             <option value="postazione coworking">postazione coworking</option>
                         </select>
                     </label>
-                    <label>
+                    <label id="labelform">
                         Capienza massima:
                         <input type="number" name="capienza_max" min="1" required>
                     </label>
-                    <label>
+                    <label id="labelform">
                         Prezzo/ora (€):
                         <input type="number" name="prezzo_ora" min="0" step="0.01" required>
                     </label>
-                    <label>
+                    <label id="labelform">
                         Descrizione breve:
                         <input type="text" name="descrizione_breve" maxlength="100" required>
                     </label>
-                    <label>
+                    <label id="labelform">
                         nome spazio:
                         <input type="text" name="nomespazio" id="nomespazio" maxlength="20" required></input>
                     </label>
                 </div>
             </div>
 
-            <label>
+            <label id="labelform">
                 Descrizione lunga:
                 <textarea name="descrizione_lunga" rows="4" required></textarea>
             </label>
