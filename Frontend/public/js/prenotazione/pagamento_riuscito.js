@@ -103,7 +103,7 @@ function viewBookings() {
 window.viewBookings = viewBookings;
 
 function home() {
-    window.location.href = "../html/index.html";
+    window.location.href = "/html/index.html";
 }
 
 window.home = home;

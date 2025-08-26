@@ -83,5 +83,5 @@ document.getElementById('button-sub').addEventListener('click', async () => {
   const email = document.getElementById('email').value.trim();
 
   
-  window.location.href = `prenotazione/pagamento.html?nome=${encodeURIComponent(nome)}&email=${encodeURIComponent(email)}&prezzo=${prezzo}&id=${spazioId}&giorno=${encodeURIComponent(giorno)}&orario=${encodeURIComponent(orario)}&id_gestore=${encodeURIComponent(id_gestore)}`;
+  window.location.href = `/html/prenotazione/pagamento.html?nome=${encodeURIComponent(nome)}&email=${encodeURIComponent(email)}&prezzo=${prezzo}&id=${spazioId}&giorno=${encodeURIComponent(giorno)}&orario=${encodeURIComponent(orario)}&id_gestore=${encodeURIComponent(id_gestore)}`;
 });
