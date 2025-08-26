@@ -5,7 +5,7 @@
  * @author [Nome del tuo team o tuo nome]
  */
 
-import { supabase } from '../collegamentoDb.js';
+import { supabase } from '/js/collegamentoDb.js';
 
 // Variabili globali per gestire lo stato delle immagini selezionate
 let selectedFiles = [];

@@ -1,5 +1,5 @@
 // CONFIGURAZIONE SUPABASE
-import { supabase } from '../collegamentoDb.js';
+import { supabase } from '/js/collegamentoDb.js';
 console.log('Supabase client:', supabase);
 
 

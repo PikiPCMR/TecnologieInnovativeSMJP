@@ -1,8 +1,5 @@
-// Definisci la tua palette di colori qui
-const colorPalette = ['#36A2EB', '#FF6384', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#3E517A', '#F7464A'];
-
 // Importa l'istanza di Supabase
-import { supabase } from './collegamentoDb.js';
+import { supabase } from '/js/collegamentoDb.js';
 
 // Ottiene l'ID utente dal localStorage. Se non esiste, il codice non procede.
 const userId = localStorage.getItem('user');
@@ -36,7 +33,7 @@ async function fetchDashboardData() {
         const card = document.createElement('div');
         card.className = 'action-card spazio-card';
         card.onclick = () => {
-            window.location.href = `../html/contenuti_gestore/modifica_spazio.html?id_spazio=${spazio.id_spazio}`;
+            window.location.href = `/html/contenuti_gestore/modifica_spazio.html?id_spazio=${spazio.id_spazio}`;
         };
 
         let emoji = '​💼​';
@@ -63,7 +60,7 @@ async function fetchDashboardData() {
         <p class="card-description">Crea un nuovo spazio di coworking e inseriscilo nella rete.</p>
     `;
     aggiungiCard.onclick = () => {
-        window.location.href = '../html/contenuti_gestore/crea_nuovo_spazio.html';
+        window.location.href = '/html/contenuti_gestore/crea_nuovo_spazio.html';
     };
     container.appendChild(aggiungiCard);
 

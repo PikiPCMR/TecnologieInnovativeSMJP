@@ -4,13 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../../styles/styles.css">
-    <link rel="stylesheet" href="../../styles/profilo/avatar.css">
-    <link rel="stylesheet" href="../../styles/contenuti_gestore/stilecontenutigestore.css">
-    <script type="module" src="../../js/index.js"></script>
-    <script type="module" src="../../js/contenuti_gestore/crea_nuovo_spazio.js"></script>
+    <link rel="stylesheet" href="/styles/styles.css">
+    <link rel="stylesheet" href="/styles/profilo/avatar.css">
+    <link rel="stylesheet" href="/styles/contenuti_gestore/stilecontenutigestore.css">
+    <script type="module" src="/js/index.js"></script>
+    <script type="module" src="/js/contenuti_gestore/crea_nuovo_spazio.js"></script>
     <script type="module">
-        import { caricaAvatarUtente } from '../../js/gestione_avatar.js';
+        import { caricaAvatarUtente } from '/js/profilo/gestione_avatar.js';
 
         window.addEventListener('DOMContentLoaded', () => {
             caricaAvatarUtente();
@@ -22,7 +22,7 @@
 
 <body>
     <header class="header">
-        <a href="../dashboard_gestore.html" class="logo-link">
+        <a href="/html/dashboard_gestore.html" class="logo-link">
             <div class="logo">WorkSpace Pro</div>
         </a>
         <div class="profile-section">
@@ -126,9 +126,9 @@
 
         <button type="submit" id="submit-btn" form="form-nuovo-spazio">Crea Spazio</button>
     </main>
-    <script type="module" src="../../js/contenuti_gestore/crea_nuovo_spazio.js"></script>
+    <script type="module" src="/js/contenuti_gestore/crea_nuovo_spazio.js"></script>
     <script type="module">
-        import { aggiungiSpazio } from '../../js/contenuti_gestore/crea_nuovo_spazio.js';
+        import { aggiungiSpazio } from '/js/contenuti_gestore/crea_nuovo_spazio.js';
 
         document.getElementById('form-nuovo-spazio').addEventListener('submit', async (e) => {
             e.preventDefault();

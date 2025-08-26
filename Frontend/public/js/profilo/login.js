@@ -1,4 +1,4 @@
-import { supabase } from '../collegamentoDb.js';
+import { supabase } from '/js/collegamentoDb.js';
 
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("loginForm");
@@ -68,21 +68,55 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+
 async function login() {
   const id = document.getElementById('id').value.trim();
   const password = document.getElementById('password').value.trim();
 
-  const { data, error } = await supabase
-    .from('registrazione')
-    .select('*')
-    .eq('id', id)
-    .eq('password', password);
+  // Chiamiamo la funzione di database 'check_password'
+  const { data: is_correct, error } = await supabase.rpc('check_password', {
+    p_id: id,
+    p_password: password
+  });
 
   if (error) {
     alert('Errore nel login: ' + error.message);
     console.error(error);
     return;
   }
+
+  // Se la password è corretta (is_correct === true), procedi con il login
+  if (is_correct) {
+    // Aggiungi qui la logica per recuperare i dati dell'utente e reindirizzare
+    const { data: userData, error: userError } = await supabase
+      .from('registrazione')
+      .select('*')
+      .eq('id', id);
+
+    if (userError || userData.length === 0) {
+      alert('Errore nel recupero dei dati utente.');
+      console.error(userError);
+      return;
+    }
+
+    const user = userData[0];
+    console.log("Utente loggato:", user);
+    console.log("Tipo utente:", user.tipo_utente);
+    // ... il resto della tua logica di reindirizzamento rimane invariata
+    localStorage.setItem('user', JSON.stringify(user));
+    if (user.tipo_utente === "gestore") {
+      window.location.href = "/html/dashboard_gestore.html";
+    } else if (user.tipo_utente === "cliente") {
+      window.location.href = "/html/index.html";
+    } else {
+      alert("Tipo utente non riconosciuto: " + user.tipo_utente);
+      window.location.href = "/html/index.html";
+    }
+  } else {
+    // Se la funzione restituisce false, le credenziali sono errate
+    alert('Credenziali errate');
+  }
+
 
   if (data.length === 0) {
     alert('Credenziali errate');
@@ -103,10 +137,10 @@ async function login() {
   if (user.tipo_utente === "gestore") {
     window.location.href = "dashboard_gestore.html";
   } else if (user.tipo_utente === "cliente") {
-    window.location.href = "../html/index.html";
+    window.location.href = "/html/index.html";
   } else {
     alert("Tipo utente non riconosciuto: " + user.tipo_utente);
-    window.location.href = "../html/index.html";
+    window.location.href = "/html/index.html";
   }
 }
 
@@ -130,16 +164,19 @@ export function requireUserRole() {
     "/html/dashboard_gestore.html",
     "/html/contenuti_gestore/modifica_spazio.html",
     "/html/contenuti_gestore/crea_nuovo_spazio.html",
-    "/html/internal_dashboard.html"
+    "/html/contenuti_gestore/internal_dashboard.html"
   ];
 
   // Pagine consentite per cliente
   const clientePages = [
     "/html/prenota_spazio.html",
-    "/html/prenotazione.html",
-    "/html/spazio.html",
-    "/html/cerca_spazi.html",
-    "/html/index.html"
+    "/html/prenotazione/prenotazione.html",
+    "/html/ricerca_spazio/spazio.html",
+    "/html/ricerca_spazio/cerca_spazi.html",
+    "/html/index.html",
+    "html/prenotazione/pagamento.html",
+    "html/prenotazione/pagamento_riuscito.html",
+    "html/prenotazione/gestione_prenotazioni.html"
   ];
 
   if (user.tipo_utente === "gestore" && !gestorePages.includes(path)) {

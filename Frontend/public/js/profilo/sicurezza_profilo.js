@@ -1,4 +1,4 @@
-import { supabase } from '../collegamentoDb.js';
+import { supabase } from '/js/collegamentoDb.js';
 
 // === POPUP MODIFICA EMAIL ===
 export function apriPopupEmail() {
@@ -181,9 +181,9 @@ function mostraPopupDecisione(user) {
   document.getElementById("btnEsplora").addEventListener("click", () => {
     overlay.remove();
     if (user.tipo_utente === "gestore") {
-      window.location.href = "../html/dashboard_gestore.html";
+      window.location.href = "/html/dashboard_gestore.html";
     } else {
-      window.location.href = "../html/index.html";
+      window.location.href = "/html/index.html";
     }
   });
 }
@@ -203,7 +203,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
-        redirectTo: "http://localhost:3000/html/reset_password.html"
+        redirectTo: "/html/reset_password.html"
       });
       if (error) {
         alert("Errore durante l'invio: " + error.message);
@@ -213,7 +213,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // 🔐 Disconnessione + redirect anche dopo richiesta reset
         await supabase.auth.signOut();
         localStorage.removeItem("user");
-        window.location.href = "../html/profilo/login.html";
+        window.location.href = "/html/profilo/login.html";
       }
 
     });
