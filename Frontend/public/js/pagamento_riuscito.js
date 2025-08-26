@@ -49,7 +49,7 @@ async function inserisciPrenotazione(prenotazioneId) {
 
 async function insericiPagamento(prenotazioneId) {
     const payload = {
-        id_pagamento: idPagamento,
+        id_pagamento: crypto.randomUUID(),
         id_utente: user.id,
         id_prenotazione: prenotazioneId,
         importo: prezzo,

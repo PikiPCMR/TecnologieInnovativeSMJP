@@ -95,7 +95,7 @@ async function fetchInternalDashboardData() {
         <td>${p.id_spazio}</td>
         <td>${p.giorno}</td>
         <td>${p.fascia_oraria}</td>
-        <td>${pagamento.id_stripe || ''}</td>
+        <td>${pagamento.id_pagamento || ''}</td>
         <td>${pagamento.importo ? pagamento.importo.toFixed(2) + ' €' : ''}</td>
     `;
         tbody.appendChild(row);

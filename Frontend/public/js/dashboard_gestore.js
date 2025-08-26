@@ -176,9 +176,9 @@ function renderPieChart(canvasId, data, title) {
     new Chart(ctx, {
         type: 'pie',
         data: {
-            labels: Object.keys(datiOrario(canvasId, data)),
+            labels: Object.keys(data),
             datasets: [{
-                data: Object.values(datiOrario(canvasId, data)),
+                data: Object.values(data),
                 backgroundColor: [
                     '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'
                 ],
@@ -203,56 +203,6 @@ function renderPieChart(canvasId, data, title) {
             }
         }
     });
-}
-
-/**
- * Funzione per elaborare i dati delle fasce orarie.
- * Prende un array di numeri e li raggruppa per fascia oraria testuale.
- * @param {string} canvasId - L'ID del canvas del grafico.
- * @param {Array|object} data - I dati grezzi, un array di numeri o un oggetto.
- * @returns {object} Un oggetto con le fasce orarie come chiavi e i conteggi come valori.
- */
-function datiOrario(canvasId, data) {
-    const datiElaborati = {}; 
-    
-    // Controlla se l'ID del canvas richiede l'elaborazione delle fasce orarie
-    if (canvasId === 'chart-fasce-orarie') {
-        const fasceOrarie = {
-            1: '08:00-09:00',
-            2: '09:00-10:00',
-            3: '10:00-11:00',
-            4: '11:00-12:00',
-            5: '12:00-13:00',
-            6: '13:00-14:00',
-            7: '14:00-15:00',
-            8: '15:00-16:00',
-        };
-
-        // Controlla se i dati sono un array (es. [1, 2, 1]) e li raggruppa
-        if (Array.isArray(data)) {
-            data.forEach(numeroFascia => {
-                const nomeFascia = fasceOrarie[numeroFascia];
-                if (nomeFascia) {
-                    datiElaborati[nomeFascia] = (datiElaborati[nomeFascia] || 0) + 1;
-                }
-            });
-        } else if (typeof data === 'object' && data !== null) {
-            // Se i dati sono già un oggetto con chiavi numeriche (es. { '1': 20, '2': 30 })
-            for (const key in data) {
-                if (data.hasOwnProperty(key)) {
-                    const numeroFascia = parseInt(key);
-                    const nomeFascia = fasceOrarie[numeroFascia];
-                    if (nomeFascia) {
-                        datiElaborati[nomeFascia] = data[key];
-                    }
-                }
-            }
-        }
-        return datiElaborati;
-    } else {
-        // Se non è uno dei canvas specificati, restituisce i dati originali.
-        return data;
-    }
 }
 
 // Avvia il recupero dei dati quando il DOM è completamente caricato
