@@ -6,6 +6,7 @@
   <title>Workspace – Scheda Spazio</title>
 
   <link rel="stylesheet" href="../styles/styles.css" />
+  <link rel="stylesheet" href="../styles/avatar.css" />
   <link rel="stylesheet" href="../styles/spazio.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -19,15 +20,31 @@
 <body>
   <!-- HEADER PRINCIPALE -->
   <header class="header">
-    <a href="index.html" class="logo-link">
-      <div class="logo">WorkSpace Pro</div>
-    </a>
-    <div class="profile-icon" onclick="handleProfile()">
-      <img id="headerAvatar"
-        src="https://sbxrdptjegjxqaklfpxq.supabase.co/storage/v1/object/public/immaginiprofilo/user.png"
-        alt="Profilo" />
-    </div>
-  </header>
+        <a href="../" class="logo-link"> <!-- ricordarsi di mettere ../ per tornare alla root -->
+            <div class="logo">WorkSpace Pro</div>
+        </a>
+        <div class="profile-section">
+            <div class="profile-btn" onclick="toggleProfileMenu()">
+                <img id="avatar" class="avatar avatar-small"
+                    src="https://sbxrdptjegjxqaklfpxq.supabase.co/storage/v1/object/public/immaginiprofilo//user.png"
+                    alt="Avatar" />
+            </div>
+            <div class="profile-dropdown" id="profileDropdown">
+                <div class="dropdown-item" id="loginText" onclick="accedi()">
+                    <span>🔑 Accedi&nbsp;&nbsp;</span>
+                </div>
+                <div class="dropdown-item" onclick="registrati()">
+                    <span>📝 Registrati&nbsp;&nbsp;</span>
+                </div>
+                <div class="dropdown-item" id="profileItem" style="display: none;" onclick="handleProfile()">
+                    <span>🔓 Il mio profilo&nbsp;&nbsp;</span>
+                </div>
+                <div class="dropdown-item" id="logoutItem" style="display: none;" onclick="handleLogout()">
+                    <span>🚪 Esci&nbsp;&nbsp;</span>
+                </div>
+            </div>
+        </div>
+    </header>
 
   <!-- PULSANTE TORNA ALLA RICERCA -->
   <div class="container">
@@ -126,11 +143,6 @@
           </div>
           <label>Data
             <input type="date" id="bk-date">
-          </label>
-          <label>Fascia oraria
-            <select id="bk-slot">
-              <option value="">Seleziona</option>
-            </select>
           </label>
           <button id="ctaPrenota" class="btn-primary">Prenota ora</button>
           <p class="fine-print" id="costi">Tasse e costi mostrati al checkout.</p>
