@@ -8,6 +8,7 @@ const spazioId = params.get("id");
 let spazioIdAttuale=null;
 let prezzoAttuale=0;
 let date=null;
+let prenotazioneDate=null;
 document.addEventListener('DOMContentLoaded', async function() {
     user = JSON.parse(localStorage.getItem('user'));
     var calendarEl = document.getElementById('calendar');
@@ -142,10 +143,10 @@ async function showEventPopup(event) {
     // Gestione pulsanti
     document.getElementById('btn-cancella').onclick = async () => {
         console.log(supabase);
-        if (confirm("Sei sicuro di voler cancellare questa prenotazione?")) {
+        if (confirm("Sei sicuro di voler cancellare questa prenotazione, non sarà previsto alcun rimborso?")) {
             await supabase.from('pagamenti').delete().eq('id_prenotazione', event.extendedProps.id_prenotazione);
             await supabase.from('prenotazione').delete().eq('id_prenotazione', event.extendedProps.id_prenotazione);
-            alert("La prenotazione è stata cancellata. Verrai rimborsato dell'importo pagato.");
+            alert("La prenotazione è stata cancellata.");
             event.remove();
             popup.style.display = 'none';
             overlay.style.display = 'none';
@@ -171,7 +172,7 @@ async function showEventPopup(event) {
     };
 
     // Recupera la data e ora della prenotazione
-    const prenotazioneDate = new Date(event.start); // event.start è la data della prenotazione
+    prenotazioneDate = new Date(event.start); // event.start è la data della prenotazione
     const now = new Date();
 
     // Se la prenotazione è nel passato, disabilita il pulsante cancella
@@ -441,11 +442,32 @@ function showEditPopup(event, datiSalvati = null) {
 
     // === submit form ===
     document.getElementById('edit-form').addEventListener('submit', async (e) => {
-        
+        const oggi = new Date();
         e.preventDefault();
         const giorno = document.getElementById('edit-giorno').value;
         const fascia = fasciaOrariaToString(document.getElementById('edit-fascia').value);
         const spazio = nuovoSpazioId;
+        if(!fascia){
+            alert("Seleziona almeno una fascia oraria.");
+            return;
+        }
+        // 🔹 Gestione di più fasce (es: "10:00-12:00 e 17:00-18:00")
+        const fasce = fascia.split(" e "); // ["10:00-12:00", "17:00-18:00"]
+
+        // Estrai tutte le ore di inizio
+        const oreInizio = fasce.map(f => f.split("-")[0].trim()); // ["10:00", "17:00"]
+
+        // Prendi l’orario più vicino (minore)
+        const primaOra = oreInizio.sort()[0]; // "10:00"
+
+        // 🔹 Crea la data completa
+        const dataSelezionata = new Date(`${giorno}T${primaOra}:00`);
+
+        // 🔹 Controllo
+        if (dataSelezionata < oggi) {
+            alert("Non puoi modificare una prenotazione in una data/ora già passata.");
+            return;
+        }
 
         console.log("Modifica:", { giorno, fascia, spazio });
         // Aggiorna la prenotazione nel database
@@ -471,7 +493,7 @@ function showEditPopup(event, datiSalvati = null) {
                 alert(`La prenotazione modificata ha un costo inferiore, non è previsto un rimborso`);
                 
             }else{
-                alert(`Il prezzo della prenotazione è stato aumentato da ${prezzoAttuale} a ${nuovo_prezzo}, a breve verrà addebitata la differenza.`);
+                alert(`Il prezzo della prenotazione è stato aumentato di ${nuovo_prezzo-prezzoAttuale}, a breve verrà addebitata la differenza.`);
                 const resp = await fetch('https://tecnologieinnovativesmjp.onrender.com/charge-extra', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
