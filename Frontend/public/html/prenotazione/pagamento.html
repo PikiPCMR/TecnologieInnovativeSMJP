@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pagmento</title>
   <link rel="stylesheet" href="/styles/styles.css" /> <!-- Per stile coerente -->
   <script src="https://js.stripe.com/v3/"></script>
@@ -11,26 +12,31 @@
 </head>
 
 <body>
-    <header class="header">
-        <a href="/html/index.html" class="logo-link">
-        <div class="logo">WorkSpace Pro</div>
-        </a>
-    </header>
+  <header class="header">
+    <a href="/html/index.html" class="logo-link">
+      <div class="logo">WorkSpace Pro</div>
+    </a>
+  </header>
 
-    <div class="welcome-section">
-        <h1 class="welcome-title">Pagamento Prenotazione</h1>
-        <p class="welcome-subtitle">Completa il pagamento per finalizzare la tua prenotazione.</p>
-    </div>
-    
-    <div class="payment-container">
-      <h2>Inserisci i dettagli di pagamento</h2>
-      <div id="payment-element"></div>
+  <div class="welcome-section">
+    <h1 class="welcome-title">Pagamento Prenotazione</h1>
+    <p class="welcome-subtitle">Completa il pagamento per finalizzare la tua prenotazione.</p>
+  </div>
 
-      <button id="submit" class="btn btn-primary">
-        <span id="button-text">Paga ora</span>
-      </button>
+  <div class="payment-container">
+    <h2>Inserisci i dettagli di pagamento</h2>
+    <div id="payment-element"></div>
 
-      <div id="error-message" class="alert hidden"></div>
-      <p class="note">I dati della carta vengono inseriti e trasmessi in modo sicuro tramite Stripe.</p>
-    </div>
+    <button id="submit" class="btn btn-primary">
+      <span id="button-text">Paga ora</span>
+    </button>
+
+    <div id="error-message" class="alert hidden"></div>
+    <p class="note">I dati della carta vengono inseriti e trasmessi in modo sicuro tramite Stripe.</p>
+  </div>
 </body>
+<footer class="site-footer">
+  <small>© Workspace Pro</small>
+</footer>
+
+</html>

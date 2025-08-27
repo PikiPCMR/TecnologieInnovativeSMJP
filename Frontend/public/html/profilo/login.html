@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Login</title>
-  <link rel="stylesheet" href="/styles/profilo/login.css"/>
+  <link rel="stylesheet" href="/styles/profilo/login.css" />
   <link rel="stylesheet" href="/styles/styles.css" /> <!-- Per stile coerente -->
+  <script type="module" src="/js/profilo/login.js"></script>
+
 </head>
 
 <body>
 
- <header class="header" >
+  <header class="header">
     <a href="/html/index.html" class="logo-link">
       <div class="logo">WorkSpace Pro</div>
     </a>
@@ -32,28 +35,23 @@
           </div>
         </div>
         <div class="form-group">
-          <p class="forgot-password"> 
+          <p class="forgot-password">
             <a href="#" id="openResetPopup">Password dimenticata?</a>
           </p>
-        <div class="form-group">
-          <button type="submit">Accedi</button>
-        </div>
+          <div class="form-group">
+            <button type="submit">Accedi</button>
+          </div>
       </form>
       <p>Non hai un account? <a href="/html/profilo/register.html">Registrati</a></p>
     </div>
   </div>
-<!-- POPUP STILE MODERNO - RESET PASSWORD -->
+  <!-- POPUP STILE MODERNO - RESET PASSWORD -->
   <div id="resetPasswordModal" class="overlay-popup" style="display: none;">
     <div class="popup-box">
       <h3>Reset della Password</h3>
       <p>Inserisci la tua email per ricevere il link di reimpostazione.</p>
-      <input
-        type="email"
-        id="resetEmail"
-        placeholder="esempio@email.com"
-        required
-        style="width: 100%; padding: 12px 15px; margin: 20px 0 8px 0; border-radius: 10px; border: 1px solid #ccc;"
-      />
+      <input type="email" id="resetEmail" placeholder="esempio@email.com" required
+        style="width: 100%; padding: 12px 15px; margin: 20px 0 8px 0; border-radius: 10px; border: 1px solid #ccc;" />
       <span id="emailError" style="color: #ff6b6b; font-size: 0.85rem;"></span>
       <div class="popup-buttons">
         <button id="sendResetLink" class="popup-btn">Invia richiesta reset password</button>
@@ -62,6 +60,9 @@
     </div>
   </div>
 
-  <script type="module" src="/js/profilo/login.js"></script>
+  <footer class="site-footer">
+    <small>© Workspace Pro</small>
+  </footer>
 </body>
+
 </html>
