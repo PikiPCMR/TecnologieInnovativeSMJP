@@ -71,37 +71,6 @@ app.post('/webhook', bodyParser.raw({ type: 'application/json' }), (req, res) =>
 
 app.listen(PORT, () => console.log(`Server in ascolto su http://localhost:${PORT}`));
 
-// 3) Endpoint per emettere un rimborso
-app.post('/refund', async (req, res) => {
-  try {
-    const { paymentIntentId, amount } = req.body;
-
-    if (!paymentIntentId) {
-      return res.status(400).json({ error: 'paymentIntentId mancante' });
-    }
-
-    // Recupera il PaymentIntent per ottenere il charge associato
-    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
-
-    if (!paymentIntent.charges?.data[0]) {
-      return res.status(400).json({ error: 'Nessun charge trovato per questo PaymentIntent' });
-    }
-
-    const chargeId = paymentIntent.charges.data[0].id;
-
-    // Crea il rimborso (se amount non è passato, rimborsa tutto)
-    const refund = await stripe.refunds.create({
-      charge: chargeId,
-      ...(amount && { amount }), // opzionale: importo in centesimi
-    });
-
-    res.json({ refund });
-  } catch (err) {
-    console.error('Errore creazione rimborso:', err);
-    res.status(500).json({ error: 'Errore creazione rimborso' });
-  }
-});
-
 app.post("/charge-extra", async (req, res) => {
   try {
     const { paymentIntentId, amount } = req.body;

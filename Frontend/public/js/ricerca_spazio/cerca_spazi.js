@@ -22,7 +22,6 @@ window.handleLogout = handleLogout;
 let spazi = [];
 let map;
 let markers = [];
-
 export async function caricaSpazi() {
   checkLogin();
   const { data, error } = await supabase.from('spazi_lavoro').select('*');
@@ -201,3 +200,5 @@ window.Seleziona = (idSpazio) => {
   // Reindirizza alla pagina di prenotazione con parametro id
   window.location.href = `/html/prenotazione/gestione_prenotazioni.html?id=${encodeURIComponent(idSpazio)}`;
 }
+
+
