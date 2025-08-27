@@ -23,19 +23,19 @@ body {
 }
 
 .logo-link {
-  text-decoration: none;
+    text-decoration: none;
 }
 
 .logo {
-  font-size: 1.6rem;
-  font-weight: 700;
-  color: #fff;
-  transition: transform 0.3s ease;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #fff;
+    transition: transform 0.3s ease;
 }
 
 .logo:hover {
-  transform: scale(1.05);
-  cursor: pointer;
+    transform: scale(1.05);
+    cursor: pointer;
 }
 
 /* Menu Button */
@@ -296,22 +296,30 @@ body {
 
 
 }
+
 .wrapper {
-  margin-top: 40px; /* o anche 100px se vuoi più spazio */
+    margin-top: 40px;
+    /* o anche 100px se vuoi più spazio */
 }
 
 #downloadCSV {
-  margin-left: auto;
-  padding: 10px 10px;
-  background-color: rgba(255, 255, 255, 0.15);
-  border: none;
-  border-radius: 12px;
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+    margin-left: auto;
+    padding: 10px 10px;
+    background-color: rgba(255, 255, 255, 0.15);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
 #downloadCSV:hover {
-  background-color: #684bd1;
+    background-color: #684bd1;
+}
+
+.site-footer {
+    padding: 24px;
+    text-align: center;
+    color: white;
 }

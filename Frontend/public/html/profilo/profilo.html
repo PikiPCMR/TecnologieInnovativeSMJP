@@ -10,6 +10,13 @@
   <link rel="stylesheet" href="/styles/profilo/avatar.css">
   <script type="module" src="/js/profilo/profilo.js"></script>
   <script type="module" src="/js/profilo/sicurezza_profilo.js"></script>
+  <script type="module">
+  import { caricaAvatarUtente } from '/js/profilo/gestione_avatar.js';
+
+  window.addEventListener('DOMContentLoaded', () => {
+    caricaAvatarUtente();
+  });
+</script>
 </head>
 
 <body>
@@ -122,14 +129,11 @@
     </div>
   </div>
 </div>
+<footer class="site-footer">
+    <small>© Workspace Pro</small>
+  </footer>
 </body>
 
-<script type="module">
-  import { caricaAvatarUtente } from '/js/profilo/gestione_avatar.js';
 
-  window.addEventListener('DOMContentLoaded', () => {
-    caricaAvatarUtente();
-  });
-</script>
 
 </html>

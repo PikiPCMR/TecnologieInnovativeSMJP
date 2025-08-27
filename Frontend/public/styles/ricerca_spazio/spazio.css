@@ -60,7 +60,6 @@ label{display:grid;gap:6px;font-weight:600}
 .related-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
 .related-row .card img{width:100%;height:140px;object-fit:cover;border-radius:12px}
 
-.site-footer{padding:24px;text-align:center;color:var(--muted)}
 
 @media (max-width:1000px){
   .gallery{grid-template-columns:1fr}
