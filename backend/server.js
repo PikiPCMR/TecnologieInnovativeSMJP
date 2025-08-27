@@ -131,6 +131,22 @@ app.post("/charge-extra", async (req, res) => {
 });
 
 
+// Endpoint per recuperare un PaymentIntent
+app.get("/payment-intent/:id", async (req, res) => {
+  try {
+    const paymentIntentId = req.params.id;
+
+    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+
+    res.json(paymentIntent);
+  } catch (error) {
+    console.error("Errore nel recupero del PaymentIntent:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
+
 // Avvia il server
 app.listen(PORT, () => {
   console.log(`🚀 Server avviato su http://localhost:${PORT}`);

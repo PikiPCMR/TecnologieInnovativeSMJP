@@ -1,4 +1,6 @@
 import { supabase } from '/js/collegamentoDb.js';
+
+const stripe = Stripe("pk_test_51RvLUiJdCSwFSGzc72wVxTayWpUec8aCIDV5WzHbh1UyZ7lmzVT4nOVfaQ90MlHK6zvwwkrvLFZhOqUO5EoMh3HF00khxXbetg");
 let user = null;
 let prenotList = [];
 const $ = (s)=>document.querySelector(s);
@@ -140,26 +142,42 @@ async function showEventPopup(event) {
 
     // Gestione pulsanti
     document.getElementById('btn-cancella').onclick = async () => {
+        console.log(supabase);
         if (confirm("Sei sicuro di voler cancellare questa prenotazione?")) {
+            let importo=prezzoAttuale*100;
+            const { data: pagamenti, error } = await supabase
+                .from('pagamenti')
+                .select('id_pagamento')
+                .eq('id_prenotazione', event.extendedProps.id_prenotazione);
 
-            
-            const resp = await fetch('https://tecnologieinnovativesmjp.onrender.com/refund', {
+            if (error) {
+                console.error('Errore nel recupero del pagamento:', error);
+            } else if (pagamenti && pagamenti.length > 0) {
+                const idPagamento = pagamenti[0].id_pagamento;
+                const paymentIntent = await fetch(`https://tecnologieinnovativesmjp.onrender.com/payment-intent/${idPagamento}`).then(res => res.json());
+                console.log(paymentIntent);
+
+                console.log('ID pagamento:', idPagamento);
+                console.log(importo);
+                const resp = await fetch('https://tecnologieinnovativesmjp.onrender.com/refund', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        id_pagamento: event.extendedProps.id_pagamento,
-                        importo: prezzoAttuale
+                        paymentIntentId: pagamenti[0].id_pagamento,
+                        amount: importo
                     })
                 });
-            await supabase.from('prenotazione').delete().eq('id_prenotazione', event.extendedProps.id_prenotazione);
-            alert("La prenotazione è stata cancellata. Verrai rimborsato dell'importo pagato.");
-            event.remove();
-            popup.style.display = 'none';
-            overlay.style.display = 'none';
-            if (popup) popup.remove();
-            if (overlay) overlay.style.display = 'none';
-            spazioIdAttuale=null;
-            prezzoAttuale=0;
+                await supabase.from('prenotazione').delete().eq('id_prenotazione', event.extendedProps.id_prenotazione);
+                alert("La prenotazione è stata cancellata. Verrai rimborsato dell'importo pagato.");
+                event.remove();
+                popup.style.display = 'none';
+                overlay.style.display = 'none';
+                if (popup) popup.remove();
+                if (overlay) overlay.style.display = 'none';
+                spazioIdAttuale=null;
+                prezzoAttuale=0;
+            }
+            
 
         }
     };
@@ -176,6 +194,21 @@ async function showEventPopup(event) {
         spazioIdAttuale=null;
         prezzoAttuale=0;
     };
+
+    // Recupera la data e ora della prenotazione
+    const prenotazioneDate = new Date(event.start); // event.start è la data della prenotazione
+    const now = new Date();
+
+    // Se la prenotazione è nel passato, disabilita il pulsante cancella
+    if (prenotazioneDate < now) {
+        const btnCancella = document.getElementById('btn-cancella');
+        btnCancella.disabled = true;
+        btnCancella.style.opacity = 0.5;
+        btnCancella.title = "Non puoi cancellare una prenotazione già iniziata o passata.";
+        btnCancella.onclick = () => {
+            alert("Non puoi cancellare una prenotazione già iniziata o passata.");
+        };
+    }
 }
 
 const FASCE = [
