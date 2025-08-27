@@ -24,7 +24,7 @@ export function caricaDatiCliente() {
     console.warn('⚠️ Nessun utente loggato, esco dalla funzione.');
     return;
   }
-  
+
   const avatarSrc = user.avatarUrl || 'https://sbxrdptjegjxqaklfpxq.supabase.co/storage/v1/object/public/immaginiprofilo//user1.png';
   document.getElementById('avatar').src = avatarSrc;
   document.getElementById('avatar').addEventListener('click', () => apriPopup(avatarSrc));
@@ -46,12 +46,42 @@ export function caricaDatiCliente() {
 }
 window.caricaDatiCliente = caricaDatiCliente;
 
-// === LOGO DINAMICO ===
+// === LOGO WORKSPACE PRO DINAMICO ===
 document.addEventListener("DOMContentLoaded", () => {
   const logoLink = document.querySelector('.logo-link');
   const user = JSON.parse(localStorage.getItem('user'));
-  logoLink.href = user?.tipo_utente === 'gestore' ? 'dashboard_gestore.html' : 'index.html';
+  logoLink.href = user?.tipo_utente === 'gestore' ? '/html/dashboard_gestore.html' : '/html/index.html';
 });
+
+// Funzione per scaricare CSV
+function scaricaCSV(prenotazioni, tipoUtente) {
+  let intestazioni = tipoUtente === "gestore"
+    ? ["ID Prenotazione", "Utente", "Spazio", "Giorno", "Orario"]
+    : ["ID Prenotazione", "Spazio", "Giorno", "Orario"];
+
+  let righe = prenotazioni.map(p => 
+    tipoUtente === "gestore"
+      ? [p.id_prenotazione, p.id_utente, p.id_spazio, p.giorno, p.fascia_oraria]
+      : [p.id_prenotazione, p.id_spazio, p.giorno, p.fascia_oraria]
+  );
+
+  // Unisco intestazioni e righe
+  let csvContent = [intestazioni, ...righe]
+    .map(r => r.join(","))
+    .join("\n");
+
+  // Creazione blob CSV
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+
+  // Download automatico
+  const link = document.createElement("a");
+  link.setAttribute("href", url);
+  link.setAttribute("download", "prenotazioni.csv");
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
 
 // === NAVIGAZIONE SEZIONI ===
 export async function navigate(sezione) {
@@ -63,17 +93,77 @@ export async function navigate(sezione) {
     case 'prenotazioni':
       cont.innerHTML = `
         <h2>PRENOTAZIONI</h2>
+        <button id="downloadCSV" display:none;">📥 Scarica CSV</button>
         <ul id="prenotazioniList">Caricamento...</ul>
       `;
-      const { data: prenotazioni, error } = await supabase
-        .from('prenotazione')
-        .select('*')
-        .eq('id_utente', user.id);
+
       const list = document.getElementById('prenotazioniList');
-      list.innerHTML = (error || !prenotazioni.length)
-        ? '<li>Nessuna prenotazione trovata.</li>'
-        : prenotazioni.map(p => `<li>${p.giorno} - ${p.fascia_oraria}h</li>`).join('');
+      const btnCSV = document.getElementById('downloadCSV');
+
+      // Data di oggi in formato YYYY-MM-DD
+      const oggi = new Date().toISOString().split("T")[0];
+
+      let prenotazioni = [];
+      let error = null;
+
+      if (user.tipo_utente === 'gestore') {
+        // Recupero prenotazioni future per gestore
+        ({ data: prenotazioni, error } = await supabase
+          .from('prenotazione')
+          .select(`
+            id_prenotazione,
+            id_utente,
+            id_spazio,
+            giorno,
+            fascia_oraria,
+            spazi_lavoro!inner (
+              id_spazio,
+              id_gestore
+            )
+          `)
+          .eq('spazi_lavoro.id_gestore', user.id)
+          .gte('giorno', oggi)  // <-- filtro prenotazioni future
+        );
+
+        list.innerHTML = (error || !prenotazioni?.length)
+          ? '<li>Nessuna prenotazione trovata.</li>'
+          : prenotazioni.map(p => `
+            <li>
+              <strong>Utente:</strong> ${p.id_utente} <br>
+              <strong>Spazio:</strong> ${p.id_spazio} <br>
+              <strong>Giorno:</strong> ${p.giorno} <br>
+              <strong>Orario:</strong> ${p.fascia_oraria}
+            </li>
+          `).join('');
+
+      } else {
+        // Caso utente normale → mostra solo le sue prenotazioni future
+        ({ data: prenotazioni, error } = await supabase
+          .from('prenotazione')
+          .select('*')
+          .eq('id_utente', user.id)
+          .gte('giorno', oggi)  // <-- filtro prenotazioni future
+        );
+
+        list.innerHTML = (error || !prenotazioni?.length)
+          ? '<li>Nessuna prenotazione trovata.</li>'
+          : prenotazioni.map(p => `
+            <li>
+              <strong>Spazio:</strong> ${p.id_spazio} <br>
+              <strong>Giorno:</strong> ${p.giorno} <br>
+              <strong>Orario:</strong> ${p.fascia_oraria}
+            </li>
+          `).join('');
+      }
+
+      // Se ci sono prenotazioni, mostro il pulsante CSV
+      if (prenotazioni?.length) {
+        btnCSV.style.display = "inline-block";
+        btnCSV.addEventListener("click", () => scaricaCSV(prenotazioni, user.tipo_utente));
+      }
+
       break;
+
 
     case 'generali':
       cont.innerHTML = `
@@ -103,21 +193,6 @@ export async function navigate(sezione) {
             <button class="btn-edit" onclick="apriPopupResetPassword()">Reset Password</button>
           </div>
         </div>
-      `;
-      break;
-
-    case 'pagamenti':
-      cont.innerHTML = `
-        <h2>PAGAMENTI</h2>
-        <p>Metodo: <strong>${user.metodo_pagamento || 'Non impostato'}</strong></p>
-      `;
-      break;
-
-    case 'comunicazioni':
-      cont.innerHTML = `
-        <h2>COMUNICAZIONI</h2>
-        <p>Preferenze email, notifiche e messaggi.</p>
-        <p>In arrivo...</p>
       `;
       break;
 
