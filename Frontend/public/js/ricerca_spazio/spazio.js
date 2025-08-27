@@ -232,17 +232,39 @@ function bindCTA(){
     const giorno = $("#giorno")?.value;
     if (!giorno || !selectedSlots.length) return;
 
-    let errorOccurred = false;
+    // --- CONTROLLO DATA E ORA ---
+    const oggi = new Date();
+    const dataSelezionata = new Date(giorno + "T00:00:00");
+    // Se la data è nel passato
+    if (dataSelezionata < new Date(oggi.getFullYear(), oggi.getMonth(), oggi.getDate())) {
+      alert("Non puoi prenotare per una data passata.");
+      return;
+    }
+    // Se la data è oggi, controlla anche le fasce orarie
+    if (dataSelezionata.getTime() === new Date(oggi.getFullYear(), oggi.getMonth(), oggi.getDate()).getTime()) {
+      // Trova la fascia oraria più vicina nel passato
+      const oraAttuale = oggi.getHours() + oggi.getMinutes()/60;
+      // Mappa id slot → orario inizio
+      const slotInizi = {
+        1: 8, 2: 9, 3: 10, 4: 11, 5: 14, 6: 15, 7: 16, 8: 17
+      };
+      // Se tutte le fasce selezionate sono già iniziate, blocca
+      const tuttePassate = selectedSlots.every(id => slotInizi[id] <= oraAttuale);
+      if (tuttePassate) {
+        alert("Non puoi prenotare per una fascia oraria già iniziata o passata.");
+        return;
+      }
+    }
+    // --- FINE CONTROLLO ---
 
-    
+    let errorOccurred = false;
 
     if (!errorOccurred) {
       window.location.href = `/html/prenotazione/prenotazione.html?id=${encodeURIComponent(spazioId)}&giorno=${encodeURIComponent(giorno)}&selectedSlots=${encodeURIComponent(selectedSlots)}&id_gestore=${encodeURIComponent(gestore_id)}`;
     }
   });
-    
 }
-
+    
 
 // ====== RELATED ======
 async function loadRelated(){

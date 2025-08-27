@@ -85,3 +85,7 @@ document.getElementById('button-sub').addEventListener('click', async () => {
   
   window.location.href = `/html/prenotazione/pagamento.html?nome=${encodeURIComponent(nome)}&email=${encodeURIComponent(email)}&prezzo=${prezzo}&id=${spazioId}&giorno=${encodeURIComponent(giorno)}&orario=${encodeURIComponent(orario)}&id_gestore=${encodeURIComponent(id_gestore)}`;
 });
+
+document.getElementById('annulla').addEventListener('click', () => {
+  window.location.href = `/html/ricerca_spazio/cerca_spazi.html`;
+});
