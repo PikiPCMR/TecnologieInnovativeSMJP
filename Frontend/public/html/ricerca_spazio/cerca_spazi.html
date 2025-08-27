@@ -10,6 +10,13 @@
   <link rel="stylesheet" href="/styles/profilo/avatar.css">
   <script type="module" src="/js/index.js"></script>
   <script type="module" src="/js/ricerca_spazio/cerca_spazi.js"></script>
+  <script type="module">
+        import { caricaAvatarUtente } from '/js/profilo/gestione_avatar.js';
+
+        window.addEventListener('DOMContentLoaded', () => {
+            caricaAvatarUtente();
+        });
+    </script>
 
 
   <!-- Leaflet CSS per la mappa -->
@@ -21,7 +28,7 @@
     </script>
 
   <script type="module">
-    import { requireUserRole } from '/js/login.js';
+    import { requireUserRole } from '/js/profilo/login.js';
 
     window.addEventListener('DOMContentLoaded', () => {
       requireUserRole();

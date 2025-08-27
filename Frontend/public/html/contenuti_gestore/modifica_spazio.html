@@ -135,7 +135,7 @@
     </main>
     <script type="module">
         import { modificaSpazio, rimuoviSpazio, loadSpazioData } from '/js/contenuti_gestore/modifica_spazio.js';
-        import { caricaAvatarUtente } from '/js/gestione_avatar.js';
+        import { caricaAvatarUtente } from '/js/profilo/gestione_avatar.js';
 
         window.addEventListener('DOMContentLoaded', () => {
             caricaAvatarUtente();
@@ -145,7 +145,7 @@
                 loadSpazioData(spazioId);
             } else {
                 alert('ID dello spazio non fornito.');
-                window.location.href = '../dashboard_gestore.html';
+                window.location.href = '/html/dashboard_gestore.html';
             }
         });
 
