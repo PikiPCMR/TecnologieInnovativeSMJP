@@ -26,7 +26,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                prezzo: importo
+                prezzo: importo,
+                email: email
             })
         });
         const data = await resp.json();

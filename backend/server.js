@@ -22,7 +22,7 @@ app.use(express.json());
 // 1) Endpoint per creare PaymentIntent e restituire il client_secret
 app.post('/create-payment-intent', async (req, res) => {
   try {
-    const { prezzo } = req.body;
+    const { prezzo, email } = req.body;
     if (!prezzo) {
       return res.status(400).json({ error: 'prezzo mancante' });
     }
@@ -32,6 +32,7 @@ app.post('/create-payment-intent', async (req, res) => {
       amount: prezzo,
       currency: 'eur',
       automatic_payment_methods: { enabled: true }, // abilita carte + altri metodi supportati
+      receipt_email: email // opzionale: invia ricevuta via email
     });
 
     res.json({ 

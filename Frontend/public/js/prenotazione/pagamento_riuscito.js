@@ -17,6 +17,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     waitForPrenotazione(prenotazioneId)
     insericiPagamento(prenotazioneId);
     
+
+    invioEmailUtente()
 });
 
 async function inserisciPrenotazione(prenotazioneId) {
