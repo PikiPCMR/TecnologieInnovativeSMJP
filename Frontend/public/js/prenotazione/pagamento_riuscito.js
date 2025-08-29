@@ -1,26 +1,46 @@
+/**
+ * @file Gestisce la creazione di una nuova prenotazione e del relativo pagamento,
+ * reindirizzando l'utente a una pagina di successo.
+ * @author Simone Marino, Nicola Pichierri, Manuel Gjolaj, Mattia Statti
+ */
+
 import { supabase } from '../collegamentoDb.js';
 
 const queryString = window.location.search;
 const params = new URLSearchParams(queryString);
+
+/** @type {string} spazioId - L'ID dello spazio di lavoro, recuperato dalla URL. */
 const spazioId= params.get('spazioId') || '';
+/** @type {string} giorno - Il giorno della prenotazione, recuperato dalla URL. */
 const giorno = params.get('giorno') || '';
+/** @type {string} fascia - La fascia oraria della prenotazione, recuperata dalla URL. */
 const fascia = params.get('orario') || '';
+/** @type {string} prezzo - Il prezzo totale della prenotazione, recuperato dalla URL. */
 const prezzo = params.get('prezzo') || '';
+/** @type {string} id_gestore - L'ID del gestore dello spazio, recuperato dalla URL. */
 const id_gestore = params.get('id_gestore') || '';
+/** @type {string} idPagamento - L'ID del pagamento, recuperato dalla URL. */
 const idPagamento = params.get('id_pagamento') || '';
+/** @type {Object|null} user - L'oggetto utente loggato, recuperato dal localStorage. */
 let user= null;
 
 document.addEventListener('DOMContentLoaded', async () => {
     user = JSON.parse(localStorage.getItem('user'));
     const prenotazioneId = crypto.randomUUID();
-    inserisciPrenotazione(prenotazioneId);
-    waitForPrenotazione(prenotazioneId)
-    insericiPagamento(prenotazioneId);
+    await inserisciPrenotazione(prenotazioneId);
+    await waitForPrenotazione(prenotazioneId);
+    await insericiPagamento(prenotazioneId);
     
 
     invioEmailUtente()
 });
 
+/**
+ * Inserisce una nuova prenotazione nel database.
+ * Controlla se la prenotazione esiste già prima di inserirla.
+ * @async
+ * @param {string} prenotazioneId - L'ID univoco della prenotazione da inserire.
+ */
 async function inserisciPrenotazione(prenotazioneId) {
     const payload = {
         id_prenotazione: prenotazioneId,
@@ -44,11 +64,17 @@ async function inserisciPrenotazione(prenotazioneId) {
         if (error) {
             console.error("Errore inserimento prenotazione:", error.message, error.details, error.hint);
         } else {
-            console.log("Prenotazione inserito:", data);   
+            console.log("Prenotazione inserito:", data);  
         }
     }
 }
 
+/**
+ * Inserisce un nuovo pagamento nel database.
+ * Controlla se il pagamento esiste già prima di inserirlo.
+ * @async
+ * @param {string} prenotazioneId - L'ID della prenotazione associata al pagamento.
+ */
 async function insericiPagamento(prenotazioneId) {
     const payload = {
         id_pagamento: crypto.randomUUID(),
@@ -69,11 +95,20 @@ async function insericiPagamento(prenotazioneId) {
         if (error) {
             console.error("Errore inserimento pagamento:", error.message, error.details, error.hint);
         } else {
-            console.log("Pagamento inserito:", data);   
+            console.log("Pagamento inserito:", data);  
         }
     }
 }
 
+/**
+ * Attende che la prenotazione venga inserita nel database prima di procedere.
+ * Implementa un meccanismo di polling con un timeout.
+ * @async
+ * @param {string} prenotazioneId - L'ID della prenotazione da cercare.
+ * @param {number} [timeoutMs=15000] - Il tempo massimo di attesa in millisecondi.
+ * @returns {Promise<Object>} La prenotazione trovata.
+ * @throws {Error} Se la prenotazione non viene trovata entro il tempo limite.
+ */
 async function waitForPrenotazione(prenotazioneId, timeoutMs = 15000) {
     const start = Date.now();
     while (true) {
@@ -99,11 +134,17 @@ async function waitForPrenotazione(prenotazioneId, timeoutMs = 15000) {
     }
 }
 
+/**
+ * Reindirizza l'utente alla pagina di gestione delle prenotazioni.
+ */
 function viewBookings() {
     window.location.href = '/html/prenotazione/gestione_prenotazioni.html';
 }
 window.viewBookings = viewBookings;
 
+/**
+ * Reindirizza l'utente alla pagina principale.
+ */
 function home() {
     window.location.href = "/html/index.html";
 }

@@ -19,5 +19,8 @@
     "node-fetch": "^3.3.2",
     "pg": "^8.15.6",
     "stripe": "^18.4.0"
+  },
+  "devDependencies": {
+    "jsdoc": "^4.0.4"
   }
 }

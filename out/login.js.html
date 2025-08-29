@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: login.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: login.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @file Gestisce la logica di login, il recupero password e la gestione dei ruoli utente.
+ * @author Simone Marino, Nicola Pichierri, Manuel Gjolaj, Mattia Statti
+ */
+
+import { supabase } from '/js/collegamentoDb.js';
+
+document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById("loginForm");
+    form.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        await login();
+    });
+
+    // --- GESTIONE RESET PASSWORD ---
+    /** @type {HTMLElement} openBtn - Pulsante per aprire il popup di reset password. */
+    const openBtn = document.getElementById("openResetPopup");
+    /** @type {HTMLElement} modal - Il modal per il reset password. */
+    const modal = document.getElementById("resetPasswordModal");
+    /** @type {HTMLElement} closeBtn - Pulsante per chiudere il modal di reset password. */
+    const closeBtn = document.getElementById("closeResetModal");
+    /** @type {HTMLElement} sendBtn - Pulsante per inviare il link di reset password. */
+    const sendBtn = document.getElementById("sendResetLink");
+    /** @type {HTMLInputElement} emailInput - Campo di input per l'email di reset. */
+    const emailInput = document.getElementById("resetEmail");
+    /** @type {HTMLElement} errorBox - Elemento per mostrare i messaggi di errore. */
+    const errorBox = document.getElementById("emailError");
+
+    if (openBtn &amp;&amp; modal &amp;&amp; closeBtn &amp;&amp; sendBtn &amp;&amp; emailInput &amp;&amp; errorBox) {
+        openBtn.addEventListener("click", () => {
+            modal.style.display = "flex";
+        });
+
+        closeBtn.addEventListener("click", () => {
+            modal.style.display = "none";
+            emailInput.value = '';
+            errorBox.textContent = '';
+        });
+
+        sendBtn.addEventListener("click", async () => {
+            const email = emailInput.value.trim();
+            errorBox.textContent = '';
+
+            if (!email) {
+                errorBox.textContent = "Inserisci un indirizzo email valido.";
+                return;
+            }
+
+            // 🔍 Verifica se la mail esiste nella tabella "registrazione"
+            const { data, error } = await supabase
+                .from("registrazione")
+                .select("*")
+                .eq("email", email);
+
+            if (error) {
+                console.error("Errore verifica email:", error.message);
+                errorBox.textContent = "Errore durante la verifica.";
+                return;
+            }
+
+            if (!data || data.length === 0) {
+                errorBox.textContent = "Email senza account registrato.";
+                return;
+            }
+
+            // ✅ Procedi con invio reset se esiste
+            const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+                redirectTo: '/html/profilo/reset_password.html'
+            });
+
+            if (resetError) {
+                errorBox.textContent = "Errore durante l'invio: " + resetError.message;
+            } else {
+                alert("Email di reset inviata con successo!");
+                modal.style.display = "none";
+                emailInput.value = '';
+            }
+        });
+    }
+});
+
+/**
+ * Gestisce la logica di login dell'utente.
+ * Invia le credenziali al database per la verifica e reindirizza l'utente in base al suo ruolo.
+ * @async
+ */
+async function login() {
+    /** @type {string} id - L'ID utente inserito nel campo di input. */
+    const id = document.getElementById('id').value.trim();
+    /** @type {string} password - La password inserita nel campo di input. */
+    const password = document.getElementById('password').value.trim();
+
+    // Chiamiamo la funzione di database 'check_password'
+    const { data: is_correct, error } = await supabase.rpc('check_password', {
+        p_id: id,
+        p_password: password
+    });
+
+    if (error) {
+        alert('Errore nel login: ' + error.message);
+        console.error(error);
+        return;
+    }
+
+    // Se la password è corretta (is_correct === true), procedi con il login
+    if (is_correct) {
+        // Aggiungi qui la logica per recuperare i dati dell'utente e reindirizzare
+        const { data: userData, error: userError } = await supabase
+            .from('registrazione')
+            .select('*')
+            .eq('id', id);
+
+        if (userError || userData.length === 0) {
+            alert('Errore nel recupero dei dati utente.');
+            console.error(userError);
+            return;
+        }
+
+        const user = userData[0];
+        console.log("Utente loggato:", user);
+        console.log("Tipo utente:", user.tipo_utente);
+        // ... il resto della tua logica di reindirizzamento rimane invariata
+        localStorage.setItem('user', JSON.stringify(user));
+        if (user.tipo_utente === "gestore") {
+            window.location.href = "/html/dashboard_gestore.html";
+        } else if (user.tipo_utente === "cliente") {
+            window.location.href = "/html/index.html";
+        } else {
+            alert("Tipo utente non riconosciuto: " + user.tipo_utente);
+            window.location.href = "/html/index.html";
+        }
+    } else {
+        // Se la funzione restituisce false, le credenziali sono errate
+        alert('Credenziali errate');
+    }
+}
+
+/** @type {HTMLElement} togglePassword - Pulsante per mostrare/nascondere la password. */
+const togglePassword = document.getElementById("togglePassword");
+/** @type {HTMLInputElement} passwordInput - Campo di input per la password. */
+const passwordInput = document.getElementById("password");
+
+if (togglePassword &amp;&amp; passwordInput) {
+    togglePassword.addEventListener("click", () => {
+        const isVisible = passwordInput.type === "text";
+        passwordInput.type = isVisible ? "password" : "text";
+        togglePassword.textContent = isVisible ? "Mostra" : "Nascondi";
+    });
+}
+
+/**
+ * Funzione per reindirizzare l'utente in base al suo ruolo, impedendo l'accesso a pagine non autorizzate.
+ */
+export function requireUserRole() {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const path = window.location.pathname;
+
+    // Pagine consentite per gestore
+    const gestorePages = [
+        "/html/dashboard_gestore.html",
+        "/html/contenuti_gestore/modifica_spazio.html",
+        "/html/contenuti_gestore/crea_nuovo_spazio.html",
+        "/html/contenuti_gestore/internal_dashboard.html"
+    ];
+
+    // Pagine consentite per cliente
+    const clientePages = [
+        "/html/prenota_spazio.html",
+        "/html/prenotazione/prenotazione.html",
+        "/html/ricerca_spazio/spazio.html",
+        "/html/ricerca_spazio/cerca_spazi.html",
+        "/html/index.html",
+        "html/prenotazione/pagamento.html",
+        "html/prenotazione/pagamento_riuscito.html",
+        "html/prenotazione/gestione_prenotazioni.html"
+    ];
+
+    if (user.tipo_utente === "gestore" &amp;&amp; !gestorePages.includes(path)) {
+        window.location.href = "/html/dashboard_gestore.html";
+        return;
+    }
+
+    if (user.tipo_utente === "cliente" &amp;&amp; !clientePages.includes(path)) {
+        window.location.href = "/html/index.html";
+        return;
+    }
+}
+
+window.requireUserRole = requireUserRole;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#annullaVerificaEmail">annullaVerificaEmail</a></li><li><a href="global.html#apriPopup">apriPopup</a></li><li><a href="global.html#apriPopupEmail">apriPopupEmail</a></li><li><a href="global.html#apriPopupPassword">apriPopupPassword</a></li><li><a href="global.html#apriPopupResetPassword">apriPopupResetPassword</a></li><li><a href="global.html#caricaAvatarDaDB">caricaAvatarDaDB</a></li><li><a href="global.html#caricaAvatarUtente">caricaAvatarUtente</a></li><li><a href="global.html#caricaDatiCliente">caricaDatiCliente</a></li><li><a href="global.html#chiudiPopup">chiudiPopup</a></li><li><a href="global.html#chiudiPopupEmail">chiudiPopupEmail</a></li><li><a href="global.html#chiudiPopupPassword">chiudiPopupPassword</a></li><li><a href="global.html#createInput">createInput</a></li><li><a href="global.html#login">login</a></li><li><a href="global.html#modificaDatiGenerali">modificaDatiGenerali</a></li><li><a href="global.html#mostraPopupDecisione">mostraPopupDecisione</a></li><li><a href="global.html#mostraPopupVerifica">mostraPopupVerifica</a></li><li><a href="global.html#navigate">navigate</a></li><li><a href="global.html#passwordInput">passwordInput</a></li><li><a href="global.html#registrationForm">registrationForm</a></li><li><a href="global.html#requireUserRole">requireUserRole</a></li><li><a href="global.html#saveUser">saveUser</a></li><li><a href="global.html#scaricaCSV">scaricaCSV</a></li><li><a href="global.html#selezionaAvatar">selezionaAvatar</a></li><li><a href="global.html#togglePassword">togglePassword</a></li><li><a href="global.html#togglePasswordVisibility">togglePasswordVisibility</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Fri Aug 29 2025 12:30:24 GMT+0200 (Ora legale dell’Europa centrale)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

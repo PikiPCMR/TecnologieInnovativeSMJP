@@ -1,3 +1,8 @@
+/**
+ * @file Gestisce la visualizzazione e la gestione delle prenotazioni dell'utente.
+ * @author Simone Marino, Nicola Pichierri, Manuel Gjolaj, Mattia Statti
+ */
+
 import { supabase } from '/js/collegamentoDb.js';
 console.log(localStorage.getItem('user'));
 

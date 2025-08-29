@@ -1,8 +1,7 @@
 /**
- * @fileoverview Questo modulo gestisce la logica per la selezione e la visualizzazione degli avatar utente.
- * Include funzioni per aprire e chiudere un popup, caricare avatar predefiniti da un database,
- * salvare la selezione dell'utente e aggiornare l'interfaccia.
- * @author [Nome del tuo team o tuo nome]
+ * @file Gestisce la visualizzazione del riepilogo della prenotazione
+ * e la preparazione al pagamento, raccogliendo i dati dell'utente.
+ * @author Simone Marino, Nicola Pichierri, Manuel Gjolaj, Mattia Statti
  */
 
 import { supabase } from '/js/collegamentoDb.js';

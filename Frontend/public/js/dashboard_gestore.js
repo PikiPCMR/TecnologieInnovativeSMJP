@@ -1,3 +1,8 @@
+/**
+ * @file Gestisce le funzionalità di modifica del profilo utente, inclusi email, password,
+ * e la visualizzazione di popup informativi e di decisione.
+ * @author Simone Marino, Nicola Pichierri, Manuel Gjolaj, Mattia Statti
+ */
 // Importa l'istanza di Supabase
 import { supabase } from '/js/collegamentoDb.js';
 

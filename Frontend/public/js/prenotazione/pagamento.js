@@ -1,6 +1,16 @@
-// 1) Inserisci la tua Publishable Key di Stripe (TEST o LIVE a seconda dell'ambiente)
+/**
+ * @file Gestisce il processo di pagamento tramite Stripe, creando un PaymentIntent
+ * e confermando il pagamento per una nuova prenotazione.
+ * @author Simone Marino, Nicola Pichierri, Manuel Gjolaj, Mattia Statti
+ */
+
+/**
+ * L'istanza di Stripe creata con la Publishable Key.
+ * @type {stripe.Stripe}
+ */
 const stripe = Stripe("pk_test_51RvLUiJdCSwFSGzc72wVxTayWpUec8aCIDV5WzHbh1UyZ7lmzVT4nOVfaQ90MlHK6zvwwkrvLFZhOqUO5EoMh3HF00khxXbetg");
 
+/** @type {stripe.elements.Elements} */
 let elements; // istanza Elements condivisa
 const submitBtn = document.getElementById('submit');
 const errorBox = document.getElementById('error-message');
@@ -9,15 +19,22 @@ const errorBox = document.getElementById('error-message');
 const queryString = window.location.search;
 const params = new URLSearchParams(queryString);
 
+/** @type {string} name - Il nome dell'utente, recuperato dalla URL. */
 const name = params.get('nome') || '';
+/** @type {string} email - L'email dell'utente, recuperata dalla URL. */
 const email = params.get('email') || '';
+/** @type {string} prezzo - Il prezzo totale della prenotazione, recuperato dalla URL. */
 const prezzo = params.get('prezzo') || '';
+/** @type {string} spazioId - L'ID dello spazio di lavoro, recuperato dalla URL. */
 const spazioId = params.get('id') || '';
+/** @type {string} giorno - Il giorno della prenotazione, recuperato dalla URL. */
 const giorno = params.get('giorno') || '';
+/** @type {string} fascia - La fascia oraria della prenotazione, recuperata dalla URL. */
 const fascia = params.get('orario') || '';
+/** @type {string} id_gestore - L'ID del gestore dello spazio, recuperato dalla URL. */
 const id_gestore = params.get('id_gestore') || '';
+/** @type {string|null} idPagamento - L'ID del PaymentIntent creato da Stripe. */
 let idPagamento = null;
-// 2) All'avvio, chiedi al backend di creare un PaymentIntent e restituisci il clientSecret
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         const importo = parseInt(prezzo) * 100; // in centesimi
@@ -46,7 +63,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-// 5) Gestione submit: conferma pagamento (attiva 3DS se necessario) e reindirizza alla pagina di successo
 document.getElementById('submit').addEventListener('click', async () => {
     clearError();
     setLoading(true);
@@ -85,15 +101,26 @@ document.getElementById('submit').addEventListener('click', async () => {
     
 });
 
-// Utils UI
+/**
+ * Gestisce lo stato di caricamento dell'interfaccia utente.
+ * Disabilita il pulsante di pagamento e aggiorna il testo.
+ * @param {boolean} isLoading - `true` per mostrare lo stato di caricamento, `false` per nasconderlo.
+ */
 function setLoading(isLoading) {
     submitBtn.disabled = isLoading;
     document.getElementById('button-text').textContent = isLoading ? 'Elaborazione…' : 'Paga ora';
 }
+/**
+ * Mostra un messaggio di errore all'utente.
+ * @param {string} message - Il messaggio di errore da visualizzare.
+ */
 function showError(message) {
     errorBox.textContent = message;
     errorBox.classList.remove('hidden');
 }
+/**
+ * Nasconde il messaggio di errore.
+ */
 function clearError() {
     errorBox.textContent = '';
     errorBox.classList.add('hidden');

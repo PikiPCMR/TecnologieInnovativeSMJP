@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: contenuti_gestore/modifica_spazio.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: contenuti_gestore/modifica_spazio.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @file Gestisce la visualizzazione e la gestione delle prenotazioni dell'utente.
+ * @author Simone Marino, Nicola Pichierri, Manuel Gjolaj, Mattia Statti
+ */
+
+import { supabase } from '/js/collegamentoDb.js';
+console.log(localStorage.getItem('user'));
+
+// Variabili per gestire le immagini lato client
+let selectedFiles = [];
+export let existingImageUrls = []; 
+
+const rimuoviBtn = document.getElementById('rimuovi-immagini-btn');
+const previewContainer = document.getElementById('image-preview-container');
+
+// Funzione per mostrare le immagini in un carosello
+function updatePreviewCarousel() {
+    previewContainer.innerHTML = '';
+    const allFiles = [...existingImageUrls, ...selectedFiles]; // Combina immagini esistenti e nuove
+
+    if (allFiles.length > 0) {
+        rimuoviBtn.style.display = 'block';
+        const carousel = document.createElement('div');
+        carousel.className = 'image-carousel';
+
+        allFiles.forEach(fileOrUrl => {
+            const img = document.createElement('img');
+            if (typeof fileOrUrl === 'string') {
+                img.src = fileOrUrl;
+                img.alt = 'Immagine esistente';
+            } else {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    img.src = e.target.result;
+                    img.alt = fileOrUrl.name;
+                };
+                reader.readAsDataURL(fileOrUrl);
+            }
+            carousel.appendChild(img);
+        });
+        previewContainer.appendChild(carousel);
+    } else {
+        rimuoviBtn.style.display = 'none';
+    }
+}
+
+/**
+ * Carica le immagini nel bucket e restituisce un array di URL.
+ * Elimina prima le immagini esistenti nel bucket se necessario.
+ * @param {Array&lt;File>} files - I nuovi file da caricare.
+ * @param {string} id_spazio - L'ID dello spazio per creare il percorso.
+ * @returns {Promise&lt;Array&lt;string>>} Un array con gli URL pubblici delle nuove immagini.
+ */
+export async function uploadSpazioImages(files, id_spazio) {
+    if (existingImageUrls &amp;&amp; existingImageUrls.length > 0) {
+        const pathsToDelete = existingImageUrls.map(url => {
+            const pathStartIndex = url.indexOf('immaginispazio/') + 'immaginispazio/'.length;
+            return url.substring(pathStartIndex);
+        });
+        const { error: deleteError } = await supabase.storage
+            .from('immaginispazio')
+            .remove(pathsToDelete);
+
+        if (deleteError) {
+            console.error('Errore durante l\'eliminazione delle vecchie immagini:', deleteError);
+        }
+    }
+
+    const urls = [];
+    for (const file of files) {
+        const filePath = `${id_spazio}/${Date.now()}_${file.name}`;
+        const { error: uploadError } = await supabase.storage
+            .from('immaginispazio')
+            .upload(filePath, file, { upsert: true });
+
+        if (uploadError) {
+            console.error('Errore durante l\'upload:', uploadError);
+            continue;
+        }
+
+        const { data: { publicUrl } } = supabase.storage
+            .from('immaginispazio')
+            .getPublicUrl(filePath);
+
+        urls.push(publicUrl);
+    }
+    return urls;
+}
+
+/**
+ * Funzione principale per caricare i dati dello spazio esistente.
+ * @param {string} id_spazio - L'ID dello spazio da caricare.
+ */
+export async function loadSpazioData(id_spazio) {
+    const { data: spazio, error } = await supabase
+        .from('spazi_lavoro')
+        .select('*')
+        .eq('id_spazio', id_spazio)
+        .single();
+
+    if (error || !spazio) {
+        console.error('Errore nel caricamento dei dati dello spazio:', error);
+        alert('Spazio non trovato.');
+        return;
+    }
+
+    document.getElementById('titolo-modifica-spazio').textContent = `Benvenuto nella pagina di modifica di ${spazio.id_spazio}.`;
+
+    document.querySelector('input[name="indirizzo_spazio"]').value = spazio.indirizzo_spazio;
+    document.querySelector('input[name="numero_civico"]').value = spazio.numero_civico;
+    document.querySelector('input[name="città"]').value = spazio.città;
+    document.querySelector('input[name="provincia"]').value = spazio.provincia;
+    document.querySelector('input[name="nazione"]').value = spazio.nazione;
+    document.querySelector('select[name="categoria"]').value = spazio.categoria;
+    document.querySelector('input[name="capienza_max"]').value = spazio.capienza_max;
+    document.querySelector('input[name="prezzo_ora"]').value = spazio.prezzo_ora;
+    document.querySelector('input[name="descrizione_breve"]').value = spazio.descrizione_breve;
+    document.querySelector('textarea[name="descrizione_lunga"]').value = spazio.descrizione_lunga;
+
+    existingImageUrls = spazio.immagini_spazio || [];
+    updatePreviewCarousel();
+}
+
+/**
+ * Funzione principale per modificare uno spazio.
+ * @param {object} formData - I dati del form.
+ * @param {Array&lt;File>} newFiles - I nuovi file selezionati.
+ * @param {string} id_spazio - L'ID dello spazio da modificare.
+ */
+export async function modificaSpazio(formData, newFiles, id_spazio) {
+    const user = JSON.parse(localStorage.getItem('user'))?.id;
+    if (!user) {
+        alert('Gestore non loggato!');
+        return;
+    }
+
+    let immaginiUrls = existingImageUrls;
+    if (newFiles &amp;&amp; newFiles.length > 0) {
+        immaginiUrls = await uploadSpazioImages(newFiles, id_spazio);
+        if (immaginiUrls.length === 0 &amp;&amp; newFiles.length > 0) {
+            alert('Si è verificato un errore durante l\'upload delle nuove immagini.');
+            return;
+        }
+    } else if (existingImageUrls.length === 0) {
+        await uploadSpazioImages([], id_spazio);
+        immaginiUrls = [];
+    }
+
+    const spazioData = {
+        ...formData,
+        id_gestore: user,
+        immagini_spazio: immaginiUrls
+    };
+
+    const { error } = await supabase
+        .from('spazi_lavoro')
+        .update(spazioData)
+        .eq('id_spazio', id_spazio);
+
+    if (error) {
+        alert('Errore nella modifica dello spazio!');
+        console.error(error);
+        return;
+    }
+
+    alert('Spazio modificato con successo!');
+    window.location.href = '../dashboard_gestore.html';
+
+}
+
+/**
+ * Funzione per eliminare uno spazio di lavoro.
+ * @param {string} id_spazio - L'ID dello spazio da eliminare.
+ */
+export async function rimuoviSpazio(id_spazio) {
+    if (!confirm('Sei sicuro di voler eliminare questo spazio? Questa azione non può essere annullata.')) {
+        return;
+    }
+
+    const { data: spazio, error: fetchError } = await supabase
+        .from('spazi_lavoro')
+        .select('immagini_spazio')
+        .eq('id_spazio', id_spazio)
+        .single();
+
+    if (fetchError || !spazio) {
+        console.error('Errore nel recupero degli URL delle immagini:', fetchError);
+        alert('Impossibile recuperare i dati dello spazio per l\'eliminazione.');
+        return;
+    }
+
+    if (spazio.immagini_spazio &amp;&amp; spazio.immagini_spazio.length > 0) {
+        const pathsToDelete = spazio.immagini_spazio.map(url => {
+            const pathStartIndex = url.indexOf('immaginispazio/') + 'immaginispazio/'.length;
+            return url.substring(pathStartIndex);
+        });
+        const { error: deleteBucketError } = await supabase.storage
+            .from('immaginispazio')
+            .remove(pathsToDelete);
+
+        if (deleteBucketError) {
+            console.error('Errore durante l\'eliminazione delle immagini dal bucket:', deleteBucketError);
+            alert('Errore durante l\'eliminazione delle immagini.');
+            return;
+        }
+    }
+
+    const { error: deleteRowError } = await supabase
+        .from('spazi_lavoro')
+        .delete()
+        .eq('id_spazio', id_spazio);
+
+    if (deleteRowError) {
+        console.error('Errore durante l\'eliminazione della tupla:', deleteRowError);
+        alert('Errore durante l\'eliminazione dello spazio.');
+        return;
+    }
+
+    alert('Spazio eliminato con successo!');
+    window.location.href = '../dashboard_gestore.html';
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#$">$</a></li><li><a href="global.html#FASCE">FASCE</a></li><li><a href="global.html#accedi">accedi</a></li><li><a href="global.html#aggiungiMarker">aggiungiMarker</a></li><li><a href="global.html#aggiungiSpazio">aggiungiSpazio</a></li><li><a href="global.html#annullaVerificaEmail">annullaVerificaEmail</a></li><li><a href="global.html#apriPopup">apriPopup</a></li><li><a href="global.html#apriPopupEmail">apriPopupEmail</a></li><li><a href="global.html#apriPopupPassword">apriPopupPassword</a></li><li><a href="global.html#apriPopupResetPassword">apriPopupResetPassword</a></li><li><a href="global.html#bindCTA">bindCTA</a></li><li><a href="global.html#calcolaOreTotali">calcolaOreTotali</a></li><li><a href="global.html#caricaAvatarDaDB">caricaAvatarDaDB</a></li><li><a href="global.html#caricaAvatarUtente">caricaAvatarUtente</a></li><li><a href="global.html#caricaDatiCliente">caricaDatiCliente</a></li><li><a href="global.html#caricaSpazi">caricaSpazi</a></li><li><a href="global.html#checkLogin">checkLogin</a></li><li><a href="global.html#chiudiPopup">chiudiPopup</a></li><li><a href="global.html#chiudiPopupEmail">chiudiPopupEmail</a></li><li><a href="global.html#chiudiPopupPassword">chiudiPopupPassword</a></li><li><a href="global.html#clearError">clearError</a></li><li><a href="global.html#createInput">createInput</a></li><li><a href="global.html#date">date</a></li><li><a href="global.html#differenzaOre">differenzaOre</a></li><li><a href="global.html#drawSparkline">drawSparkline</a></li><li><a href="global.html#editMode">editMode</a></li><li><a href="global.html#elements">elements</a></li><li><a href="global.html#email">email</a></li><li><a href="global.html#eventClick">eventClick</a></li><li><a href="global.html#fascia">fascia</a></li><li><a href="global.html#fasciaOrariaToString">fasciaOrariaToString</a></li><li><a href="global.html#fetchAllTimeData">fetchAllTimeData</a></li><li><a href="global.html#fetchDashboardData">fetchDashboardData</a></li><li><a href="global.html#fetchInternalDashboardData">fetchInternalDashboardData</a></li><li><a href="global.html#formatPrice">formatPrice</a></li><li><a href="global.html#gestore_id">gestore_id</a></li><li><a href="global.html#giorno">giorno</a></li><li><a href="global.html#handleLogout">handleLogout</a></li><li><a href="global.html#handleProfile">handleProfile</a></li><li><a href="global.html#home">home</a></li><li><a href="global.html#idPagamento">idPagamento</a></li><li><a href="global.html#id_gestore">id_gestore</a></li><li><a href="global.html#initDateInputs">initDateInputs</a></li><li><a href="global.html#initMap">initMap</a></li><li><a href="global.html#inizializzaMappa">inizializzaMappa</a></li><li><a href="global.html#insericiPagamento">insericiPagamento</a></li><li><a href="global.html#inserisciPrenotazione">inserisciPrenotazione</a></li><li><a href="global.html#isLoggedIn">isLoggedIn</a></li><li><a href="global.html#loadRelated">loadRelated</a></li><li><a href="global.html#loadReviews">loadReviews</a></li><li><a href="global.html#loadSpazio">loadSpazio</a></li><li><a href="global.html#loadSpazioData">loadSpazioData</a></li><li><a href="global.html#login">login</a></li><li><a href="global.html#map">map</a></li><li><a href="global.html#markers">markers</a></li><li><a href="global.html#modificaDatiGenerali">modificaDatiGenerali</a></li><li><a href="global.html#modificaSpazio">modificaSpazio</a></li><li><a href="global.html#mostraPopupDecisione">mostraPopupDecisione</a></li><li><a href="global.html#mostraPopupVerifica">mostraPopupVerifica</a></li><li><a href="global.html#mostraSpazi">mostraSpazi</a></li><li><a href="global.html#name">name</a></li><li><a href="global.html#navigate">navigate</a></li><li><a href="global.html#occupancyLast30">occupancyLast30</a></li><li><a href="global.html#openDashboardGestore">openDashboardGestore</a></li><li><a href="global.html#orario">orario</a></li><li><a href="global.html#params">params</a></li><li><a href="global.html#passwordInput">passwordInput</a></li><li><a href="global.html#prenotList">prenotList</a></li><li><a href="global.html#prenotazioneDate">prenotazioneDate</a></li><li><a href="global.html#prezzo">prezzo</a></li><li><a href="global.html#prezzoAttuale">prezzoAttuale</a></li><li><a href="global.html#refreshAvailability">refreshAvailability</a></li><li><a href="global.html#registrati">registrati</a></li><li><a href="global.html#registrationForm">registrationForm</a></li><li><a href="global.html#renderBarChart">renderBarChart</a></li><li><a href="global.html#renderGallery">renderGallery</a></li><li><a href="global.html#renderLineChart">renderLineChart</a></li><li><a href="global.html#renderLineChartSimple">renderLineChartSimple</a></li><li><a href="global.html#renderPieChart">renderPieChart</a></li><li><a href="global.html#renderServizi">renderServizi</a></li><li><a href="global.html#requireUserRole">requireUserRole</a></li><li><a href="global.html#rimuoviSpazio">rimuoviSpazio</a></li><li><a href="global.html#saveUser">saveUser</a></li><li><a href="global.html#scaricaCSV">scaricaCSV</a></li><li><a href="global.html#searchSpaces">searchSpaces</a></li><li><a href="global.html#selectedSlots">selectedSlots</a></li><li><a href="global.html#selezionaAvatar">selezionaAvatar</a></li><li><a href="global.html#setLoading">setLoading</a></li><li><a href="global.html#setText">setText</a></li><li><a href="global.html#showEditPopup">showEditPopup</a></li><li><a href="global.html#showError">showError</a></li><li><a href="global.html#showEventPopup">showEventPopup</a></li><li><a href="global.html#spazi">spazi</a></li><li><a href="global.html#spazioId">spazioId</a></li><li><a href="global.html#spazioIdAttuale">spazioIdAttuale</a></li><li><a href="global.html#stripe">stripe</a></li><li><a href="global.html#supabase">supabase</a></li><li><a href="global.html#supabaseKey">supabaseKey</a></li><li><a href="global.html#supabaseUrl">supabaseUrl</a></li><li><a href="global.html#testDbConnection">testDbConnection</a></li><li><a href="global.html#timeout">timeout</a></li><li><a href="global.html#toggleCTA">toggleCTA</a></li><li><a href="global.html#togglePassword">togglePassword</a></li><li><a href="global.html#togglePasswordVisibility">togglePasswordVisibility</a></li><li><a href="global.html#toggleProfileMenu">toggleProfileMenu</a></li><li><a href="global.html#updatePreviewCarousel">updatePreviewCarousel</a></li><li><a href="global.html#updateProfileMenu">updateProfileMenu</a></li><li><a href="global.html#uploadSpazioImages">uploadSpazioImages</a></li><li><a href="global.html#user">user</a></li><li><a href="global.html#valuta">valuta</a></li><li><a href="global.html#viewBookings">viewBookings</a></li><li><a href="global.html#waitForPrenotazione">waitForPrenotazione</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Fri Aug 29 2025 12:33:56 GMT+0200 (Ora legale dell’Europa centrale)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

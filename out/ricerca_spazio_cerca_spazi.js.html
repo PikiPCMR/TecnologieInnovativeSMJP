@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: ricerca_spazio/cerca_spazi.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: ricerca_spazio/cerca_spazi.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @file Gestisce la visualizzazione degli spazi di lavoro, la ricerca e il filtraggio,
+ * e l'integrazione con una mappa interattiva (Leaflet).
+ * @author Simone Marino, Nicola Pichierri, Manuel Gjolaj, Mattia Statti
+ */
+
+import { supabase } from '../collegamentoDb.js';
+import {
+    checkLogin,
+    toggleProfileMenu,
+    accedi,
+    registrati,
+    handleProfile,
+    handleLogout
+} from '../index.js';
+
+const queryString = window.location.search;
+const params = new URLSearchParams(queryString);
+/** @type {boolean} editMode - Indica se la pagina è in modalità di modifica. */
+let editMode = params.get('edit') === 'true';
+
+// Esponi le funzioni globali
+window.checkLogin = checkLogin;
+window.toggleProfileMenu = toggleProfileMenu;
+window.accedi = accedi;
+window.registrati = registrati;
+window.handleProfile = handleProfile;
+window.handleLogout = handleLogout;
+
+/** @type {Array&lt;Object>} spazi - Array di oggetti che rappresentano gli spazi di lavoro. */
+let spazi = [];
+/** @type {Object} map - L'istanza della mappa Leaflet. */
+let map;
+/** @type {Array&lt;Object>} markers - Array di marker Leaflet sulla mappa. */
+let markers = [];
+
+/**
+ * Carica gli spazi di lavoro dal database e li visualizza.
+ * @async
+ */
+export async function caricaSpazi() {
+    checkLogin();
+    const { data, error } = await supabase.from('spazi_lavoro').select('*');
+    if (error) {
+        console.error('❌ Errore nel caricamento degli spazi:', error);
+        return;
+    }
+
+    spazi = data;
+    mostraSpazi(spazi);
+    inizializzaMappa(spazi);
+}
+
+/**
+ * Mostra una lista di spazi di lavoro nel container HTML.
+ * Il layout cambia in base alla modalità (modifica o visualizzazione).
+ * @param {Array&lt;Object>} lista - L'array di spazi di lavoro da visualizzare.
+ */
+function mostraSpazi(lista) {
+    const container = document.getElementById('listaSpazi');
+    if (!lista.length) {
+        container.innerHTML = '&lt;p style="color:white; text-align:center;">Nessuno spazio trovato.&lt;/p>';
+        return;
+    }
+
+    container.innerHTML = lista.map(spazio => {
+        const immagine = spazio.immagini_spazio?.[0] || 'img/placeholder.jpg';
+        const indirizzo = `${spazio.indirizzo_spazio || ''}, ${spazio.numero_civico || ''}`;
+        aggiungiMarker(`${indirizzo}, ${spazio.città}`);
+        if(editMode) {
+            return `
+                &lt;div class="workspace-card">
+                    &lt;img class="workspace-img" src="${immagine}" alt="${spazio.id_spazio}" />
+                    &lt;div class="workspace-info">
+                        &lt;h3>${spazio.id_spazio}&lt;/h3>
+                        &lt;p class="location">${spazio.città}, ${spazio.provincia}&lt;/p>
+                        &lt;p class="services">📍 ${indirizzo}&lt;/p>
+                        &lt;p class="services">🧭 Categoria: ${spazio.categoria}&lt;/p>
+                        &lt;div class="workspace-footer">
+                            &lt;div class="price">Italia&lt;/div>
+                            &lt;button class="btn-book" onclick="Seleziona('${spazio.id_spazio}')">Seleziona&lt;/button>
+                        &lt;/div>
+                    &lt;/div>
+                &lt;/div>
+            `;
+        } else {
+            return `
+                &lt;div class="workspace-card">
+                    &lt;img class="workspace-img" src="${immagine}" alt="${spazio.id_spazio}" />
+                    &lt;div class="workspace-info">
+                        &lt;h3>${spazio.id_spazio}&lt;/h3>
+                        &lt;p class="location">${spazio.città}, ${spazio.provincia}&lt;/p>
+                        &lt;p class="services">📍 ${indirizzo}&lt;/p>
+                        &lt;p class="services">🧭 Categoria: ${spazio.categoria}&lt;/p>
+                        &lt;div class="workspace-footer">
+                            &lt;div class="price">Italia&lt;/div>
+                            &lt;button class="btn-book" onclick="vaiAScheda('${spazio.id_spazio}')">Dettagli&lt;/button>
+                        &lt;/div>
+                    &lt;/div>
+                &lt;/div>
+            `;
+        }
+    }).join('');
+}
+
+/**
+ * Filtra gli spazi di lavoro in base a città e tipo, aggiornando la visualizzazione e la mappa.
+ */
+window.filtraSpazi = () => {
+    const citta = document.getElementById('filtroCitta')?.value.toLowerCase() || '';
+    const tipo = document.getElementById('filtroTipo')?.value.toLowerCase() || '';
+
+    const filtrati = spazi.filter(s =>
+        (!citta || s.città.toLowerCase().includes(citta)) &amp;&amp;
+        (!tipo || s.categoria?.toLowerCase() === tipo)
+    );
+
+    mostraSpazi(filtrati);
+    inizializzaMappa(filtrati);
+};
+
+/**
+ * Avvia il processo di prenotazione per uno spazio di lavoro specifico.
+ * Reindirizza l'utente se non è loggato.
+ * @param {string} idSpazio - L'ID dello spazio da prenotare.
+ */
+window.prenotaSpazio = (idSpazio) => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (!user) {
+        alert("Effettua il login per prenotare.");
+        return;
+    }
+    alert(`Prenotazione avviata per: ${idSpazio}`);
+};
+
+/**
+ * Inizializza o aggiorna la mappa Leaflet con i marker degli spazi di lavoro.
+ * @param {Array&lt;Object>} spazi - L'array di spazi di lavoro da visualizzare sulla mappa.
+ */
+function inizializzaMappa(spazi) {
+    if (map) map.remove();
+
+    map = L.map('mappa').setView([45.5, 9.2], 6);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    markers.forEach(marker => map.removeLayer(marker));
+    markers = [];
+
+    spazi.forEach(spazio => {
+        const lat = parseFloat(spazio.latitudine);
+        const lon = parseFloat(spazio.longitudine);
+        if (!lat || !lon) return;
+
+        const marker = L.marker([lat, lon]).addTo(map);
+        marker.bindPopup(`&lt;strong>${spazio.id_spazio}&lt;/strong>&lt;br>${spazio.Città}`);
+        markers.push(marker);
+    });
+}
+
+// Esponi le funzioni nel contesto globale per l'uso in HTML
+window.caricaSpazi = caricaSpazi;
+window.mostraSpazi = mostraSpazi;
+
+/**
+ * Aggiunge un marker alla mappa utilizzando un indirizzo per ottenere le coordinate.
+ * @param {string} indirizzo - L'indirizzo da geocodificare.
+ */
+function aggiungiMarker(indirizzo) {
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&amp;q=${encodeURIComponent(indirizzo)}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.length > 0) {
+                const lat = parseFloat(data[0].lat);
+                const lon = parseFloat(data[0].lon);
+
+                L.marker([lat, lon])
+                    .addTo(map)
+                    .bindPopup(indirizzo);
+            }
+        })
+        .catch(err => console.error("Errore nel geocoding:", err));
+}
+
+const input = document.getElementById("filtroCitta");
+const suggerimenti = document.getElementById("suggerimenti");
+
+/** @type {number|null} timeout - Timeout per la ricerca dei suggerimenti di geocodifica. */
+let timeout = null;
+
+input.addEventListener("input", () => {
+    clearTimeout(timeout);
+    const query = input.value.trim();
+
+    if (query.length &lt; 2) {
+        suggerimenti.style.display = "none";
+        return;
+    }
+
+    timeout = setTimeout(() => {
+        fetch(`https://nominatim.openstreetmap.org/search?format=json&amp;q=${encodeURIComponent(query)}&amp;addressdetails=1&amp;limit=5`)
+            .then(res => res.json())
+            .then(data => {
+                suggerimenti.innerHTML = "";
+                data.forEach(place => {
+                    const item = document.createElement("div");
+                    item.className = "suggestion-item";
+                    item.innerHTML = `
+                        &lt;div class="text">
+                            &lt;span class="title">${place.display_name.split(",")[0]}, &lt;/span>
+                            &lt;span class="subtitle">${place.address.city || place.address.town || place.address.village || ""}, &lt;/span>
+                            &lt;span class="subtitle">${place.address.country || ""}&lt;/span>
+                        &lt;/div>
+                    `;
+                    item.addEventListener("click", () => {
+                        input.value = `${place.display_name.split(",")[0]}, ${place.address.city || place.address.town || place.address.village || ""}, ${place.address.country || ""}`;
+                        suggerimenti.style.display = "none";
+                    });
+                    suggerimenti.appendChild(item);
+                });
+                suggerimenti.style.display = "block";
+            });
+    }, 300);
+});
+
+/**
+ * Reindirizza l'utente alla pagina dei dettagli di uno specifico spazio di lavoro.
+ * @param {string} idSpazio - L'ID dello spazio da visualizzare.
+ */
+window.vaiAScheda = (idSpazio) => {
+    // Reindirizza alla pagina con parametro id
+    window.location.href = `/html/ricerca_spazio/spazio.html?id=${encodeURIComponent(idSpazio)}`;
+};
+
+/**
+ * Reindirizza l'utente alla pagina di gestione delle prenotazioni di uno spazio specifico.
+ * Utilizzata nella modalità di modifica.
+ * @param {string} idSpazio - L'ID dello spazio da selezionare.
+ */
+window.Seleziona = (idSpazio) => {
+    // Reindirizza alla pagina di prenotazione con parametro id
+    window.location.href = `/html/prenotazione/gestione_prenotazioni.html?id=${encodeURIComponent(idSpazio)}`;
+};</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#$">$</a></li><li><a href="global.html#FASCE">FASCE</a></li><li><a href="global.html#accedi">accedi</a></li><li><a href="global.html#aggiungiMarker">aggiungiMarker</a></li><li><a href="global.html#aggiungiSpazio">aggiungiSpazio</a></li><li><a href="global.html#annullaVerificaEmail">annullaVerificaEmail</a></li><li><a href="global.html#apriPopup">apriPopup</a></li><li><a href="global.html#apriPopupEmail">apriPopupEmail</a></li><li><a href="global.html#apriPopupPassword">apriPopupPassword</a></li><li><a href="global.html#apriPopupResetPassword">apriPopupResetPassword</a></li><li><a href="global.html#bindCTA">bindCTA</a></li><li><a href="global.html#calcolaOreTotali">calcolaOreTotali</a></li><li><a href="global.html#caricaAvatarDaDB">caricaAvatarDaDB</a></li><li><a href="global.html#caricaAvatarUtente">caricaAvatarUtente</a></li><li><a href="global.html#caricaDatiCliente">caricaDatiCliente</a></li><li><a href="global.html#caricaSpazi">caricaSpazi</a></li><li><a href="global.html#checkLogin">checkLogin</a></li><li><a href="global.html#chiudiPopup">chiudiPopup</a></li><li><a href="global.html#chiudiPopupEmail">chiudiPopupEmail</a></li><li><a href="global.html#chiudiPopupPassword">chiudiPopupPassword</a></li><li><a href="global.html#clearError">clearError</a></li><li><a href="global.html#createInput">createInput</a></li><li><a href="global.html#date">date</a></li><li><a href="global.html#differenzaOre">differenzaOre</a></li><li><a href="global.html#drawSparkline">drawSparkline</a></li><li><a href="global.html#editMode">editMode</a></li><li><a href="global.html#elements">elements</a></li><li><a href="global.html#email">email</a></li><li><a href="global.html#eventClick">eventClick</a></li><li><a href="global.html#fascia">fascia</a></li><li><a href="global.html#fasciaOrariaToString">fasciaOrariaToString</a></li><li><a href="global.html#fetchAllTimeData">fetchAllTimeData</a></li><li><a href="global.html#fetchDashboardData">fetchDashboardData</a></li><li><a href="global.html#fetchInternalDashboardData">fetchInternalDashboardData</a></li><li><a href="global.html#formatPrice">formatPrice</a></li><li><a href="global.html#gestore_id">gestore_id</a></li><li><a href="global.html#giorno">giorno</a></li><li><a href="global.html#handleLogout">handleLogout</a></li><li><a href="global.html#handleProfile">handleProfile</a></li><li><a href="global.html#home">home</a></li><li><a href="global.html#idPagamento">idPagamento</a></li><li><a href="global.html#id_gestore">id_gestore</a></li><li><a href="global.html#initDateInputs">initDateInputs</a></li><li><a href="global.html#initMap">initMap</a></li><li><a href="global.html#inizializzaMappa">inizializzaMappa</a></li><li><a href="global.html#insericiPagamento">insericiPagamento</a></li><li><a href="global.html#inserisciPrenotazione">inserisciPrenotazione</a></li><li><a href="global.html#isLoggedIn">isLoggedIn</a></li><li><a href="global.html#loadRelated">loadRelated</a></li><li><a href="global.html#loadReviews">loadReviews</a></li><li><a href="global.html#loadSpazio">loadSpazio</a></li><li><a href="global.html#loadSpazioData">loadSpazioData</a></li><li><a href="global.html#login">login</a></li><li><a href="global.html#map">map</a></li><li><a href="global.html#markers">markers</a></li><li><a href="global.html#modificaDatiGenerali">modificaDatiGenerali</a></li><li><a href="global.html#modificaSpazio">modificaSpazio</a></li><li><a href="global.html#mostraPopupDecisione">mostraPopupDecisione</a></li><li><a href="global.html#mostraPopupVerifica">mostraPopupVerifica</a></li><li><a href="global.html#mostraSpazi">mostraSpazi</a></li><li><a href="global.html#name">name</a></li><li><a href="global.html#navigate">navigate</a></li><li><a href="global.html#occupancyLast30">occupancyLast30</a></li><li><a href="global.html#openDashboardGestore">openDashboardGestore</a></li><li><a href="global.html#orario">orario</a></li><li><a href="global.html#params">params</a></li><li><a href="global.html#passwordInput">passwordInput</a></li><li><a href="global.html#prenotList">prenotList</a></li><li><a href="global.html#prenotazioneDate">prenotazioneDate</a></li><li><a href="global.html#prezzo">prezzo</a></li><li><a href="global.html#prezzoAttuale">prezzoAttuale</a></li><li><a href="global.html#refreshAvailability">refreshAvailability</a></li><li><a href="global.html#registrati">registrati</a></li><li><a href="global.html#registrationForm">registrationForm</a></li><li><a href="global.html#renderBarChart">renderBarChart</a></li><li><a href="global.html#renderGallery">renderGallery</a></li><li><a href="global.html#renderLineChart">renderLineChart</a></li><li><a href="global.html#renderLineChartSimple">renderLineChartSimple</a></li><li><a href="global.html#renderPieChart">renderPieChart</a></li><li><a href="global.html#renderServizi">renderServizi</a></li><li><a href="global.html#requireUserRole">requireUserRole</a></li><li><a href="global.html#rimuoviSpazio">rimuoviSpazio</a></li><li><a href="global.html#saveUser">saveUser</a></li><li><a href="global.html#scaricaCSV">scaricaCSV</a></li><li><a href="global.html#searchSpaces">searchSpaces</a></li><li><a href="global.html#selectedSlots">selectedSlots</a></li><li><a href="global.html#selezionaAvatar">selezionaAvatar</a></li><li><a href="global.html#setLoading">setLoading</a></li><li><a href="global.html#setText">setText</a></li><li><a href="global.html#showEditPopup">showEditPopup</a></li><li><a href="global.html#showError">showError</a></li><li><a href="global.html#showEventPopup">showEventPopup</a></li><li><a href="global.html#spazi">spazi</a></li><li><a href="global.html#spazioId">spazioId</a></li><li><a href="global.html#spazioIdAttuale">spazioIdAttuale</a></li><li><a href="global.html#stripe">stripe</a></li><li><a href="global.html#supabase">supabase</a></li><li><a href="global.html#supabaseKey">supabaseKey</a></li><li><a href="global.html#supabaseUrl">supabaseUrl</a></li><li><a href="global.html#testDbConnection">testDbConnection</a></li><li><a href="global.html#timeout">timeout</a></li><li><a href="global.html#toggleCTA">toggleCTA</a></li><li><a href="global.html#togglePassword">togglePassword</a></li><li><a href="global.html#togglePasswordVisibility">togglePasswordVisibility</a></li><li><a href="global.html#toggleProfileMenu">toggleProfileMenu</a></li><li><a href="global.html#updatePreviewCarousel">updatePreviewCarousel</a></li><li><a href="global.html#updateProfileMenu">updateProfileMenu</a></li><li><a href="global.html#uploadSpazioImages">uploadSpazioImages</a></li><li><a href="global.html#user">user</a></li><li><a href="global.html#valuta">valuta</a></li><li><a href="global.html#viewBookings">viewBookings</a></li><li><a href="global.html#waitForPrenotazione">waitForPrenotazione</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Fri Aug 29 2025 12:33:56 GMT+0200 (Ora legale dell’Europa centrale)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

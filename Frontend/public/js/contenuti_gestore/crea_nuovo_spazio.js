@@ -1,8 +1,6 @@
 /**
- * @fileoverview Questo script gestisce l'interazione con gli input di tipo file per le immagini,
- * la loro anteprima lato client e l'upload su un bucket di storage di Supabase.
- * Include anche la logica per salvare i dati di un "spazio di lavoro" nel database.
- * @author [Nome del tuo team o tuo nome]
+ * @file Gestisce la visualizzazione e la gestione delle prenotazioni dell'utente.
+ * @author Simone Marino, Nicola Pichierri, Manuel Gjolaj, Mattia Statti
  */
 
 import { supabase } from '/js/collegamentoDb.js';

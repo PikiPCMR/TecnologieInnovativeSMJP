@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: ricerca_spazio/spazio.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: ricerca_spazio/spazio.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @file Gestisce la visualizzazione dei dettagli di un singolo spazio di lavoro,
+ * la gestione delle prenotazioni, la visualizzazione di recensioni, e l'interazione con la mappa.
+ * @author Simone Marino, Nicola Pichierri, Manuel Gjolaj, Mattia Statti
+ */
+
+import { supabase } from '../collegamentoDb.js';
+
+/**
+ * Funzione di utilità per selezionare un elemento del DOM.
+ * @param {string} s - Il selettore CSS.
+ * @returns {Element|null} L'elemento del DOM corrispondente al selettore.
+ */
+const $ = (s) => document.querySelector(s);
+/** @type {URLSearchParams} params - I parametri URL della pagina. */
+const params = new URLSearchParams(location.search);
+/** @type {string|null} spazioId - L'ID dello spazio di lavoro ottenuto dall'URL. */
+const spazioId = params.get("id");
+
+// fasce orarie
+/**
+ * Array di oggetti che definiscono le fasce orarie disponibili.
+ * @type {Array&lt;Object>}
+ */
+const FASCE = [
+    { id: 1, label: "08:00–09:00" },
+    { id: 2, label: "09:00–10:00" },
+    { id: 3, label: "10:00–11:00" },
+    { id: 4, label: "11:00–12:00" },
+    { id: 5, label: "14:00–15:00" },
+    { id: 6, label: "15:00–16:00" },
+    { id: 7, label: "16:00–17:00" },
+    { id: 8, label: "17:00–18:00" },
+];
+
+/** @type {string} valuta - La valuta di default per i prezzi. */
+let valuta = "€";
+/** @type {object|null} user - L'oggetto utente loggato, recuperato dal localStorage. */
+let user = null;
+/** @type {Array&lt;number>} selectedSlots - Un array degli ID delle fasce orarie selezionate dall'utente. */
+let selectedSlots = [];
+/** @type {string|null} gestore_id - L'ID del gestore dello spazio di lavoro. */
+let gestore_id = null;
+
+document.addEventListener("DOMContentLoaded", async () => {
+    user = JSON.parse(localStorage.getItem('user'));
+    if (!spazioId) { alert("ID spazio mancante (?id=...)"); return; }
+
+    await loadSpazio();
+    await loadRelated();
+    initDateInputs();
+    await refreshAvailability();
+    bindCTA();
+});
+
+/**
+ * Imposta il testo di un elemento HTML specificato dall'ID.
+ * @param {string} id - L'ID dell'elemento.
+ * @param {string} text - Il testo da impostare.
+ */
+function setText(id, text) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = text;
+}
+
+// ====== CARICAMENTO SPAZIO + HOST ======
+
+/**
+ * Carica i dati dello spazio di lavoro dal database e aggiorna la pagina.
+ * @async
+ */
+async function loadSpazio() {
+    const { data: spazio, error } = await supabase
+        .from("spazi_lavoro")
+        .select("*")
+        .eq("id_spazio", spazioId)
+        .maybeSingle();
+
+    if (error) { console.error("Errore loadSpazio:", error); return; }
+    if (!spazio) { console.warn("Spazio non trovato"); return; }
+
+    // Titoli (bc-title può non esistere: la funzione setText è sicura)
+    const titolo = spazio.title || spazio.id_spazio;
+    setText("title", titolo);
+    setText("bc-title", titolo);
+    setText("subtitle", `${spazio.categoria || ""} · ${spazio["Città"] || ""}, ${spazio.provincia || ""} – ${spazio.nazione || ""}`);
+    setText("categoria", spazio.categoria || "—");
+
+    // Indirizzo
+    const indirizzo = [spazio.indirizzo_spazio, spazio.numero_civico, spazio["Città"]].filter(Boolean).join(" ");
+    setText("indirizzo", indirizzo || "—");
+
+    // Capienza &amp; descrizione
+    setText("capienza", spazio.capienza_max ?? "—");
+    setText("descrizione", spazio.descrizione_lunga || spazio.descrizione_breve || "—");
+
+    // Prezzo (legge da DB: prezzo_ora [text] -> numero)
+    const prezzoDb = parseFloat(spazio.prezzo_ora ?? spazio.prezzo_base_ora);
+    valuta = spazio.valuta || "€";
+    setText("prezzo", Number.isFinite(prezzoDb) ? formatPrice(prezzoDb, valuta) : "—");
+
+    // Servizi
+    renderServizi(spazio.servizi);
+
+    // Gallery
+    renderGallery(spazio.immagini_spazio);
+
+    // Mappa (fallback su latitudine/longitudine se i nomi campo sono quelli)
+    const lat = parseFloat(spazio.lat ?? spazio.latitudine ?? 45.07);
+    const lng = parseFloat(spazio.lng ?? spazio.longitudine ?? 7.69);
+    initMap({ lat, lng, title: titolo });
+
+    // Dati gestore (in "registrazione" la chiave è "id")
+    if (spazio.id_gestore) {
+        gestore_id = spazio.id_gestore;
+        const { data: host } = await supabase.from("registrazione")
+            .select("id, nome, cognome, email , numero_telefono, immagine_profilo")
+            .eq("id", spazio.id_gestore)
+            .maybeSingle();
+
+        if (host) {
+            setText("hostName", `${host.nome || ""} ${host.cognome || ""}`.trim() || "Gestore");
+            setText("hostMail", "Email: " + host.email || "");
+            setText("hostPhone", "Telefono: " + host.numero_telefono || "");
+            const av = document.getElementById("hostAvatar");
+            if (av) av.src = host.immagine_profilo || "https://ui-avatars.com/api/?name=G";
+        }
+    }
+}
+
+/**
+ * Renderizza i servizi dello spazio di lavoro in una lista HTML.
+ * @param {Array&lt;string>} servizi - L'array di servizi da visualizzare.
+ */
+function renderServizi(servizi) {
+    const ul = $("#servizi");
+    if (!ul) return;
+    ul.innerHTML = "";
+    (Array.isArray(servizi) ? servizi : []).forEach(s => {
+        const li = document.createElement("li");
+        li.textContent = s;
+        ul.appendChild(li);
+    });
+}
+
+/**
+ * Renderizza la galleria di immagini dello spazio di lavoro.
+ * @param {Array&lt;string>} imgs - L'array di URL delle immagini.
+ */
+function renderGallery(imgs) {
+    const hero = $("#hero");
+    if (!hero) return;
+
+    const arr = Array.isArray(imgs) ? imgs : [];
+    if (arr.length) {
+        hero.src = arr[0];
+        const thumbs = $("#thumbs");
+        if (thumbs) {
+            thumbs.innerHTML = "";
+            arr.slice(0, 4).forEach(url => {
+                const i = document.createElement("img");
+                i.src = url;
+                i.alt = "foto spazio";
+                i.addEventListener("click", () => hero.src = url);
+                thumbs.appendChild(i);
+            });
+        }
+    } else {
+        hero.src = "https://picsum.photos/1200/800?blur=2";
+    }
+}
+
+// ====== DATE &amp; DISPONIBILITÀ ======
+
+/**
+ * Inizializza i campi di input per la data con la data odierna.
+ */
+function initDateInputs() {
+    const today = new Date().toISOString().slice(0, 10);
+    const g = $("#giorno"),
+        bkd = $("#bk-date");
+    if (g) g.value = today;
+    if (bkd) bkd.value = today;
+
+    g?.addEventListener("change", refreshAvailability);
+    bkd?.addEventListener("change", () => {
+        if (g &amp;&amp; bkd) g.value = bkd.value;
+        refreshAvailability();
+    });
+}
+
+/**
+ * Aggiorna la disponibilità delle fasce orarie in base al giorno selezionato.
+ * Disabilita le fasce già prenotate.
+ * @async
+ */
+async function refreshAvailability() {
+    const bkSel = $("#bk-slot");
+    if (bkSel) bkSel.innerHTML = `&lt;option value="">Seleziona&lt;/option>`;
+    const day = $("#giorno")?.value;
+
+    const { data: prenotazioni } = await supabase
+        .from("prenotazione")
+        .select("fascia_oraria")
+        .eq("id_spazio", spazioId)
+        .eq("giorno", day);
+
+    // Mappa: id -> [inizio, fine]
+    const fasceOrarie = {
+        1: ['08:00', '09:00'],
+        2: ['09:00', '10:00'],
+        3: ['10:00', '11:00'],
+        4: ['11:00', '12:00'],
+        5: ['14:00', '15:00'],
+        6: ['15:00', '16:00'],
+        7: ['16:00', '17:00'],
+        8: ['17:00', '18:00'],
+    };
+
+    // Trova tutti gli id occupati
+    const occupate = new Set();
+    (prenotazioni || []).forEach(p => {
+        if (!p.fascia_oraria) return;
+        // Split per " e " (più intervalli)
+        const intervalli = String(p.fascia_oraria).split(" e ");
+        intervalli.forEach(intv => {
+            // Split per "-" (es: "10:00-15:00")
+            const [inizio, fine] = intv.split("-").map(s => s.trim());
+            if (!inizio || !fine) return;
+            // Segna occupate tutte le fasce che rientrano nell'intervallo
+            Object.entries(fasceOrarie).forEach(([id, [start, end]]) => {
+                if (start >= inizio &amp;&amp; end &lt;= fine) {
+                    occupate.add(id);
+                }
+            });
+        });
+    });
+
+    const wrap = $("#slots");
+    if (!wrap) return;
+    wrap.innerHTML = "";
+    FASCE.forEach(f => {
+        const btn = document.createElement("button");
+        btn.className = "slot";
+        btn.type = "button";
+        btn.textContent = f.label;
+        const busy = occupate.has(String(f.id));
+        btn.setAttribute("aria-disabled", busy ? "true" : "false");
+        if (!busy) {
+            btn.addEventListener("click", () => {
+                // Toggle selezione multipla
+                if (selectedSlots.includes(f.id)) {
+                    selectedSlots = selectedSlots.filter(id => id !== f.id);
+                    btn.setAttribute("aria-selected", "false");
+                } else {
+                    selectedSlots.push(f.id);
+                    btn.setAttribute("aria-selected", "true");
+                }
+                toggleCTA();
+            });
+            btn.setAttribute("aria-selected", selectedSlots.includes(f.id) ? "true" : "false");
+        }
+        wrap.appendChild(btn);
+    });
+
+    toggleCTA();
+    drawSparkline(await occupancyLast30());
+}
+
+/**
+ * Abilita o disabilita il pulsante di call-to-action (CTA) per la prenotazione.
+ */
+function toggleCTA() {
+    const enabled = Boolean($("#bk-date") ?.value &amp;&amp; selectedSlots.length > 0);
+    const btn = $("#ctaPrenota");
+    if (btn) btn.disabled = !enabled;
+}
+
+// ====== PRENOTAZIONE ======
+
+/**
+ * Associa un listener al pulsante di prenotazione.
+ */
+function bindCTA() {
+    document.getElementById("ctaPrenota")?.addEventListener("click", async () => {
+        if (!user || !user.id) {
+            alert("Devi essere loggato per prenotare.");
+            return;
+        }
+        const giorno = $("#giorno") ?.value;
+        if (!giorno || !selectedSlots.length) return;
+
+        // --- CONTROLLO DATA E ORA ---
+        const oggi = new Date();
+        const dataSelezionata = new Date(giorno + "T00:00:00");
+        // Se la data è nel passato
+        if (dataSelezionata &lt; new Date(oggi.getFullYear(), oggi.getMonth(), oggi.getDate())) {
+            alert("Non puoi prenotare per una data passata.");
+            return;
+        }
+        // Se la data è oggi, controlla anche le fasce orarie
+        if (dataSelezionata.getTime() === new Date(oggi.getFullYear(), oggi.getMonth(), oggi.getDate()).getTime()) {
+            // Trova la fascia oraria più vicina nel passato
+            const oraAttuale = oggi.getHours() + oggi.getMinutes() / 60;
+            // Mappa id slot → orario inizio
+            const slotInizi = {
+                1: 8,
+                2: 9,
+                3: 10,
+                4: 11,
+                5: 14,
+                6: 15,
+                7: 16,
+                8: 17
+            };
+            // Se tutte le fasce selezionate sono già iniziate, blocca
+            const tuttePassate = selectedSlots.every(id => slotInizi[id] &lt;= oraAttuale);
+            if (tuttePassate) {
+                alert("Non puoi prenotare per una fascia oraria già iniziata o passata.");
+                return;
+            }
+        }
+        // --- FINE CONTROLLO ---
+
+        let errorOccurred = false;
+
+        if (!errorOccurred) {
+            window.location.href = `/html/prenotazione/prenotazione.html?id=${encodeURIComponent(spazioId)}&amp;giorno=${encodeURIComponent(giorno)}&amp;selectedSlots=${encodeURIComponent(selectedSlots)}&amp;id_gestore=${encodeURIComponent(gestore_id)}`;
+        }
+    });
+}
+
+
+// ====== RELATED ======
+
+/**
+ * Carica e visualizza gli spazi di lavoro correlati (altri spazi).
+ * @async
+ */
+async function loadRelated() {
+    const { data: rows } = await supabase.from("spazi_lavoro")
+        .select("id_spazio, title, immagini_spazio, categoria, città")
+        .neq("id_spazio", spazioId)
+        .limit(4);
+
+    const box = $("#related");
+    if (!box) return;
+    box.innerHTML = "";
+    (rows || []).forEach(r => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+            &lt;img src="${(r.immagini_spazio || [])[0] || "https://picsum.photos/600/400"}" alt="">
+            &lt;div style="padding:10px">
+                &lt;strong>${r.title || r.id_spazio}&lt;/strong>&lt;br>
+                &lt;span class="muted">${r.categoria || ""} · ${r["Città"] || ""}&lt;/span>
+            &lt;/div>`;
+        card.addEventListener("click", () => location.href = `spazio.html?id=${encodeURIComponent(r.id_spazio)}`);
+        box.appendChild(card);
+    });
+}
+
+// ====== MAPPA ======
+
+/**
+ * Inizializza la mappa Leaflet centrata sulle coordinate dello spazio di lavoro.
+ * @param {Object} coords - L'oggetto contenente latitudine, longitudine e titolo.
+ * @param {number} coords.lat - La latitudine.
+ * @param {number} coords.lng - La longitudine.
+ * @param {string} coords.title - Il titolo dello spazio.
+ */
+function initMap({ lat, lng, title }) {
+    const map = L.map("map").setView([lat, lng], 14);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: "&amp;copy; OpenStreetMap"
+    }).addTo(map);
+    L.marker([lat, lng]).addTo(map).bindPopup(title);
+}
+
+// ====== OCCUPAZIONE ======
+
+/**
+ * Calcola l'occupazione delle fasce orarie per gli ultimi 30 giorni.
+ * @async
+ * @returns {Array&lt;Object>} Un array di punti per il grafico sparkline.
+ */
+async function occupancyLast30() {
+    const end = new Date();
+    const start = new Date();
+    start.setDate(end.getDate() - 29);
+    const { data = [] } = await supabase.from("prenotazione")
+        .select("giorno, fascia_oraria")
+        .eq("id_spazio", spazioId)
+        .gte("giorno", start.toISOString().slice(0, 10))
+        .lte("giorno", end.toISOString().slice(0, 10));
+
+    const byDay = {};
+    data.forEach(r => {
+        const k = r.giorno;
+        byDay[k] = (byDay[k] || new Set());
+        byDay[k].add(String(r.fascia_oraria));
+    });
+    const points = [];
+    for (let i = 0; i &lt; 30; i++) {
+        const d = new Date(start);
+        d.setDate(start.getDate() + i);
+        const k = d.toISOString().slice(0, 10);
+        const occ = byDay[k] ?.size || 0;
+        const pct = (occ / FASCE.length) * 100;
+        points.push({ x: i, y: pct });
+    }
+    return points;
+}
+
+/**
+ * Disegna un grafico sparkline (un piccolo grafico a linea senza assi) che mostra l'occupazione.
+ * @param {Array&lt;Object>} points - Un array di punti {x, y} da disegnare.
+ */
+function drawSparkline(points) {
+    const svg = $("#sparkline");
+    if (!svg) return;
+    const maxY = 100;
+    if (!points ?.length) { svg.innerHTML = ""; return; }
+    const d = points.map((p, i) => {
+        const x = (i / (points.length - 1)) * 100;
+        const y = 24 - (p.y / maxY) * 24;
+        return `${i===0?"M":"L"} ${x.toFixed(2)} ${y.toFixed(2)}`;
+    }).join(" ");
+    svg.innerHTML = `&lt;path d="${d}" fill="none" stroke="currentColor" stroke-width="1.5">&lt;/path>`;
+}
+
+/**
+ * Formatta un numero come prezzo con simbolo di valuta.
+ * @param {number} n - Il numero da formattare.
+ * @param {string} [cur="€"] - Il simbolo della valuta.
+ * @returns {string} La stringa del prezzo formattato.
+ */
+function formatPrice(n, cur = "€") {
+    const num = Number(n);
+    return Number.isFinite(num) ? `${cur}${num.toLocaleString("it-IT")}` : "—";
+}
+// ====== RECENSIONI ======
+
+/**
+ * Carica e visualizza le recensioni per lo spazio di lavoro corrente.
+ * Calcola la media dei voti e aggiorna i badge.
+ * @async
+ */
+async function loadReviews() {
+    // 1) Prendo tutte le recensioni di questo spazio
+    const { data: recs, error } = await supabase
+        .from('recensioni')
+        .select(`
+            voto,
+            commento,
+            data_recensione,
+            registrazione:registrazione ( nome, cognome )
+        `)
+        .eq('id_spazio', spazioId)
+        .order('data_recensione', { ascending: false });
+
+    if (error) {
+        console.error('loadReviews error:', error);
+        return;
+    }
+
+    // 2) Media e count
+    const count = recs.length;
+    const avg = count ? (recs.reduce((s, r) => s + Number(r.voto || 0), 0) / count) : 0;
+
+    // summary
+    const summary = document.getElementById('reviews-summary');
+    const avgEl = document.getElementById('avg-rating');
+    const cntEl = document.getElementById('reviews-count');
+    if (summary &amp;&amp; avgEl &amp;&amp; cntEl) {
+        if (count > 0) {
+            avgEl.textContent = avg.toFixed(1);
+            cntEl.textContent = count;
+            summary.hidden = false;
+        } else {
+            summary.hidden = true;
+        }
+    }
+
+    // 3) Badge in testata
+    const badge = document.getElementById('ratingBadge');
+    const ratingValue = document.getElementById('ratingValue');
+    if (badge &amp;&amp; ratingValue) {
+        if (count > 0) {
+            ratingValue.textContent = avg.toFixed(1);
+            badge.hidden = false;
+        } else {
+            badge.hidden = true;
+        }
+    }
+
+    // 4) Lista recensioni
+    const container = document.getElementById('reviews-list');
+    container.innerHTML = '';
+    recs.forEach(r => {
+        const div = document.createElement('div');
+        div.className = 'review-item';
+        const autore = `${r.registrazione?.nome || ''} ${r.registrazione?.cognome || ''}`.trim() || 'Utente';
+        const stelle = '★'.repeat(Number(r.voto || 0)) + '☆'.repeat(5 - Number(r.voto || 0));
+        const dataIT = r.data_recensione ? new Date(r.data_recensione).toLocaleDateString('it-IT') : '';
+        div.innerHTML = `
+            &lt;div>&lt;strong>${autore}&lt;/strong> &lt;span class="review-rating">${stelle}&lt;/span>&lt;/div>
+            &lt;small>${dataIT}&lt;/small>
+            &lt;p>${(r.commento || '').replaceAll('&lt;', '&amp;lt;')}&lt;/p>
+        `;
+        container.appendChild(div);
+    });
+}
+
+// invio / aggiornamento recensione (upsert per evitare errore di vincolo unico)
+document.getElementById('submit-review')?.addEventListener('click', async () => {
+    const voto = parseInt(document.getElementById('review-rating').value, 10);
+    const commento = document.getElementById('review-comment').value.trim();
+
+    if (!user?.id) {
+        alert("Accedi per lasciare una recensione.");
+        return;
+    }
+    if (!voto || voto &lt; 1 || voto > 5 || !commento) {
+        alert("Inserisci un voto (1–5) e un commento.");
+        return;
+    }
+
+    // NB: usa onConflict con (id_spazio, id_utente) se hai creato il vincolo UNIQUE su quelle colonne
+    const { error } = await supabase
+        .from('recensioni')
+        .upsert({
+            id_spazio: spazioId,
+            id_utente: user.id, // deve combaciare con registrazione.id
+            voto,
+            commento,
+            data_recensione: new Date().toISOString()
+        }, { onConflict: 'id_spazio,id_utente' });
+
+    if (error) {
+        console.error('submit review error:', error);
+        alert("Errore durante l'invio.");
+        return;
+    }
+
+    document.getElementById('review-rating').value = '';
+    document.getElementById('review-comment').value = '';
+    await loadReviews();
+});
+
+// carica anche le recensioni all’avvio pagina
+document.addEventListener("DOMContentLoaded", loadReviews);</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#$">$</a></li><li><a href="global.html#FASCE">FASCE</a></li><li><a href="global.html#accedi">accedi</a></li><li><a href="global.html#aggiungiMarker">aggiungiMarker</a></li><li><a href="global.html#aggiungiSpazio">aggiungiSpazio</a></li><li><a href="global.html#annullaVerificaEmail">annullaVerificaEmail</a></li><li><a href="global.html#apriPopup">apriPopup</a></li><li><a href="global.html#apriPopupEmail">apriPopupEmail</a></li><li><a href="global.html#apriPopupPassword">apriPopupPassword</a></li><li><a href="global.html#apriPopupResetPassword">apriPopupResetPassword</a></li><li><a href="global.html#bindCTA">bindCTA</a></li><li><a href="global.html#calcolaOreTotali">calcolaOreTotali</a></li><li><a href="global.html#caricaAvatarDaDB">caricaAvatarDaDB</a></li><li><a href="global.html#caricaAvatarUtente">caricaAvatarUtente</a></li><li><a href="global.html#caricaDatiCliente">caricaDatiCliente</a></li><li><a href="global.html#caricaSpazi">caricaSpazi</a></li><li><a href="global.html#checkLogin">checkLogin</a></li><li><a href="global.html#chiudiPopup">chiudiPopup</a></li><li><a href="global.html#chiudiPopupEmail">chiudiPopupEmail</a></li><li><a href="global.html#chiudiPopupPassword">chiudiPopupPassword</a></li><li><a href="global.html#clearError">clearError</a></li><li><a href="global.html#createInput">createInput</a></li><li><a href="global.html#date">date</a></li><li><a href="global.html#differenzaOre">differenzaOre</a></li><li><a href="global.html#drawSparkline">drawSparkline</a></li><li><a href="global.html#editMode">editMode</a></li><li><a href="global.html#elements">elements</a></li><li><a href="global.html#email">email</a></li><li><a href="global.html#eventClick">eventClick</a></li><li><a href="global.html#fascia">fascia</a></li><li><a href="global.html#fasciaOrariaToString">fasciaOrariaToString</a></li><li><a href="global.html#fetchAllTimeData">fetchAllTimeData</a></li><li><a href="global.html#fetchDashboardData">fetchDashboardData</a></li><li><a href="global.html#fetchInternalDashboardData">fetchInternalDashboardData</a></li><li><a href="global.html#formatPrice">formatPrice</a></li><li><a href="global.html#gestore_id">gestore_id</a></li><li><a href="global.html#giorno">giorno</a></li><li><a href="global.html#handleLogout">handleLogout</a></li><li><a href="global.html#handleProfile">handleProfile</a></li><li><a href="global.html#home">home</a></li><li><a href="global.html#idPagamento">idPagamento</a></li><li><a href="global.html#id_gestore">id_gestore</a></li><li><a href="global.html#initDateInputs">initDateInputs</a></li><li><a href="global.html#initMap">initMap</a></li><li><a href="global.html#inizializzaMappa">inizializzaMappa</a></li><li><a href="global.html#insericiPagamento">insericiPagamento</a></li><li><a href="global.html#inserisciPrenotazione">inserisciPrenotazione</a></li><li><a href="global.html#isLoggedIn">isLoggedIn</a></li><li><a href="global.html#loadRelated">loadRelated</a></li><li><a href="global.html#loadReviews">loadReviews</a></li><li><a href="global.html#loadSpazio">loadSpazio</a></li><li><a href="global.html#loadSpazioData">loadSpazioData</a></li><li><a href="global.html#login">login</a></li><li><a href="global.html#map">map</a></li><li><a href="global.html#markers">markers</a></li><li><a href="global.html#modificaDatiGenerali">modificaDatiGenerali</a></li><li><a href="global.html#modificaSpazio">modificaSpazio</a></li><li><a href="global.html#mostraPopupDecisione">mostraPopupDecisione</a></li><li><a href="global.html#mostraPopupVerifica">mostraPopupVerifica</a></li><li><a href="global.html#mostraSpazi">mostraSpazi</a></li><li><a href="global.html#name">name</a></li><li><a href="global.html#navigate">navigate</a></li><li><a href="global.html#occupancyLast30">occupancyLast30</a></li><li><a href="global.html#openDashboardGestore">openDashboardGestore</a></li><li><a href="global.html#orario">orario</a></li><li><a href="global.html#params">params</a></li><li><a href="global.html#passwordInput">passwordInput</a></li><li><a href="global.html#prenotList">prenotList</a></li><li><a href="global.html#prenotazioneDate">prenotazioneDate</a></li><li><a href="global.html#prezzo">prezzo</a></li><li><a href="global.html#prezzoAttuale">prezzoAttuale</a></li><li><a href="global.html#refreshAvailability">refreshAvailability</a></li><li><a href="global.html#registrati">registrati</a></li><li><a href="global.html#registrationForm">registrationForm</a></li><li><a href="global.html#renderBarChart">renderBarChart</a></li><li><a href="global.html#renderGallery">renderGallery</a></li><li><a href="global.html#renderLineChart">renderLineChart</a></li><li><a href="global.html#renderLineChartSimple">renderLineChartSimple</a></li><li><a href="global.html#renderPieChart">renderPieChart</a></li><li><a href="global.html#renderServizi">renderServizi</a></li><li><a href="global.html#requireUserRole">requireUserRole</a></li><li><a href="global.html#rimuoviSpazio">rimuoviSpazio</a></li><li><a href="global.html#saveUser">saveUser</a></li><li><a href="global.html#scaricaCSV">scaricaCSV</a></li><li><a href="global.html#searchSpaces">searchSpaces</a></li><li><a href="global.html#selectedSlots">selectedSlots</a></li><li><a href="global.html#selezionaAvatar">selezionaAvatar</a></li><li><a href="global.html#setLoading">setLoading</a></li><li><a href="global.html#setText">setText</a></li><li><a href="global.html#showEditPopup">showEditPopup</a></li><li><a href="global.html#showError">showError</a></li><li><a href="global.html#showEventPopup">showEventPopup</a></li><li><a href="global.html#spazi">spazi</a></li><li><a href="global.html#spazioId">spazioId</a></li><li><a href="global.html#spazioIdAttuale">spazioIdAttuale</a></li><li><a href="global.html#stripe">stripe</a></li><li><a href="global.html#supabase">supabase</a></li><li><a href="global.html#supabaseKey">supabaseKey</a></li><li><a href="global.html#supabaseUrl">supabaseUrl</a></li><li><a href="global.html#testDbConnection">testDbConnection</a></li><li><a href="global.html#timeout">timeout</a></li><li><a href="global.html#toggleCTA">toggleCTA</a></li><li><a href="global.html#togglePassword">togglePassword</a></li><li><a href="global.html#togglePasswordVisibility">togglePasswordVisibility</a></li><li><a href="global.html#toggleProfileMenu">toggleProfileMenu</a></li><li><a href="global.html#updatePreviewCarousel">updatePreviewCarousel</a></li><li><a href="global.html#updateProfileMenu">updateProfileMenu</a></li><li><a href="global.html#uploadSpazioImages">uploadSpazioImages</a></li><li><a href="global.html#user">user</a></li><li><a href="global.html#valuta">valuta</a></li><li><a href="global.html#viewBookings">viewBookings</a></li><li><a href="global.html#waitForPrenotazione">waitForPrenotazione</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Fri Aug 29 2025 12:33:56 GMT+0200 (Ora legale dell’Europa centrale)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: dashboard_gestore.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: dashboard_gestore.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @file Gestisce le funzionalità di modifica del profilo utente, inclusi email, password,
+ * e la visualizzazione di popup informativi e di decisione.
+ * @author Simone Marino, Nicola Pichierri, Manuel Gjolaj, Mattia Statti
+ */
+// Importa l'istanza di Supabase
+import { supabase } from '/js/collegamentoDb.js';
+
+// Ottiene l'ID utente dal localStorage. Se non esiste, il codice non procede.
+const userId = localStorage.getItem('user');
+const user = JSON.parse(localStorage.getItem('user'))?.id;
+
+/**
+ * Funzione principale per recuperare i dati e renderizzare la dashboard.
+ * Gestisce il recupero degli spazi, delle prenotazioni e dei pagamenti.
+ */
+async function fetchDashboardData() {
+    // Esci se l'utente non è loggato.
+    if (!userId) return;
+
+    // Calcola l'inizio del mese corrente per filtrare le prenotazioni.
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
+
+    // 1. Ottiene tutti gli spazi del gestore loggato.
+    const { data: spazi, error: spaziError } = await supabase
+        .from('spazi_lavoro')
+        .select('id_spazio, categoria, id_gestore, categoria, indirizzo_spazio, numero_civico, città, prezzo_ora')
+        .eq('id_gestore', user);
+
+    if (spaziError) return console.error('Errore spazi:', spaziError);
+
+    // --- Rendering dinamico delle card degli spazi ---
+    const container = document.getElementById('spazi-cards-container');
+    container.innerHTML = ''; // Pulisce il container prima di aggiungere nuove card
+
+    spazi.forEach(spazio => {
+        const card = document.createElement('div');
+        card.className = 'action-card spazio-card';
+        card.onclick = () => {
+            window.location.href = `/html/contenuti_gestore/modifica_spazio.html?id_spazio=${spazio.id_spazio}`;
+        };
+
+        let emoji = '​💼​';
+        if (spazio.categoria === 'sala riunioni') emoji = '📞​';
+        else if (spazio.categoria === 'postazione coworking') emoji = '💻';
+
+        card.innerHTML = `
+            &lt;div class="card-icon">${emoji}&lt;/div>
+            &lt;h3 class="card-title">${spazio.id_spazio}&lt;/h3>
+            &lt;p class="card-description">
+                &lt;strong>${spazio.categoria}&lt;/strong> in ${spazio.indirizzo_spazio} ${spazio.numero_civico}, ${spazio.città}, costo ${spazio.prezzo_ora}€ &lt;br>
+            &lt;/p>
+        `;
+        container.appendChild(card);
+    });
+
+    // Card per aggiunta spazio
+    const aggiungiCard = document.createElement('div');
+    aggiungiCard.className = 'action-card';
+    aggiungiCard.id = 'aggiungi-spazio-card';
+    aggiungiCard.innerHTML = `
+        &lt;div class="card-icon">➕&lt;/div>
+        &lt;h3 class="card-title">Aggiungi Spazio&lt;/h3>
+        &lt;p class="card-description">Crea un nuovo spazio di coworking e inseriscilo nella rete.&lt;/p>
+    `;
+    aggiungiCard.onclick = () => {
+        window.location.href = '/html/contenuti_gestore/crea_nuovo_spazio.html';
+    };
+    container.appendChild(aggiungiCard);
+
+    // Estrae gli ID degli spazi per le query successive
+    const spazioIds = spazi.map(s => s.id_spazio);
+    if (spazioIds.length === 0) return console.log('Nessuno spazio trovato per il gestore');
+
+    // 2. Ottiene le prenotazioni del mese in corso per gli spazi del gestore
+    const { data: prenotazioni, error: prenotazioniError } = await supabase
+        .from('prenotazione')
+        .select('id_prenotazione, id_spazio, fascia_oraria, giorno')
+        .in('id_spazio', spazioIds)
+        .gte('giorno', startOfMonth);
+
+    if (prenotazioniError) return console.error('Errore prenotazioni:', prenotazioniError);
+
+    // Se non ci sono prenotazioni, esci
+    if (prenotazioni.length === 0) {
+        console.log('Nessuna prenotazione nel mese corrente');
+        return;
+    }
+
+    // Estrae gli ID delle prenotazioni per la query sui pagamenti
+    const prenotazioneIds = prenotazioni.map(p => p.id_prenotazione);
+
+    // 3. Ottiene i pagamenti relativi alle prenotazioni del mese
+    const { data: pagamenti, error: pagamentiError } = await supabase
+        .from('pagamenti')
+        .select('id_prenotazione, importo')
+        .in('id_prenotazione', prenotazioneIds);
+
+    if (pagamentiError) return console.error('Errore pagamenti:', pagamentiError);
+
+    // === CALCOLO E AGGREGAZIONE DATI PER I GRAFICI E I CONTATORI ===
+
+    // === GUADAGNI PER SPAZIO ===
+    const guadagniPerSpazio = {};
+    prenotazioni.forEach(p => {
+        const importo = pagamenti.find(pg => pg.id_prenotazione === p.id_prenotazione)?.importo || 0;
+        guadagniPerSpazio[p.id_spazio] = (guadagniPerSpazio[p.id_spazio] || 0) + importo;
+    });
+
+    // === TOTALE GUADAGNI ===
+    const totaleGuadagni = pagamenti.reduce((acc, pg) => acc + (pg.importo || 0), 0);
+    console.log('Totale guadagni:', totaleGuadagni);
+
+    // === CONTEGGIO PRENOTAZIONI PER CATEGORIA ===
+    const categoriaPerSpazio = Object.fromEntries(spazi.map(s => [s.id_spazio, s.categoria]));
+    const categoriaCount = {};
+    prenotazioni.forEach(p => {
+        const cat = categoriaPerSpazio[p.id_spazio];
+        if (cat) categoriaCount[cat] = (categoriaCount[cat] || 0) + 1;
+    });
+
+    // === FASCE ORARIE PIÙ PRENOTATE ===
+    // Aggrega i conteggi delle fasce orarie in un oggetto { fascia: conteggio }
+    const fasciaOrariaCount = {};
+    prenotazioni.forEach(p => {
+        const fascia = p.fascia_oraria;
+        if (fascia) fasciaOrariaCount[fascia] = (fasciaOrariaCount[fascia] || 0) + 1;
+    });
+
+    // === SPAZIO PIÙ PRENOTATO ===
+    const prenotazioniPerSpazio = {};
+    prenotazioni.forEach(p => {
+        prenotazioniPerSpazio[p.id_spazio] = (prenotazioniPerSpazio[p.id_spazio] || 0) + 1;
+    });
+
+    // Trova l'id_spazio con il maggior numero di prenotazioni
+    let maxPrenotazioni = 0;
+    let idSpazioPiuPrenotato = null;
+    for (const [id, count] of Object.entries(prenotazioniPerSpazio)) {
+        if (count > maxPrenotazioni) {
+            maxPrenotazioni = count;
+            idSpazioPiuPrenotato = id;
+        }
+    }
+
+    // Trova il nome dello spazio più prenotato
+    const spazioPiuPrenotatoNome = spazi.find(s => s.id_spazio === idSpazioPiuPrenotato)?.id_spazio || 'N/A';
+    console.log('Spazio più prenotato:', spazioPiuPrenotatoNome);
+
+    // === TOTALE PRENOTAZIONI ===
+    const totalePrenotazioni = prenotazioni.length;
+    console.log('Totale prenotazioni:', totalePrenotazioni);
+
+    // --- Rendering dei grafici e dei contatori ---
+    // Questi grafici usano i dati già raggruppati, quindi non hanno bisogno di 'datiOrario'
+    renderPieChart('chart-guadagni', guadagniPerSpazio, 'Guadagni per spazio');
+    renderPieChart('chart-categorie', categoriaCount, 'Prenotazioni per categoria');
+
+    // Per questo grafico, 'fasciaOrariaCount' è già un oggetto raggruppato
+    // Non è necessario usare 'datiOrario' per questa operazione, ma lo lasciamo per coerenza con la logica precedente
+    renderPieChart('chart-fasce-orarie', fasciaOrariaCount, 'Prenotazioni per fascia oraria');
+
+    // Aggiorna i contatori nel DOM
+    document.getElementById('counter-prenotazioni').innerText = totalePrenotazioni;
+    document.getElementById('counter-guadagni').innerText = totaleGuadagni.toFixed(2) + ' €';
+    document.getElementById('counter-spazio-piu-prenotato').innerText = spazioPiuPrenotatoNome;
+}
+
+/**
+ * Funzione per creare i grafici a torta.
+ * @param {string} canvasId - L'ID del canvas del grafico.
+ * @param {object} data - Un oggetto con i dati (chiave-valore).
+ * @param {string} title - Il titolo del grafico.
+ */
+function renderPieChart(canvasId, data, title) {
+    const ctx = document.getElementById(canvasId).getContext('2d');
+    new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: Object.keys(data),
+            datasets: [{
+                data: Object.values(data),
+                backgroundColor: [
+                    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'
+                ],
+                borderWidth: "0.5"
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: title,
+                    color: 'white'
+                },
+                legend: {
+                    labels: {
+                        color: 'white'
+                    },
+                    position: 'bottom',
+                }
+            }
+        }
+    });
+}
+
+// Avvia il recupero dei dati quando il DOM è completamente caricato
+window.addEventListener('DOMContentLoaded', () => {
+    fetchDashboardData();
+});</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#$">$</a></li><li><a href="global.html#FASCE">FASCE</a></li><li><a href="global.html#accedi">accedi</a></li><li><a href="global.html#aggiungiMarker">aggiungiMarker</a></li><li><a href="global.html#aggiungiSpazio">aggiungiSpazio</a></li><li><a href="global.html#annullaVerificaEmail">annullaVerificaEmail</a></li><li><a href="global.html#apriPopup">apriPopup</a></li><li><a href="global.html#apriPopupEmail">apriPopupEmail</a></li><li><a href="global.html#apriPopupPassword">apriPopupPassword</a></li><li><a href="global.html#apriPopupResetPassword">apriPopupResetPassword</a></li><li><a href="global.html#bindCTA">bindCTA</a></li><li><a href="global.html#calcolaOreTotali">calcolaOreTotali</a></li><li><a href="global.html#caricaAvatarDaDB">caricaAvatarDaDB</a></li><li><a href="global.html#caricaAvatarUtente">caricaAvatarUtente</a></li><li><a href="global.html#caricaDatiCliente">caricaDatiCliente</a></li><li><a href="global.html#caricaSpazi">caricaSpazi</a></li><li><a href="global.html#checkLogin">checkLogin</a></li><li><a href="global.html#chiudiPopup">chiudiPopup</a></li><li><a href="global.html#chiudiPopupEmail">chiudiPopupEmail</a></li><li><a href="global.html#chiudiPopupPassword">chiudiPopupPassword</a></li><li><a href="global.html#clearError">clearError</a></li><li><a href="global.html#createInput">createInput</a></li><li><a href="global.html#date">date</a></li><li><a href="global.html#differenzaOre">differenzaOre</a></li><li><a href="global.html#drawSparkline">drawSparkline</a></li><li><a href="global.html#editMode">editMode</a></li><li><a href="global.html#elements">elements</a></li><li><a href="global.html#email">email</a></li><li><a href="global.html#eventClick">eventClick</a></li><li><a href="global.html#fascia">fascia</a></li><li><a href="global.html#fasciaOrariaToString">fasciaOrariaToString</a></li><li><a href="global.html#fetchAllTimeData">fetchAllTimeData</a></li><li><a href="global.html#fetchDashboardData">fetchDashboardData</a></li><li><a href="global.html#fetchInternalDashboardData">fetchInternalDashboardData</a></li><li><a href="global.html#formatPrice">formatPrice</a></li><li><a href="global.html#gestore_id">gestore_id</a></li><li><a href="global.html#giorno">giorno</a></li><li><a href="global.html#handleLogout">handleLogout</a></li><li><a href="global.html#handleProfile">handleProfile</a></li><li><a href="global.html#home">home</a></li><li><a href="global.html#idPagamento">idPagamento</a></li><li><a href="global.html#id_gestore">id_gestore</a></li><li><a href="global.html#initDateInputs">initDateInputs</a></li><li><a href="global.html#initMap">initMap</a></li><li><a href="global.html#inizializzaMappa">inizializzaMappa</a></li><li><a href="global.html#insericiPagamento">insericiPagamento</a></li><li><a href="global.html#inserisciPrenotazione">inserisciPrenotazione</a></li><li><a href="global.html#isLoggedIn">isLoggedIn</a></li><li><a href="global.html#loadRelated">loadRelated</a></li><li><a href="global.html#loadReviews">loadReviews</a></li><li><a href="global.html#loadSpazio">loadSpazio</a></li><li><a href="global.html#loadSpazioData">loadSpazioData</a></li><li><a href="global.html#login">login</a></li><li><a href="global.html#map">map</a></li><li><a href="global.html#markers">markers</a></li><li><a href="global.html#modificaDatiGenerali">modificaDatiGenerali</a></li><li><a href="global.html#modificaSpazio">modificaSpazio</a></li><li><a href="global.html#mostraPopupDecisione">mostraPopupDecisione</a></li><li><a href="global.html#mostraPopupVerifica">mostraPopupVerifica</a></li><li><a href="global.html#mostraSpazi">mostraSpazi</a></li><li><a href="global.html#name">name</a></li><li><a href="global.html#navigate">navigate</a></li><li><a href="global.html#occupancyLast30">occupancyLast30</a></li><li><a href="global.html#openDashboardGestore">openDashboardGestore</a></li><li><a href="global.html#orario">orario</a></li><li><a href="global.html#params">params</a></li><li><a href="global.html#passwordInput">passwordInput</a></li><li><a href="global.html#prenotList">prenotList</a></li><li><a href="global.html#prenotazioneDate">prenotazioneDate</a></li><li><a href="global.html#prezzo">prezzo</a></li><li><a href="global.html#prezzoAttuale">prezzoAttuale</a></li><li><a href="global.html#refreshAvailability">refreshAvailability</a></li><li><a href="global.html#registrati">registrati</a></li><li><a href="global.html#registrationForm">registrationForm</a></li><li><a href="global.html#renderBarChart">renderBarChart</a></li><li><a href="global.html#renderGallery">renderGallery</a></li><li><a href="global.html#renderLineChart">renderLineChart</a></li><li><a href="global.html#renderLineChartSimple">renderLineChartSimple</a></li><li><a href="global.html#renderPieChart">renderPieChart</a></li><li><a href="global.html#renderServizi">renderServizi</a></li><li><a href="global.html#requireUserRole">requireUserRole</a></li><li><a href="global.html#rimuoviSpazio">rimuoviSpazio</a></li><li><a href="global.html#saveUser">saveUser</a></li><li><a href="global.html#scaricaCSV">scaricaCSV</a></li><li><a href="global.html#searchSpaces">searchSpaces</a></li><li><a href="global.html#selectedSlots">selectedSlots</a></li><li><a href="global.html#selezionaAvatar">selezionaAvatar</a></li><li><a href="global.html#setLoading">setLoading</a></li><li><a href="global.html#setText">setText</a></li><li><a href="global.html#showEditPopup">showEditPopup</a></li><li><a href="global.html#showError">showError</a></li><li><a href="global.html#showEventPopup">showEventPopup</a></li><li><a href="global.html#spazi">spazi</a></li><li><a href="global.html#spazioId">spazioId</a></li><li><a href="global.html#spazioIdAttuale">spazioIdAttuale</a></li><li><a href="global.html#stripe">stripe</a></li><li><a href="global.html#supabase">supabase</a></li><li><a href="global.html#supabaseKey">supabaseKey</a></li><li><a href="global.html#supabaseUrl">supabaseUrl</a></li><li><a href="global.html#testDbConnection">testDbConnection</a></li><li><a href="global.html#timeout">timeout</a></li><li><a href="global.html#toggleCTA">toggleCTA</a></li><li><a href="global.html#togglePassword">togglePassword</a></li><li><a href="global.html#togglePasswordVisibility">togglePasswordVisibility</a></li><li><a href="global.html#toggleProfileMenu">toggleProfileMenu</a></li><li><a href="global.html#updatePreviewCarousel">updatePreviewCarousel</a></li><li><a href="global.html#updateProfileMenu">updateProfileMenu</a></li><li><a href="global.html#uploadSpazioImages">uploadSpazioImages</a></li><li><a href="global.html#user">user</a></li><li><a href="global.html#valuta">valuta</a></li><li><a href="global.html#viewBookings">viewBookings</a></li><li><a href="global.html#waitForPrenotazione">waitForPrenotazione</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Fri Aug 29 2025 12:33:56 GMT+0200 (Ora legale dell’Europa centrale)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

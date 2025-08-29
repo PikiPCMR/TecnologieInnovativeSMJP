@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: profilo.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: profilo.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @file Gestisce la visualizzazione e la modifica del profilo utente (cliente o gestore),
+ * inclusa la gestione delle prenotazioni, dei dati personali e delle opzioni di sicurezza.
+ * @author Simone Marino, Nicola Pichierri, Manuel Gjolaj, Mattia Statti
+ */
+
+// CONFIGURAZIONE SUPABASE
+import { supabase } from '/js/collegamentoDb.js';
+console.log('Supabase client:', supabase);
+
+
+console.log("USER:", JSON.parse(localStorage.getItem('user')));
+
+document.addEventListener("DOMContentLoaded", () => {
+    caricaDatiCliente();
+    navigate('prenotazioni');
+    // Mostra popup finale solo se richiesto da localStorage
+    const popupFlag = localStorage.getItem("mostraPopupDecisione");
+    if (popupFlag === "true") {
+        localStorage.removeItem("mostraPopupDecisione"); // usalo solo una volta
+        mostraPopupDecisione(JSON.parse(localStorage.getItem("user")));
+    }
+});
+
+// === CARICA PROFILO ===
+/**
+ * Carica e visualizza i dati del profilo utente sulla pagina.
+ * Recupera le informazioni dall'oggetto 'user' nel localStorage.
+ */
+export function caricaDatiCliente() {
+
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (!user || !user.id) {
+        console.warn('⚠️ Nessun utente loggato, esco dalla funzione.');
+        return;
+    }
+
+    const avatarSrc = user.avatarUrl || 'https://sbxrdptjegjxqaklfpxq.supabase.co/storage/v1/object/public/immaginiprofilo//user1.png';
+    document.getElementById('avatar').src = avatarSrc;
+    document.getElementById('avatar').addEventListener('click', () => apriPopup(avatarSrc));
+
+    const saluto = document.getElementById("salutoUtente");
+    if (user.nome === null || user.nome === '') {
+        saluto.textContent = `Ciao, ${user.id}`;
+    } else {
+        saluto.textContent = `Ciao, ${user.nome}`;
+    }
+
+    if (user.tipo_utente === "gestore") {
+        const media = user.rating || 'N/A';
+        const count = user.reviewsCount || 0;
+        document.getElementById("mediaRecensioni").textContent = `⭐ ${media} (${count} recensioni)`;
+    } else {
+        document.getElementById("mediaRecensioni").style.display = "none";
+    }
+}
+window.caricaDatiCliente = caricaDatiCliente;
+
+// === LOGO WORKSPACE PRO DINAMICO ===
+document.addEventListener("DOMContentLoaded", () => {
+    const logoLink = document.querySelector('.logo-link');
+    const user = JSON.parse(localStorage.getItem('user'));
+    logoLink.href = user?.tipo_utente === 'gestore' ? '/html/dashboard_gestore.html' : '/html/index.html';
+});
+
+/**
+ * Genera e scarica un file CSV con i dati delle prenotazioni.
+ * @param {Array&lt;Object>} prenotazioni - L'array di oggetti contenente i dati delle prenotazioni.
+ * @param {string} tipoUtente - Il tipo di utente ("gestore" o "cliente") per determinare le intestazioni del CSV.
+ */
+function scaricaCSV(prenotazioni, tipoUtente) {
+    let intestazioni = tipoUtente === "gestore"
+        ? ["ID Prenotazione", "Utente", "Spazio", "Giorno", "Orario"]
+        : ["ID Prenotazione", "Spazio", "Giorno", "Orario"];
+
+    let righe = prenotazioni.map(p => 
+        tipoUtente === "gestore"
+            ? [p.id_prenotazione, p.id_utente, p.id_spazio, p.giorno, p.fascia_oraria]
+            : [p.id_prenotazione, p.id_spazio, p.giorno, p.fascia_oraria]
+    );
+
+    // Unisco intestazioni e righe
+    let csvContent = [intestazioni, ...righe]
+        .map(r => r.join(","))
+        .join("\n");
+
+    // Creazione blob CSV
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+
+    // Download automatico
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", "prenotazioni.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+// === NAVIGAZIONE SEZIONI ===
+/**
+ * Naviga tra le diverse sezioni del profilo utente (prenotazioni, dati generali, sicurezza).
+ * Carica i contenuti dinamici in base alla sezione selezionata.
+ * @async
+ * @param {string} sezione - Il nome della sezione da visualizzare ('prenotazioni', 'generali', 'sicurezza').
+ */
+export async function navigate(sezione) {
+    const cont = document.getElementById('section-content');
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (!user?.id) return;
+
+    switch (sezione) {
+        case 'prenotazioni':
+            cont.innerHTML = `
+                &lt;h2>PRENOTAZIONI&lt;/h2>
+                &lt;button id="downloadCSV" display:none;">📥 Scarica CSV&lt;/button>
+                &lt;ul id="prenotazioniList">Caricamento...&lt;/ul>
+            `;
+
+            const list = document.getElementById('prenotazioniList');
+            const btnCSV = document.getElementById('downloadCSV');
+
+            // Data di oggi in formato YYYY-MM-DD
+            const oggi = new Date().toISOString().split("T")[0];
+
+            let prenotazioni = [];
+            let error = null;
+
+            if (user.tipo_utente === 'gestore') {
+                // Recupero prenotazioni future per gestore
+                ({ data: prenotazioni, error } = await supabase
+                    .from('prenotazione')
+                    .select(`
+                        id_prenotazione,
+                        id_utente,
+                        id_spazio,
+                        giorno,
+                        fascia_oraria,
+                        spazi_lavoro!inner (
+                            id_spazio,
+                            id_gestore
+                        )
+                    `)
+                    .eq('spazi_lavoro.id_gestore', user.id)
+                    .gte('giorno', oggi)  // &lt;-- filtro prenotazioni future
+                );
+
+                list.innerHTML = (error || !prenotazioni?.length)
+                    ? '&lt;li>Nessuna prenotazione trovata.&lt;/li>'
+                    : prenotazioni.map(p => `
+                        &lt;li>
+                            &lt;strong>Utente:&lt;/strong> ${p.id_utente} &lt;br>
+                            &lt;strong>Spazio:&lt;/strong> ${p.id_spazio} &lt;br>
+                            &lt;strong>Giorno:&lt;/strong> ${p.giorno} &lt;br>
+                            &lt;strong>Orario:&lt;/strong> ${p.fascia_oraria}
+                        &lt;/li>
+                    `).join('');
+
+            } else {
+                // Caso utente normale → mostra solo le sue prenotazioni future
+                ({ data: prenotazioni, error } = await supabase
+                    .from('prenotazione')
+                    .select('*')
+                    .eq('id_utente', user.id)
+                    .gte('giorno', oggi)  // &lt;-- filtro prenotazioni future
+                );
+
+                list.innerHTML = (error || !prenotazioni?.length)
+                    ? '&lt;li>Nessuna prenotazione trovata.&lt;/li>'
+                    : prenotazioni.map(p => `
+                        &lt;li>
+                            &lt;strong>Spazio:&lt;/strong> ${p.id_spazio} &lt;br>
+                            &lt;strong>Giorno:&lt;/strong> ${p.giorno} &lt;br>
+                            &lt;strong>Orario:&lt;/strong> ${p.fascia_oraria}
+                        &lt;/li>
+                    `).join('');
+            }
+
+            // Se ci sono prenotazioni, mostro il pulsante CSV
+            if (prenotazioni?.length) {
+                btnCSV.style.display = "inline-block";
+                btnCSV.addEventListener("click", () => scaricaCSV(prenotazioni, user.tipo_utente));
+            }
+
+            break;
+
+
+        case 'generali':
+            cont.innerHTML = `
+                &lt;h2>DATI GENERALI&lt;/h2>
+                &lt;div class="dati-box">
+                    &lt;div class="dato">&lt;strong>Username:&lt;/strong> ${user.id}&lt;/div>
+                    &lt;div class="dato">&lt;strong>Nome:&lt;/strong> ${user.nome}&lt;/div>
+                    &lt;div class="dato">&lt;strong>Cognome:&lt;/strong> ${user.cognome}&lt;/div>
+                    &lt;div class="dato">&lt;strong>Indirizzo:&lt;/strong> ${user.indirizzo}&lt;/div>
+                    &lt;div class="dato">&lt;strong>Telefono:&lt;/strong> ${user.numero_telefono || 'Non fornito'}&lt;/div>
+                &lt;/div>
+                &lt;button class="btn-edit" style="margin-top: 20px;" onclick="modificaDatiGenerali()">Modifica Dati&lt;/button>
+            `;
+            break;
+
+        case 'sicurezza':
+            cont.innerHTML = `
+                &lt;h2>ACCESSO &amp; SICUREZZA&lt;/h2>
+                &lt;div class="dati-box">
+                    &lt;div class="dato">&lt;strong>Email:&lt;/strong> ${user.email}
+                        &lt;button class="btn-edit" style="margin-left: 10px;" onclick="apriPopupEmail()">Modifica&lt;/button>
+                    &lt;/div>
+                    &lt;div class="dato">
+                        &lt;button class="btn-edit" onclick="apriPopupPassword()">Cambia password&lt;/button>
+                    &lt;/div>
+                    &lt;div class="dato">
+                        &lt;button class="btn-edit" onclick="apriPopupResetPassword()">Reset Password&lt;/button>
+                    &lt;/div>
+                &lt;/div>
+            `;
+            break;
+
+        default:
+            cont.innerHTML = `&lt;p>Sezione "${sezione}" non trovata.&lt;/p>`;
+    }
+}
+window.navigate = navigate;
+
+// va in modifica_dati.js
+/**
+ * Crea un elemento di input HTML per un modulo di modifica dati.
+ * @param {string} name - L'attributo 'name' e 'id' dell'input.
+ * @param {string} label - L'etichetta visualizzata per l'input.
+ * @param {string} [value=''] - Il valore predefinito dell'input.
+ * @param {string} [type='text'] - Il tipo di input (es. 'text', 'password').
+ * @returns {string} La stringa HTML dell'elemento di input.
+ */
+function createInput(name, label, value = '', type = 'text') {
+    return `
+        &lt;div class="form-group">
+            &lt;label for="${name}">${label}&lt;/label>
+            &lt;input type="${type}" id="${name}" name="${name}" value="${value}" />
+        &lt;/div>
+    `;
+}
+// === MODIFICA DATI GENERALI ===
+/**
+ * Reindirizza l'interfaccia utente al modulo di modifica dei dati generali.
+ * Prepopola i campi del modulo con i dati dell'utente dal localStorage.
+ * Gestisce l'invio del modulo, aggiornando il database e il localStorage.
+ * @async
+ */
+export function modificaDatiGenerali() {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const cont = document.getElementById('section-content');
+
+    cont.innerHTML = `
+        &lt;h2>Modifica Dati Generali&lt;/h2>
+        &lt;form id="form-modifica-dati" class="form-modifica">
+            ${createInput('username', 'Username', user.id)}
+            ${createInput('nome', 'Nome', user.nome)}
+            ${createInput('cognome', 'Cognome', user.cognome)}
+            ${createInput('indirizzo', 'Indirizzo', user.indirizzo || '')}
+            ${createInput('telefono', 'Telefono', user.numero_telefono || '')}
+            &lt;button type="submit" class="btn-edit">Salva Modifiche&lt;/button>
+        &lt;/form>
+    `;
+
+    document.getElementById('form-modifica-dati').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const form = e.target;
+        const nuovoUsername = form.username.value.trim();
+        const updatedUser = {
+            id: nuovoUsername,
+            nome: form.nome.value,
+            cognome: form.cognome.value,
+            indirizzo: form.indirizzo.value,
+            numero_telefono: form.telefono.value
+        };
+
+        // Controllo username già esistente (escludendo il proprio)
+        if (nuovoUsername !== user.id) {
+            const { data: utentiStessoUsername, error: usernameError } = await supabase
+                .from('registrazione')
+                .select('id')
+                .eq('id', nuovoUsername)
+                .neq('id', user.id);
+
+            if (usernameError) {
+                alert("Errore nel controllo username.");
+                console.error(usernameError);
+                return;
+            }
+
+            if (utentiStessoUsername.length > 0) {
+                alert("Questo username è già in uso. Scegli un altro username.");
+                return;
+            }
+        }
+
+        const { error } = await supabase
+            .from('registrazione')
+            .update(updatedUser)
+            .eq('id', user.id);
+
+        if (error) {
+            alert("Errore durante il salvataggio nel database.");
+            console.error(error);
+            return;
+        }
+
+        // Aggiorna localStorage e saluto
+        const nuovoUtente = { ...user, ...updatedUser };
+        localStorage.setItem('user', JSON.stringify(nuovoUtente));
+        document.getElementById('salutoUtente').textContent = `Ciao, ${nuovoUtente.nome}`;
+        caricaDatiCliente();
+        navigate('generali');
+    });
+}
+window.modificaDatiGenerali = modificaDatiGenerali;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#annullaVerificaEmail">annullaVerificaEmail</a></li><li><a href="global.html#apriPopup">apriPopup</a></li><li><a href="global.html#apriPopupEmail">apriPopupEmail</a></li><li><a href="global.html#apriPopupPassword">apriPopupPassword</a></li><li><a href="global.html#apriPopupResetPassword">apriPopupResetPassword</a></li><li><a href="global.html#caricaAvatarDaDB">caricaAvatarDaDB</a></li><li><a href="global.html#caricaAvatarUtente">caricaAvatarUtente</a></li><li><a href="global.html#caricaDatiCliente">caricaDatiCliente</a></li><li><a href="global.html#chiudiPopup">chiudiPopup</a></li><li><a href="global.html#chiudiPopupEmail">chiudiPopupEmail</a></li><li><a href="global.html#chiudiPopupPassword">chiudiPopupPassword</a></li><li><a href="global.html#createInput">createInput</a></li><li><a href="global.html#login">login</a></li><li><a href="global.html#modificaDatiGenerali">modificaDatiGenerali</a></li><li><a href="global.html#mostraPopupDecisione">mostraPopupDecisione</a></li><li><a href="global.html#mostraPopupVerifica">mostraPopupVerifica</a></li><li><a href="global.html#navigate">navigate</a></li><li><a href="global.html#passwordInput">passwordInput</a></li><li><a href="global.html#registrationForm">registrationForm</a></li><li><a href="global.html#requireUserRole">requireUserRole</a></li><li><a href="global.html#saveUser">saveUser</a></li><li><a href="global.html#scaricaCSV">scaricaCSV</a></li><li><a href="global.html#selezionaAvatar">selezionaAvatar</a></li><li><a href="global.html#togglePassword">togglePassword</a></li><li><a href="global.html#togglePasswordVisibility">togglePasswordVisibility</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Fri Aug 29 2025 12:30:24 GMT+0200 (Ora legale dell’Europa centrale)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
