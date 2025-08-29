@@ -88,7 +88,7 @@ window.filtraSpazi = () => {
   const tipo = document.getElementById('filtroTipo')?.value.toLowerCase() || '';
 
   const filtrati = spazi.filter(s =>
-    (!citta || citta.includes(s.Città.toLowerCase())) &&
+    (!citta || citta.includes(s.città.toLowerCase())) &&
     (!tipo || s.categoria?.toLowerCase() === tipo)
   );
 
