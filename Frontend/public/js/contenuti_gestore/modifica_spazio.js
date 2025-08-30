@@ -8,13 +8,33 @@ console.log(localStorage.getItem('user'));
 
 // Variabili per gestire le immagini lato client
 let selectedFiles = [];
-export let existingImageUrls = []; 
+export let existingImageUrls = [];
 
 const rimuoviBtn = document.getElementById('rimuovi-immagini-btn');
 const previewContainer = document.getElementById('image-preview-container');
+const immaginiInput = document.getElementById('immagini-input');
+
+// Aggiungi un listener per l'input dei file
+immaginiInput.addEventListener('change', (e) => {
+    // Aggiungi i nuovi file all'array selectedFiles
+    selectedFiles = Array.from(e.target.files);
+    updatePreviewCarousel();
+});
+
+// Aggiungi un listener per il bottone "Rimuovi"
+rimuoviBtn.addEventListener('click', () => {
+    // Svuota gli array e l'input file
+    existingImageUrls = [];
+    selectedFiles = [];
+    immaginiInput.value = '';
+    updatePreviewCarousel();
+});
 
 // Funzione per mostrare le immagini in un carosello
-function updatePreviewCarousel() {
+/**
+ * Funzione per mostrare le immagini in un carosello
+ */
+export function updatePreviewCarousel() {
     previewContainer.innerHTML = '';
     const allFiles = [...existingImageUrls, ...selectedFiles]; // Combina immagini esistenti e nuove
 
@@ -134,16 +154,15 @@ export async function modificaSpazio(formData, newFiles, id_spazio) {
         return;
     }
 
-    let immaginiUrls = existingImageUrls;
+    let immaginiUrls = [];
     if (newFiles && newFiles.length > 0) {
         immaginiUrls = await uploadSpazioImages(newFiles, id_spazio);
         if (immaginiUrls.length === 0 && newFiles.length > 0) {
             alert('Si è verificato un errore durante l\'upload delle nuove immagini.');
             return;
         }
-    } else if (existingImageUrls.length === 0) {
-        await uploadSpazioImages([], id_spazio);
-        immaginiUrls = [];
+    } else {
+        immaginiUrls = existingImageUrls;
     }
 
     const spazioData = {
@@ -165,7 +184,6 @@ export async function modificaSpazio(formData, newFiles, id_spazio) {
 
     alert('Spazio modificato con successo!');
     window.location.href = '../dashboard_gestore.html';
-
 }
 
 /**
