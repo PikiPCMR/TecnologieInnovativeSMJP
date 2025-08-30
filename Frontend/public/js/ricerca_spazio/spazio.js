@@ -106,9 +106,7 @@ async function loadSpazio() {
     renderGallery(spazio.immagini_spazio);
 
     // Mappa (fallback su latitudine/longitudine se i nomi campo sono quelli)
-    const lat = parseFloat(spazio.lat ?? spazio.latitudine ?? 45.07);
-    const lng = parseFloat(spazio.lng ?? spazio.longitudine ?? 7.69);
-    initMap({ lat, lng, title: titolo });
+    aggiungiMarker(`${indirizzo}, ${spazio.provincia || ""}, ${spazio.nazione || ""}`);
 
     // Dati gestore (in "registrazione" la chiave è "id")
     if (spazio.id_gestore) {
@@ -339,7 +337,7 @@ function bindCTA() {
  */
 async function loadRelated() {
     const { data: rows } = await supabase.from("spazi_lavoro")
-        .select("id_spazio, title, immagini_spazio, categoria, città")
+        .select("id_spazio, immagini_spazio, categoria, città")
         .neq("id_spazio", spazioId)
         .limit(4);
 
@@ -352,7 +350,7 @@ async function loadRelated() {
         card.innerHTML = `
             <img src="${(r.immagini_spazio || [])[0] || "https://picsum.photos/600/400"}" alt="">
             <div style="padding:10px">
-                <strong>${r.title || r.id_spazio}</strong><br>
+                <strong>${r.id_spazio}</strong><br>
                 <span class="muted">${r.categoria || ""} · ${r["Città"] || ""}</span>
             </div>`;
         card.addEventListener("click", () => location.href = `spazio.html?id=${encodeURIComponent(r.id_spazio)}`);
@@ -363,19 +361,27 @@ async function loadRelated() {
 // ====== MAPPA ======
 
 /**
- * Inizializza la mappa Leaflet centrata sulle coordinate dello spazio di lavoro.
- * @param {Object} coords - L'oggetto contenente latitudine, longitudine e titolo.
- * @param {number} coords.lat - La latitudine.
- * @param {number} coords.lng - La longitudine.
- * @param {string} coords.title - Il titolo dello spazio.
+ * Aggiunge un marker alla mappa utilizzando un indirizzo per ottenere le coordinate.
+ * @param {string} indirizzo - L'indirizzo da geocodificare.
  */
-function initMap({ lat, lng, title }) {
-    const map = L.map("map").setView([lat, lng], 14);
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        maxZoom: 19,
-        attribution: "&copy; OpenStreetMap"
-    }).addTo(map);
-    L.marker([lat, lng]).addTo(map).bindPopup(title);
+function aggiungiMarker(indirizzo) {
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(indirizzo)}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.length > 0) {
+                const lat = parseFloat(data[0].lat);
+                const lon = parseFloat(data[0].lon);
+                const map = L.map("map").setView([lat, lon], 14);
+                L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                    maxZoom: 19,
+                    attribution: "&copy; OpenStreetMap"
+                }).addTo(map);
+                L.marker([lat, lon])
+                    .addTo(map)
+                    .bindPopup(indirizzo);
+            }
+        })
+        .catch(err => console.error("Errore nel geocoding:", err));
 }
 
 // ====== OCCUPAZIONE ======
