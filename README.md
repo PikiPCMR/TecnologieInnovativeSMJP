@@ -1,5 +1,4 @@
 # TecnologieInnovativeSMJP
-# Spazi Coworking
 
 Un'applicazione web per la gestione e la prenotazione di spazi coworking.  
 Il progetto utilizza **Express.js** come backend, **Supabase** come database e autenticazione, **Leaflet** per la mappa interattiva degli spazi, **Chart.js** per le statistiche e **Stripe** per i pagamenti online.
