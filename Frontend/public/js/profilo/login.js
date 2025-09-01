@@ -65,7 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // ✅ Procedi con invio reset se esiste
             const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: 'https://tecnologieinnovativesmjp.onrender.com/html/profilo/reset_password'
+                redirectTo: 'https://tecnologieinnovativesmjp.onrender.com/html/profilo/reset_password.html'
             });
 
             if (resetError) {
