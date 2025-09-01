@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             localStorage.setItem("mostraPopupDecisione", "true");
 
             // ✅ Redirect automatico
-            window.location.href = "/profilo/profilo.html";
+            window.location.href = "/html/profilo/profilo.html";
         }
     }
 
@@ -176,7 +176,7 @@ async function saveUser(user) {
     // 👇 Salva flag per mostrare popup in profilo
     localStorage.setItem("mostraPopupDecisione", "true");
 
-    const redirectUrl = "/html/profilo.html"; // ✅ URL di destinazione
+    const redirectUrl = "https://tecnologieinnovativesmjp.onrender.com/html/profilo/profilo.html"; // ✅ URL di destinazione
 
     const { error: magicError } = await supabase.auth.signInWithOtp({
         email: user.email,
