@@ -244,7 +244,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
-                redirectTo: "/html/reset_password.html"
+                redirectTo: "/html/profilo/reset_password.html"
             });
             if (error) {
                 alert("Errore durante l'invio: " + error.message);
