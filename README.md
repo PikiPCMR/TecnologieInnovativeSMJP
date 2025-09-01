@@ -1,16 +1,30 @@
 # TecnologieInnovativeSMJP
-primo commit di prova
 
-<!DOCTYPE html>
-<html lang="it">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Artigianato Online</title>
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-  <h1>Benvenuto su Artigianato Online!</h1>
-  <script src="app.js"></script>
-</body>
-</html>
+Un'applicazione web per la gestione e la prenotazione di spazi coworking.  
+Il progetto utilizza **Express.js** come backend, **Supabase** come database e autenticazione, **Leaflet** per la mappa interattiva degli spazi, **Chart.js** per le statistiche e **Stripe** per i pagamenti online.
+
+---
+
+## Tecnologie utilizzate
+- **Express.js** – server backend e API REST  
+- **Supabase** – database PostgreSQL + autenticazione  
+- **Leaflet** – mappa interattiva per visualizzare gli spazi coworking  
+- **Chart.js** – grafici e statistiche sugli spazi/prenotazioni  
+- **Stripe** – gestione dei pagamenti sicuri online  
+
+---
+
+## Funzionalità principali
+- **Autenticazione utenti** (login/registrazione) tramite Supabase  
+- **Mappa Leaflet** con marker per ogni spazio coworking disponibile  
+- **Prenotazioni online** con gestione calendario  
+- **Pagamenti sicuri** con Stripe  
+- **Dashboard** con statistiche (Chart.js) su guadagni, prenotazioni e categorie più richieste  
+
+---
+
+## Miglioramenti futuri
+- Notifiche email di conferma prenotazione  
+- Gestione abbonamenti mensili  
+- Filtri avanzati nella mappa (prezzo, disponibilità, servizi)  
+
