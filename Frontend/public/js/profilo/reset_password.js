@@ -88,7 +88,7 @@ import { supabase } from '/js/collegamentoDb.js';
         }
 
         alert("Password aggiornata con successo!");
-        window.location.href = "html/profilo/login.html";
+        window.location.href = "/html/profilo/login.html";
     });
 
     /**
